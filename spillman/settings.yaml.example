@@ -1,0 +1,13 @@
+global:
+    loglevel: "DEBUG"
+    smtp:
+        host: ""
+        port: 587
+        user: ""
+        pass: ""
+        from: ""
+        to: ""
+spillman:
+    url: ""
+    user: ""
+    password: ""
