@@ -17,16 +17,16 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from .log import setup_logger
 from .settings import settings_data
 
-rlogerr = setup_logger("rlmain", "rlmain")
+rlogerr = setup_logger("rlavllog", "rlavllog")
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
-class rlmain(Resource):
+class rlavllog(Resource):
     def __init__(self):
         self.api_url = settings_data["spillman"]["url"]
         self.api_usr = settings_data["spillman"]["user"]
         self.api_pwd = settings_data["spillman"]["password"]
         
-    def radiolog(self, agency, unit, start, end):
+    def avllog(self, agency, unit, start, end):
         start_date = date(int(start[0:4]), int(start[5:7]), int(start[8:10])) - timedelta(days=1)
         start_date = str(start_date.strftime("%m/%d/%Y"))
         end_date = date(int(end[0:4]), int(end[5:7]), int(end[8:10])) + timedelta(days=1)
@@ -39,12 +39,12 @@ class rlmain(Resource):
         <PublicSafetyEnvelope version="1.0">
             <PublicSafety id="">
                 <Query>
-                    <rlmain>
+                    <rlavllog>
                         <agency search_type="equal_to">{agency}</agency>
-                        <unit search_type="equal_to">{unit}</unit>
+                        <assgnmt search_type="equal_to">{unit}</assgnmt>
                         <logdate search_type="greater_than">23:59:59 {start_date}</logdate>
                         <logdate search_type="less_than">00:00:00 {end_date}</logdate>
-                    </rlmain>
+                    </rlavllog>
                 </Query>
             </PublicSafety>
         </PublicSafetyEnvelope>
@@ -53,10 +53,10 @@ class rlmain(Resource):
         try:
             headers = {"Content-Type": "application/xml"}
             try:
-                rlog_xml = session.post(self.api_url, data=request, headers=headers, verify=False)
-                rlog_decoded = rlog_xml.content.decode('utf-8')
-                rlog = json.loads(json.dumps(xmltodict.parse(rlog_decoded)))
-                rlog = rlog['PublicSafetyEnvelope']['PublicSafety']['Response']['rlmain']
+                avllog_xml = session.post(self.api_url, data=request, headers=headers, verify=False)
+                avllog_decoded = avllog_xml.content.decode('utf-8')
+                avllog = json.loads(json.dumps(xmltodict.parse(avllog_decoded)))
+                avllog = avllog['PublicSafetyEnvelope']['PublicSafety']['Response']['rlavllog']
 
             except Exception as e:
                 error = format(str(e))
@@ -65,10 +65,9 @@ class rlmain(Resource):
                     return
 
                 else:
-                    frmain.error(traceback.format_exc())
+                    rlavllog.error(traceback.format_exc())
                     return
             
-
         except Exception as e:
             error = format(str(e))
             print(error)
@@ -80,25 +79,21 @@ class rlmain(Resource):
                 rlogerr.error(traceback.format_exc())
                 return
 
-        return rlog
+        return avllog
       
     def format(self, agency, unit, start, end):
-        rlog = self.radiolog(agency, unit, start, end)
+        avllog = self.avllog(agency, unit, start, end)
         data = []
-        if type(rlog) == dict:
+        if type(avllog) == dict:
             return 
 
         else:
-            for results in rlog:
+            for results in avllog:
                 date = results['logdate']
                 logdate = f"{date[15:19]}-{date[9:11]}-{date[12:14]} {date[0:8]}"
-                gps_x    = f"{results['xpos'][:4]}.{results['xpos'][4:]}"
-                gps_y    = f"{results['ypos'][:2]}.{results['ypos'][2:]}"
                 
-                try:
-                    callid = results['callid']
-                except KeyError:
-                    callid = ""  
+                gps_x    = results['xlng']
+                gps_y    = results['ylat']
                 
                 try:
                     agency = results['agency']
@@ -106,41 +101,33 @@ class rlmain(Resource):
                     agency = ""  
                 
                 try:
-                    zone = results['zone']
+                    status = results['stcode']
                 except KeyError:
-                    zone = ""  
+                    status = ""  
                 
                 try:
-                    tencode = results['tencode']
-                except KeyError:
-                    tencode = ""  
-                
-                try:
-                    unit = results['unit']
+                    unit = results['assgnmt']
                 except KeyError:
                     unit = ""      
-                
-                try:
-                    description = results['desc']
-                    description = description.replace('"', '')
-                    description = description.replace("'", "")
-                except KeyError:
-                    description = ""
                     
                 try:
-                    calltype = results['calltyp']
+                    heading = results['heading']
                 except KeyError:
-                    calltype = ""
+                    heading = ""
+                    
+                try:
+                    speed = results['speed']
+                except KeyError:
+                    speed = ""
                   
                 data.append({
-                    "call_id": callid,
                     "agency": agency,
                     "unit": unit,
-                    "status": tencode,
-                    "zone": zone,
+                    "status": status,
                     "latitude": gps_y,
                     "longitude": gps_x,
-                    "description": description,
+                    "heading": heading,
+                    "speed": speed,
                     "date": logdate
                 })
                 

@@ -219,7 +219,7 @@ class frmain(Resource):
                   
     def get(self):
         args = request.args
-        agency = args.get("agency", default="", type=str)
+        agency = args.get("agency", default="*", type=str)
         start = args.get("start", default="", type=str)
         end = args.get("end", default="", type=str)
         
