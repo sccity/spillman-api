@@ -22,15 +22,10 @@ def http_root():
                <title>Spillman API</title>
                </head>
                <body>
-               <p>Spillman API</p><br>
-               <p>Copyright Santa Clara City, UT</p><br>
-               <p>Developed for Santa Clara - Ivins Fire & Rescue</p>
+               <h1>Spillman API</h1>
+               <p>Copyright Santa Clara City, UT<br>Developed for Santa Clara - Ivins Fire & Rescue</p>
                </body>
                </html>"""
-               
-@app.route("/v1")
-def v1_root():
-    return ""
   
 api.add_resource(s.sycad, '/v1/active')
 api.add_resource(s.frmain, '/v1/incidents/fire')
@@ -41,4 +36,5 @@ api.add_resource(s.rlavllog, '/v1/avl')
 
 if __name__ == '__main__':
     serve(app, host="0.0.0.0", port=5000)
+    app.debug = True
     app.run()
