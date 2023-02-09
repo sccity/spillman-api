@@ -28,6 +28,7 @@ def http_root():
                </html>"""
   
 api.add_resource(s.sycad, '/active')
+api.add_resource(s.cadmastercalltable, '/incidents/cad')
 api.add_resource(s.frmain, '/incidents/fire')
 api.add_resource(s.emmain, '/incidents/ems')
 api.add_resource(s.lwmain, '/incidents/law')
