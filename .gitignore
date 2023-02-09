@@ -1,6 +1,7 @@
 *.log
 nohup.out
 settings.yaml
+virt/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
