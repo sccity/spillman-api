@@ -26,7 +26,7 @@ class rlmain(Resource):
         self.api_usr = settings_data["spillman"]["user"]
         self.api_pwd = settings_data["spillman"]["password"]
         
-    def radiolog(self, agency, unit, start, end):
+    def dataexchange(self, agency, unit, start, end):
         start_date = date(int(start[0:4]), int(start[5:7]), int(start[8:10])) - timedelta(days=1)
         start_date = str(start_date.strftime("%m/%d/%Y"))
         end_date = date(int(end[0:4]), int(end[5:7]), int(end[8:10])) + timedelta(days=1)
@@ -53,10 +53,10 @@ class rlmain(Resource):
         try:
             headers = {"Content-Type": "application/xml"}
             try:
-                rlog_xml = session.post(self.api_url, data=request, headers=headers, verify=False)
-                rlog_decoded = rlog_xml.content.decode('utf-8')
-                rlog = json.loads(json.dumps(xmltodict.parse(rlog_decoded)))
-                rlog = rlog['PublicSafetyEnvelope']['PublicSafety']['Response']['rlmain']
+                xml = session.post(self.api_url, data=request, headers=headers, verify=False)
+                decoded = xml.content.decode('utf-8')
+                data = json.loads(json.dumps(xmltodict.parse(decoded)))
+                data = data['PublicSafetyEnvelope']['PublicSafety']['Response']['rlmain']
 
             except Exception as e:
                 error = format(str(e))
@@ -80,55 +80,56 @@ class rlmain(Resource):
                 rlogerr.error(traceback.format_exc())
                 return
 
-        return rlog
+        return data
       
-    def format(self, agency, unit, start, end):
-        rlog = self.radiolog(agency, unit, start, end)
+    def process(self, agency, unit, start, end):
+        spillman = self.dataexchange(agency, unit, start, end)
         data = []
-        if type(rlog) == dict:
+        
+        if type(spillman) == dict:
             return 
 
         else:
-            for results in rlog:
-                date = results['logdate']
+            for row in spillman:
+                date = row['logdate']
                 logdate = f"{date[15:19]}-{date[9:11]}-{date[12:14]} {date[0:8]}"
-                gps_x    = f"{results['xpos'][:4]}.{results['xpos'][4:]}"
-                gps_y    = f"{results['ypos'][:2]}.{results['ypos'][2:]}"
+                gps_x    = f"{row['xpos'][:4]}.{row['xpos'][4:]}"
+                gps_y    = f"{row['ypos'][:2]}.{row['ypos'][2:]}"
                 
                 try:
-                    callid = results['callid']
+                    callid = row['callid']
                 except KeyError:
                     callid = ""  
                 
                 try:
-                    agency = results['agency']
+                    agency = row['agency']
                 except KeyError:
                     agency = ""  
                 
                 try:
-                    zone = results['zone']
+                    zone = row['zone']
                 except KeyError:
                     zone = ""  
                 
                 try:
-                    tencode = results['tencode']
+                    tencode = row['tencode']
                 except KeyError:
                     tencode = ""  
                 
                 try:
-                    unit = results['unit']
+                    unit = row['unit']
                 except KeyError:
                     unit = ""      
                 
                 try:
-                    description = results['desc']
+                    description = row['desc']
                     description = description.replace('"', '')
                     description = description.replace("'", "")
                 except KeyError:
                     description = ""
                     
                 try:
-                    calltype = results['calltyp']
+                    calltype = row['calltyp']
                 except KeyError:
                     calltype = ""
                   
@@ -153,4 +154,10 @@ class rlmain(Resource):
         start = args.get("start", default="", type=str)
         end = args.get("end", default="", type=str)
         
-        return self.format(agency, unit, start, end)
+        if start == "":
+            return "<p>Error: missing start date argument.</p>"
+          
+        if end == "":
+            return "<p>Error: missing end date argument.</p>"
+        
+        return self.process(agency, unit, start, end)

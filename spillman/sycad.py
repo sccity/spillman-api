@@ -6,7 +6,7 @@
 # Spillman API
 # Copyright Santa Clara City
 # Developed for Santa Clara - Ivins Fire & Rescue
-from flask_restful import Resource, Api, reqparse
+from flask_restful import Resource, Api, request
 import sys, json, logging, xmltodict, traceback, collections
 import requests, uuid
 import spillman as s
@@ -25,7 +25,7 @@ class sycad(Resource):
         self.api_usr = settings_data["spillman"]["user"]
         self.api_pwd = settings_data["spillman"]["password"]
         
-    def active(self):
+    def dataexchange(self, agency, status, ctype, city):
         session = requests.Session()
         session.auth = (self.api_usr, self.api_pwd)
         request = f"""
@@ -33,6 +33,10 @@ class sycad(Resource):
             <PublicSafety id="">
                 <Query>
                     <sycad>
+                        <agency search_type="equal_to">{agency}</agency>
+                        <stat search_type="equal_to">{status}</stat>
+                        <type search_type="equal_to">{ctype}</type>
+                        <rtcity search_type="equal_to">{city}</rtcity>
                     </sycad>
                 </Query>
             </PublicSafety>
@@ -42,12 +46,10 @@ class sycad(Resource):
         try:
             headers = {"Content-Type": "application/xml"}
             try:
-                calls_xml = session.post(
-                    self.api_url, data=request, headers=headers, verify=False
-                )
-                calls_decoded = calls_xml.content.decode("utf-8")
-                calls = json.loads(json.dumps(xmltodict.parse(calls_decoded)))
-                calls = calls["PublicSafetyEnvelope"]["PublicSafety"]["Response"]["sycad"]
+                xml = session.post(self.api_url, data=request, headers=headers, verify=False)
+                decoded = xml.content.decode("utf-8")
+                data = json.loads(json.dumps(xmltodict.parse(decoded)))
+                data = data["PublicSafetyEnvelope"]["PublicSafety"]["Response"]["sycad"]
 
             except Exception as e:
                 error = format(str(e))
@@ -63,61 +65,62 @@ class sycad(Resource):
             sycad.error(traceback.format_exc())
             return
 
-        return calls
+        return data
       
-    def format(self):
-        calls = self.active()
+    def process(self, agency, status, ctype, city):
+        spillman = self.dataexchange(agency, status, ctype, city)
         data = []
-        if type(calls) == dict:
+        
+        if type(spillman) == dict:
             try:
-                callid = calls.get("callid")
+                callid = spillman.get("callid")
                     
                 try:
-                    recid = calls.get("recid")
+                    recid = spillman.get("recid")
                 except:
                     recid = "" 
                   
-                agency_id = calls.get("agency")
+                agency_id = spillman.get("agency")
                 
                 try:
-                    zone = calls.get("zone")
+                    zone = spillman.get("zone")
                 except:
                     zone = ""
                     
                 try:
-                    unit = calls.get("unit")
+                    unit = spillman.get("unit")
                 except:
                     unit = ""
                     
-                address = calls.get("rtaddr")
+                address = spillman.get("rtaddr")
                 address = address.split(";", 1)[0]
                 gps_x = f"{xpos[:4]}.{xpos[4:]}"
                 gps_y = f"{ypos[:2]}.{ypos[2:]}"
-                reported = calls.get("reprtd")
+                reported = spillman.get("reprtd")
                 sql_date = f"{reported[15:19]}-{reported[9:11]}-{reported[12:14]} {reported[0:8]}"
                 
-                if calls.get("type") == "l":
+                if spillman.get("type") == "l":
                     call_type = "Law"
-                elif calls.get("type") == "f":
+                elif spillman.get("type") == "f":
                     call_type = "Fire"
-                elif calls.get("type") == "e":
+                elif spillman.get("type") == "e":
                     call_type = "EMS"
                 else:
                     call_type = "Other"
                     
                   
                 try:
-                    status = calls.get("stat")
+                    status = spillman.get("stat")
                 except:
                     status = ""
     
                 try:
-                    nature = calls.get("nature")
+                    nature = spillman.get("nature")
                 except:
                     nature = ""
                     
                 try:
-                    city = calls.get("rtcity")
+                    city = spillman.get("rtcity")
                 except:
                     city = ""
                         
@@ -143,56 +146,56 @@ class sycad(Resource):
             return data
 
         else:
-            for active_calls in calls:
+            for row in spillman:
                 try:
-                    callid = active_calls["callid"]
+                    callid = row["callid"]
                     
                     try:
-                        recid = active_calls["recid"]
+                        recid = row["recid"]
                     except:
                         recid = "" 
                       
-                    agency_id = active_calls["agency"]
+                    agency_id = row["agency"]
                     
                     try:
-                        zone = active_calls["zone"]
+                        zone = row["zone"]
                     except:
                         zone = ""
                         
                     try:
-                        unit = active_calls["unit"]
+                        unit = row["unit"]
                     except:
                         unit = ""
                         
-                    address = active_calls["rtaddr"]
+                    address = row["rtaddr"]
                     address = address.split(";", 1)[0]
-                    gps_x = f"{active_calls['xpos'][:4]}.{active_calls['xpos'][4:]}"
-                    gps_y = f"{active_calls['ypos'][:2]}.{active_calls['ypos'][2:]}"
-                    reported = active_calls["reprtd"]
+                    gps_x = f"{row['xpos'][:4]}.{row['xpos'][4:]}"
+                    gps_y = f"{row['ypos'][:2]}.{row['ypos'][2:]}"
+                    reported = row["reprtd"]
                     sql_date = f"{reported[15:19]}-{reported[9:11]}-{reported[12:14]} {reported[0:8]}"
                     
-                    if active_calls["type"] == "l":
+                    if row["type"] == "l":
                         call_type = "Law"
-                    elif active_calls["type"] == "f":
+                    elif row["type"] == "f":
                         call_type = "Fire"
-                    elif active_calls["type"] == "e":
+                    elif row["type"] == "e":
                         call_type = "EMS"
                     else:
                         call_type = "Other"
                         
                       
                     try:
-                        status = active_calls["stat"]
+                        status = row["stat"]
                     except:
                         status = ""
      
                     try:
-                        nature = active_calls["nature"]
+                        nature = row["nature"]
                     except:
                         nature = ""
                         
                     try:
-                        city = active_calls["rtcity"]
+                        city = row["rtcity"]
                     except:
                         city = ""
 
@@ -219,4 +222,10 @@ class sycad(Resource):
         return data
                   
     def get(self):
-        return self.format()
+        args = request.args
+        agency = args.get("agency", default="*", type=str)
+        status = args.get("status", default="*", type=str)
+        ctype = args.get("type", default="*", type=str)
+        city = args.get("city", default="*", type=str)
+        
+        return self.process(agency, status, ctype, city)

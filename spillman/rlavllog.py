@@ -26,7 +26,7 @@ class rlavllog(Resource):
         self.api_usr = settings_data["spillman"]["user"]
         self.api_pwd = settings_data["spillman"]["password"]
         
-    def avllog(self, agency, unit, start, end):
+    def dataexchange(self, agency, unit, start, end):
         start_date = date(int(start[0:4]), int(start[5:7]), int(start[8:10])) - timedelta(days=1)
         start_date = str(start_date.strftime("%m/%d/%Y"))
         end_date = date(int(end[0:4]), int(end[5:7]), int(end[8:10])) + timedelta(days=1)
@@ -53,10 +53,10 @@ class rlavllog(Resource):
         try:
             headers = {"Content-Type": "application/xml"}
             try:
-                avllog_xml = session.post(self.api_url, data=request, headers=headers, verify=False)
-                avllog_decoded = avllog_xml.content.decode('utf-8')
-                avllog = json.loads(json.dumps(xmltodict.parse(avllog_decoded)))
-                avllog = avllog['PublicSafetyEnvelope']['PublicSafety']['Response']['rlavllog']
+                xml = session.post(self.api_url, data=request, headers=headers, verify=False)
+                decoded = xml.content.decode('utf-8')
+                data = json.loads(json.dumps(xmltodict.parse(decoded)))
+                data = data['PublicSafetyEnvelope']['PublicSafety']['Response']['rlavllog']
 
             except Exception as e:
                 error = format(str(e))
@@ -79,44 +79,45 @@ class rlavllog(Resource):
                 rlogerr.error(traceback.format_exc())
                 return
 
-        return avllog
+        return data
       
-    def format(self, agency, unit, start, end):
-        avllog = self.avllog(agency, unit, start, end)
+    def process(self, agency, unit, start, end):
+        spillman = self.dataexchange(agency, unit, start, end)
         data = []
-        if type(avllog) == dict:
+        
+        if type(spillman) == dict:
             return 
 
         else:
-            for results in avllog:
-                date = results['logdate']
+            for row in spillman:
+                date = row['logdate']
                 logdate = f"{date[15:19]}-{date[9:11]}-{date[12:14]} {date[0:8]}"
                 
-                gps_x    = results['xlng']
-                gps_y    = results['ylat']
+                gps_x    = row['xlng']
+                gps_y    = row['ylat']
                 
                 try:
-                    agency = results['agency']
+                    agency = row['agency']
                 except KeyError:
                     agency = ""  
                 
                 try:
-                    status = results['stcode']
+                    status = row['stcode']
                 except KeyError:
                     status = ""  
                 
                 try:
-                    unit = results['assgnmt']
+                    unit = row['assgnmt']
                 except KeyError:
                     unit = ""      
                     
                 try:
-                    heading = results['heading']
+                    heading = row['heading']
                 except KeyError:
                     heading = ""
                     
                 try:
-                    speed = results['speed']
+                    speed = row['speed']
                 except KeyError:
                     speed = ""
                   
@@ -140,4 +141,10 @@ class rlavllog(Resource):
         start = args.get("start", default="", type=str)
         end = args.get("end", default="", type=str)
         
-        return self.format(agency, unit, start, end)
+        if start == "":
+            return "<p>Error: missing start date argument.</p>"
+          
+        if end == "":
+            return "<p>Error: missing end date argument.</p>"
+        
+        return self.process(agency, unit, start, end)

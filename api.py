@@ -27,12 +27,13 @@ def http_root():
                </body>
                </html>"""
   
-api.add_resource(s.sycad, '/v1/active')
-api.add_resource(s.frmain, '/v1/incidents/fire')
-api.add_resource(s.emmain, '/v1/incidents/ems')
-api.add_resource(s.lwmain, '/v1/incidents/law')
-api.add_resource(s.rlmain, '/v1/radiolog')
-api.add_resource(s.rlavllog, '/v1/avl')
+api.add_resource(s.sycad, '/active')
+api.add_resource(s.frmain, '/incidents/fire')
+api.add_resource(s.emmain, '/incidents/ems')
+api.add_resource(s.lwmain, '/incidents/law')
+api.add_resource(s.rlmain, '/radiolog')
+api.add_resource(s.rlavllog, '/avl')
+api.add_resource(s.cdunit, '/unit')
 
 if __name__ == '__main__':
     serve(app, host="0.0.0.0", port=5000)
