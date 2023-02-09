@@ -8,7 +8,6 @@
 # Developed for Santa Clara - Ivins Fire & Rescue
 from flask import Flask, jsonify
 from flask_restful import Resource, Api, reqparse
-from waitress import serve
 import spillman as s
 from spillman.settings import settings_data, version_data
 
@@ -37,6 +36,5 @@ api.add_resource(s.rlavllog, '/avl')
 api.add_resource(s.cdunit, '/unit')
 
 if __name__ == '__main__':
-    serve(app, host="0.0.0.0", port=settings_data["global"]["port"])
     app.debug = True
-    app.run()
+    app.run(host='0.0.0.0', port=5000)
