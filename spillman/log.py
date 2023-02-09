@@ -35,7 +35,7 @@ def setup_logger(name, log_file, level=settings_data["global"]["loglevel"]):
         ),
         fromaddr=settings_data["global"]["smtp"]["from"],
         toaddrs=settings_data["global"]["smtp"]["to"],
-        subject="Spillman Automation - Application Error",
+        subject="Spillman API - Application Error",
         credentials=credentials,
         secure=(),
     )

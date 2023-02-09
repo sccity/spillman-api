@@ -7,6 +7,7 @@
 # Copyright Santa Clara City
 # Developed for Santa Clara - Ivins Fire & Rescue
 from flask_restful import Resource, Api, request
+from flask import jsonify, abort
 import sys, json, logging, xmltodict, traceback, collections
 import requests, uuid
 import spillman as s
@@ -218,9 +219,16 @@ class frmain(Resource):
                   
     def get(self):
         args = request.args
+        token = args.get("token", default="", type=str)
         agency = args.get("agency", default="*", type=str)
         start = args.get("start", default="", type=str)
         end = args.get("end", default="", type=str)
+        
+        auth = s.auth.check(token)
+        if auth is True:
+            pass
+        else:
+            return abort(403)
         
         if start == "":
             return "<p>Error: missing start date argument.</p>"

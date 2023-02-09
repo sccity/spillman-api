@@ -7,6 +7,7 @@
 # Copyright Santa Clara City
 # Developed for Santa Clara - Ivins Fire & Rescue
 from flask_restful import Resource, Api, request
+from flask import jsonify, abort
 import sys, json, logging, xmltodict, traceback, collections
 import requests, uuid
 import spillman as s
@@ -220,12 +221,19 @@ class sycad(Resource):
                 })
                 
         return data
-                  
+
     def get(self):
         args = request.args
+        token = args.get("token", default="", type=str)
         agency = args.get("agency", default="*", type=str)
         status = args.get("status", default="*", type=str)
         ctype = args.get("type", default="*", type=str)
         city = args.get("city", default="*", type=str)
+        
+        auth = s.auth.check(token)
+        if auth is True:
+            pass
+        else:
+            return abort(403)
         
         return self.process(agency, status, ctype, city)

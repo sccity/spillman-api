@@ -7,6 +7,7 @@
 # Spillman API
 # Copyright Santa Clara City
 # Developed for Santa Clara - Ivins Fire & Rescue
+from .auth import *
 from .log import *
 from .sycad import *
 from .frmain import *
