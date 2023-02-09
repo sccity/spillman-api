@@ -37,6 +37,6 @@ api.add_resource(s.rlavllog, '/avl')
 api.add_resource(s.cdunit, '/unit')
 
 if __name__ == '__main__':
-    serve(app, host="0.0.0.0", port=5000)
+    serve(app, host="0.0.0.0", port=settings_data["global"]["port"])
     app.debug = True
     app.run()
