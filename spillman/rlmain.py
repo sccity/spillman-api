@@ -17,6 +17,7 @@ from datetime import datetime
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from .log import setup_logger
 from .settings import settings_data
+from .database import db
 
 rlogerr = setup_logger("rlmain", "rlmain")
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
@@ -87,7 +88,10 @@ class rlmain(Resource):
         spillman = self.dataexchange(agency, unit, start, end)
         data = []
         
-        if type(spillman) == dict:
+        if spillman is None:
+            return
+        
+        elif type(spillman) == dict:
             try:
                 date = spillman.get("logdate")
                 logdate = f"{date[15:19]}-{date[9:11]}-{date[12:14]} {date[0:8]}"
@@ -230,7 +234,7 @@ class rlmain(Resource):
         start = args.get("start", default="", type=str)
         end = args.get("end", default="", type=str)
         
-        auth = s.auth.check(token)
+        auth = s.auth.check(token, request.access_route[0])
         if auth is True:
             pass
         else:
@@ -241,5 +245,7 @@ class rlmain(Resource):
           
         if end == "":
             return jsonify(error="Missing end date argument.")
+          
+        s.auth.audit(token, request.access_route[0], "RLMAIN", f"UNIT: {unit} AGENCY: {agency} START DATE: {start} END DATE: {end}")
         
         return self.process(agency, unit, start, end)

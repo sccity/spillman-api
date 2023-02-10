@@ -17,6 +17,7 @@ from datetime import datetime
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from .log import setup_logger
 from .settings import settings_data
+from .database import db
 
 rlogerr = setup_logger("rlavllog", "rlavllog")
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
@@ -86,7 +87,10 @@ class rlavllog(Resource):
         spillman = self.dataexchange(agency, unit, start, end)
         data = []
         
-        if type(spillman) == dict:
+        if spillman is None:
+            return
+        
+        elif type(spillman) == dict:
             try:
                 date = spillman.get("logdate")
                 logdate = f"{date[15:19]}-{date[9:11]}-{date[12:14]} {date[0:8]}"
@@ -142,45 +146,49 @@ class rlavllog(Resource):
         else:
             for row in spillman:
                 try:
-                    date = row["logdate"]
-                    logdate = f"{date[15:19]}-{date[9:11]}-{date[12:14]} {date[0:8]}"
-                except:
-                    logdate = "1900-01-01 00:00:00"
-                
-                try:
-                    gps_x = row["xlng"]
-                except:
-                    gps_x = 0
-                
-                try:
-                    gps_y = row["ylat"]
-                except:
-                    gps_y = 0
-                
-                try:
-                    agency = row["agency"]
-                except:
-                    agency = ""  
-                
-                try:
-                    status = row["stcode"]
-                except :
-                    status = ""  
-                
-                try:
-                    unit = row["assgnmt"]
-                except:
-                    unit = ""      
+                    try:
+                        date = row["logdate"]
+                        logdate = f"{date[15:19]}-{date[9:11]}-{date[12:14]} {date[0:8]}"
+                    except:
+                        logdate = "1900-01-01 00:00:00"
                     
-                try:
-                    heading = row["heading"]
-                except:
-                    heading = ""
+                    try:
+                        gps_x = row["xlng"]
+                    except:
+                        gps_x = 0
                     
-                try:
-                    speed = row["speed"]
+                    try:
+                        gps_y = row["ylat"]
+                    except:
+                        gps_y = 0
+                    
+                    try:
+                        agency = row["agency"]
+                    except:
+                        agency = ""  
+                    
+                    try:
+                        status = row["stcode"]
+                    except :
+                        status = ""  
+                    
+                    try:
+                        unit = row["assgnmt"]
+                    except:
+                        unit = ""      
+                        
+                    try:
+                        heading = row["heading"]
+                    except:
+                        heading = ""
+                        
+                    try:
+                        speed = row["speed"]
+                    except:
+                        speed = ""
+                        
                 except:
-                    speed = ""
+                    continue
                   
                 data.append({
                     "agency": agency,
@@ -203,7 +211,8 @@ class rlavllog(Resource):
         start = args.get("start", default="", type=str)
         end = args.get("end", default="", type=str)
         
-        auth = s.auth.check(token)
+        auth = s.auth.check(token, request.access_route[0])
+
         if auth is True:
             pass
         else:
@@ -214,5 +223,7 @@ class rlavllog(Resource):
           
         if end == "":
             return jsonify(error="Missing end date argument.")
+          
+        s.auth.audit(token, request.access_route[0], "RLAVLLOG", f"UNIT: {unit} AGENCY: {agency} START DATE: {start} END DATE: {end}")
         
         return self.process(agency, unit, start, end)

@@ -16,6 +16,7 @@ from datetime import datetime
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from .log import setup_logger
 from .settings import settings_data
+from .database import db
 
 cdunit = setup_logger("cdunit", "cdunit")
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
@@ -73,7 +74,10 @@ class cdunit(Resource):
         spillman = self.dataexchange(unit, agency, zone, utype, kind)
         data = []
         
-        if type(spillman) == dict:
+        if spillman is None:
+            return
+        
+        elif type(spillman) == dict:
             try:
                 unit = spillman.get("unitno")
             except:
@@ -183,10 +187,12 @@ class cdunit(Resource):
         utype = args.get("type", default="*", type=str)
         kind = args.get("kind", default="*", type=str)
         
-        auth = s.auth.check(token)
+        auth = s.auth.check(token, request.access_route[0])
         if auth is True:
             pass
         else:
             return abort(403)
+          
+        s.auth.audit(token, request.access_route[0], "CDUNIT", f"UNIT: {unit} AGENCY: {agency} ZONE: {zone} TYPE: {utype} KIND: {kind}")
           
         return self.process(unit, agency, zone, utype, kind)

@@ -16,6 +16,7 @@ from datetime import datetime
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from .log import setup_logger
 from .settings import settings_data
+from .database import db
 
 sycad = setup_logger("sycad", "sycad")
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
@@ -73,7 +74,10 @@ class sycad(Resource):
         spillman = self.dataexchange(agency, status, ctype, city, cadcallid)
         data = []
         
-        if type(spillman) == dict:
+        if spillman is None:
+            return
+        
+        elif type(spillman) == dict:
             try:
                 callid = spillman.get("callid")
             except:
@@ -226,10 +230,12 @@ class sycad(Resource):
         ctype = args.get("type", default="*", type=str)
         city = args.get("city", default="*", type=str)
         
-        auth = s.auth.check(token)
+        auth = s.auth.check(token, request.access_route[0])
         if auth is True:
             pass
         else:
             return abort(403)
-        
+          
+        s.auth.audit(token, request.access_route[0], "SYCAD", f"CALLID: {cadcallid} AGENCY: {agency} STATUS: {status} TYPE: {ctype} CITY: {city}")
+      
         return self.process(agency, status, ctype, city, cadcallid)

@@ -11,6 +11,7 @@ from flask import jsonify, abort
 import spillman as s
 from .log import setup_logger
 from .settings import settings_data
+from .database import db
 
 tablelist = setup_logger("tablelist", "tablelist")
 
@@ -25,11 +26,13 @@ class tablelist(Resource):
         token = args.get("token", default="", type=str)
         tablelist = args.get("tablelist", default="*", type=str)
         
-        auth = s.auth.check(token)
+        auth = s.auth.check(token, request.access_route[0])
         if auth is True:
             pass
         else:
             return abort(403)
+          
+        s.auth.audit(token, request.access_route[0], "TABLELIST", f"LIST ALL TABLES")
           
         data = []
         

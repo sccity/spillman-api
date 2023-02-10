@@ -16,6 +16,7 @@ from datetime import datetime
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from .log import setup_logger
 from .settings import settings_data
+from .database import db
 
 cadmastercallcommentstable = setup_logger("cadmastercallcommentstable", "cadmastercallcommentstable")
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
@@ -69,6 +70,9 @@ class cadmastercallcommentstable(Resource):
         spillman = self.dataexchange(cadcallid)
         data = []
         
+        if spillman is None:
+            return
+        
         try:
             callid = spillman.get("LongTermCallID")
         except:
@@ -91,7 +95,7 @@ class cadmastercallcommentstable(Resource):
         token = args.get("token", default="", type=str)
         cadcallid = args.get("callid", default="", type=str)
 
-        auth = s.auth.check(token)
+        auth = s.auth.check(token, request.access_route[0])
         if auth is True:
             pass
         else:
@@ -99,5 +103,7 @@ class cadmastercallcommentstable(Resource):
           
         if cadcallid == "":
             return jsonify(error="Missing callid argument.")
+          
+        s.auth.audit(token, request.access_route[0], "CADMASTERCALLCOMMENTSTABLE", f"CALLID: {cadcallid}")
           
         return self.process(cadcallid)

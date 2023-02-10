@@ -17,6 +17,7 @@ from datetime import datetime
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from .log import setup_logger
 from .settings import settings_data
+from .database import db
 
 cadmastercalltable = setup_logger("cadmastercalltable", "cadmastercalltable")
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
@@ -76,7 +77,10 @@ class cadmastercalltable(Resource):
         spillman = self.dataexchange(start, end)
         data = []
         
-        if type(spillman) == dict:
+        if spillman is None:
+            return
+        
+        elif type(spillman) == dict:
             try:
                 callid = spillman.get("RecordNumber")
             except:
@@ -231,7 +235,7 @@ class cadmastercalltable(Resource):
         start = args.get("start", default="", type=str)
         end = args.get("end", default="", type=str)
         
-        auth = s.auth.check(token)
+        auth = s.auth.check(token, request.access_route[0])
         if auth is True:
             pass
         else:
@@ -242,5 +246,7 @@ class cadmastercalltable(Resource):
           
         if end == "":
             return jsonify(error="Missing end date argument.")
+          
+        s.auth.audit(token, request.access_route[0], "CADMASTERCALLTABLE", f"START DATE: {start} END DATE: {end}")
         
         return self.process(start, end)

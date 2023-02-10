@@ -16,6 +16,7 @@ from datetime import datetime
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from .log import setup_logger
 from .settings import settings_data
+from .database import db
 
 table = setup_logger("table", "table")
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
@@ -69,10 +70,12 @@ class table(Resource):
         token = args.get("token", default="", type=str)
         table = args.get("table", default="*", type=str)
         
-        auth = s.auth.check(token)
+        auth = s.auth.check(token, request.access_route[0])
         if auth is True:
             pass
         else:
             return abort(403)
+          
+        s.auth.audit(token, request.access_route[0], "TABLE", f"TABLE: {table}")
           
         return self.dataexchange(table)
