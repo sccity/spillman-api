@@ -18,7 +18,7 @@ from .log import setup_logger
 from .settings import settings_data
 from .database import db
 
-table = setup_logger("table", "table")
+err = setup_logger("table", "table")
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 class table(Resource):
@@ -47,7 +47,7 @@ class table(Resource):
                 xml = session.post(self.api_url, data=request, headers=headers, verify=False)
                 decoded = xml.content.decode("utf-8")
                 data = json.loads(json.dumps(xmltodict.parse(decoded)))
-                data = data["PublicSafetyEnvelope"]["PublicSafety"]["Response"][f"{table}"]
+                data = data["PublicSafetyEnvelope"]["PublicSafety"]["Response"]
 
             except Exception as e:
                 error = format(str(e))
@@ -56,11 +56,11 @@ class table(Resource):
                     return
 
                 else:
-                    table.error(traceback.format_exc())
+                    err.error(traceback.format_exc())
                     return
 
         except Exception as e:
-            table.error(traceback.format_exc())
+            err.error(traceback.format_exc())
             return
 
         return data
@@ -68,7 +68,14 @@ class table(Resource):
     def get(self):
         args = request.args
         token = args.get("token", default="", type=str)
-        table = args.get("table", default="*", type=str)
+        table = args.get("table", default="", type=str)
+        
+        if token == "":
+            s.auth.audit("Missing", request.access_route[0], "AUTH", f"ACCESS DENIED")
+            return jsonify(error="No security token provided.")
+          
+        if table == "":
+            table = "sycad"
         
         auth = s.auth.check(token, request.access_route[0])
         if auth is True:

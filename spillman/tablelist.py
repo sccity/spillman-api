@@ -13,7 +13,7 @@ from .log import setup_logger
 from .settings import settings_data
 from .database import db
 
-tablelist = setup_logger("tablelist", "tablelist")
+err = setup_logger("tablelist", "tablelist")
 
 class tablelist(Resource):
     def __init__(self):
@@ -25,6 +25,10 @@ class tablelist(Resource):
         args = request.args
         token = args.get("token", default="", type=str)
         tablelist = args.get("tablelist", default="*", type=str)
+        
+        if token == "":
+            s.auth.audit("Missing", request.access_route[0], "AUTH", f"ACCESS DENIED")
+            return jsonify(error="No security token provided.")
         
         auth = s.auth.check(token, request.access_route[0])
         if auth is True:

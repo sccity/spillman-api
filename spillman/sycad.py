@@ -18,7 +18,7 @@ from .log import setup_logger
 from .settings import settings_data
 from .database import db
 
-sycad = setup_logger("sycad", "sycad")
+err = setup_logger("sycad", "sycad")
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 class sycad(Resource):
@@ -61,11 +61,11 @@ class sycad(Resource):
                     return
 
                 else:
-                    sycad.error(traceback.format_exc())
+                    err.error(traceback.format_exc())
                     return
 
         except Exception as e:
-            sycad.error(traceback.format_exc())
+            err.error(traceback.format_exc())
             return
 
         return data
@@ -229,6 +229,10 @@ class sycad(Resource):
         status = args.get("status", default="*", type=str)
         ctype = args.get("type", default="*", type=str)
         city = args.get("city", default="*", type=str)
+        
+        if token == "":
+            s.auth.audit("Missing", request.access_route[0], "AUTH", f"ACCESS DENIED")
+            return jsonify(error="No security token provided.")
         
         auth = s.auth.check(token, request.access_route[0])
         if auth is True:

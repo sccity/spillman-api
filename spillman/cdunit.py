@@ -18,7 +18,7 @@ from .log import setup_logger
 from .settings import settings_data
 from .database import db
 
-cdunit = setup_logger("cdunit", "cdunit")
+err = setup_logger("cdunit", "cdunit")
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 class cdunit(Resource):
@@ -61,11 +61,11 @@ class cdunit(Resource):
                     return
 
                 else:
-                    cdunit.error(traceback.format_exc())
+                    err.error(traceback.format_exc())
                     return
 
         except Exception as e:
-            cdunit.error(traceback.format_exc())
+            err.error(traceback.format_exc())
             return
 
         return data
@@ -186,6 +186,10 @@ class cdunit(Resource):
         zone = args.get("zone", default="*", type=str)
         utype = args.get("type", default="*", type=str)
         kind = args.get("kind", default="*", type=str)
+        
+        if token == "":
+            s.auth.audit("Missing", request.access_route[0], "AUTH", f"ACCESS DENIED")
+            return jsonify(error="No security token provided.")
         
         auth = s.auth.check(token, request.access_route[0])
         if auth is True:

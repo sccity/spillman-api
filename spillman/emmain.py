@@ -19,7 +19,7 @@ from .log import setup_logger
 from .settings import settings_data
 from .database import db
 
-emmain = setup_logger("emmain", "emmain")
+err = setup_logger("emmain", "emmain")
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 class emmain(Resource):
@@ -65,11 +65,11 @@ class emmain(Resource):
                     return
 
                 else:
-                    emmain.error(traceback.format_exc())
+                    err.error(traceback.format_exc())
                     return
 
         except Exception as e:
-            emmain.error(traceback.format_exc())
+            err.error(traceback.format_exc())
             return
 
         return data
@@ -335,6 +335,10 @@ class emmain(Resource):
         start = args.get("start", default="", type=str)
         end = args.get("end", default="", type=str)
         
+        if token == "":
+            s.auth.audit("Missing", request.access_route[0], "AUTH", f"ACCESS DENIED")
+            return jsonify(error="No security token provided.")
+        
         auth = s.auth.check(token, request.access_route[0])
         if auth is True:
             pass
@@ -342,10 +346,10 @@ class emmain(Resource):
             return abort(403)
         
         if start == "":
-            return jsonify(error="Missing start date argument.")
+            start = datetime.today().strftime('%Y-%m-%d')
           
         if end == "":
-            return jsonify(error="Missing end date argument.")
+            end = datetime.today().strftime('%Y-%m-%d')
           
         s.auth.audit(token, request.access_route[0], "EMMAIN", f"AGENCY: {agency} START DATE: {start} END DATE: {end}")
         
