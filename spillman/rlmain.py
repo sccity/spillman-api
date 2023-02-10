@@ -163,9 +163,9 @@ class rlmain(Resource):
             return abort(403)
         
         if start == "":
-            return "<p>Error: missing start date argument.</p>"
+            return jsonify(error="Missing start date argument.")
           
         if end == "":
-            return "<p>Error: missing end date argument.</p>"
+            return jsonify(error="Missing end date argument.")
         
         return self.process(agency, unit, start, end)

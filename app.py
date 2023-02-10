@@ -7,9 +7,9 @@
 # Copyright Santa Clara City
 # Developed for Santa Clara - Ivins Fire & Rescue
 from flask import Flask, jsonify
-from flask_restful import Resource, Api, reqparse
+from flask_restful import Resource, Api
 import spillman as s
-from spillman.settings import settings_data, version_data
+from spillman.settings import version_data
 
 app = Flask(__name__)
 api = Api(app)
@@ -26,6 +26,7 @@ def http_root():
 def page_not_found(e):
     return jsonify(error=str(e)), 404
   
+api.add_resource(s.table, '/table')
 api.add_resource(s.sycad, '/active')
 api.add_resource(s.cadmastercalltable, '/incidents/cad')
 api.add_resource(s.frmain, '/incidents/fire')

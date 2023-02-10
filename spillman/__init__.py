@@ -17,3 +17,4 @@ from .rlmain import *
 from .rlavllog import *
 from .cdunit import *
 from .cadmastercalltable import *
+from .table import *

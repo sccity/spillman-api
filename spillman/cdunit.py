@@ -6,7 +6,7 @@
 # Spillman API
 # Copyright Santa Clara City
 # Developed for Santa Clara - Ivins Fire & Rescue
-from flask_restful import Resource, Api, reqparse
+from flask_restful import Resource, Api, request
 from flask import jsonify, abort
 import sys, json, logging, xmltodict, traceback, collections
 import requests, uuid
@@ -26,7 +26,7 @@ class cdunit(Resource):
         self.api_usr = settings_data["spillman"]["user"]
         self.api_pwd = settings_data["spillman"]["password"]
         
-    def dataexchange(self):
+    def dataexchange(self, unit, agency, zone, utype, kind):
         session = requests.Session()
         session.auth = (self.api_usr, self.api_pwd)
         request = f"""
@@ -34,6 +34,11 @@ class cdunit(Resource):
             <PublicSafety id="">
                 <Query>
                     <cdunit>
+                        <unitno search_type="equal_to">{unit}</unitno>
+                        <agency search_type="equal_to">{agency}</agency>
+                        <zone search_type="equal_to">{zone}</zone>
+                        <type search_type="equal_to">{utype}</type>
+                        <kind search_type="equal_to">{kind}</kind>
                     </cdunit>
                 </Query>
             </PublicSafety>
@@ -64,61 +69,60 @@ class cdunit(Resource):
 
         return data
       
-    def format(self):
+    def process(self, unit, agency, zone, utype, kind):
+        spillman = self.dataexchange(unit, agency, zone, utype, kind)
         data = []
-        cdunit_data = self.dataexchange()
         
-        if type(cdunit_data) == dict:
+        if type(spillman) == dict:
             return
 
         else:
-            for records in cdunit_data:
+            for row in spillman:
                 try:
                     try:
-                        unit = records["unitno"]
+                        unit = row["unitno"]
                     except:
                         unit = ""
                     
                     try:
-                        desc = records["desc"]
+                        desc = row["desc"]
                     except:
                         desc = "" 
                       
-                    agency_id = records["agency"]
+                    agency = row["agency"]
                     
                     try:
-                        zone = records["zone"]
+                        zone = row["zone"]
                     except:
                         zone = ""
 
-                    if records["type"] == "l":
-                        type = "Law"
-                    elif records["type"] == "f":
-                        type = "Fire"
-                    elif records["type"] == "e":
-                        type = "EMS"
+                    if row["type"] == "l":
+                        utype = "Law"
+                    elif row["type"] == "f":
+                        utype = "Fire"
+                    elif row["type"] == "e":
+                        utype = "EMS"
                     else:
-                        type = "Other"
+                        utype = "Other"
                         
                     try:
-                        kind = records["kind"]
+                        kind = row["kind"]
                     except:
                         kind = ""
      
                     try:
-                        station = records["station"]
+                        station = row["station"]
                     except:
                         station = ""
 
                 except Exception as e:
-                    cdunit.error(traceback.format_exc())
                     continue
                   
                 data.append({
                     "unit": unit,
-                    "agency": agency_id,
+                    "agency": agency,
                     "zone": zone,
-                    "type": type,
+                    "type": utype,
                     "kind": kind,
                     "station": station,
                     "description": desc
@@ -129,6 +133,11 @@ class cdunit(Resource):
     def get(self):
         args = request.args
         token = args.get("token", default="", type=str)
+        unit = args.get("unit", default="*", type=str)
+        agency = args.get("agency", default="*", type=str)
+        zone = args.get("zone", default="*", type=str)
+        utype = args.get("type", default="*", type=str)
+        kind = args.get("kind", default="*", type=str)
         
         auth = s.auth.check(token)
         if auth is True:
@@ -136,4 +145,4 @@ class cdunit(Resource):
         else:
             return abort(403)
           
-        return self.format()
+        return self.process(unit, agency, zone, utype, kind)
