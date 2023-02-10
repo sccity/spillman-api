@@ -27,6 +27,7 @@ def page_not_found(e):
     return jsonify(error=str(e)), 404
   
 api.add_resource(s.table, '/table')
+api.add_resource(s.tablelist, '/table/list')
 api.add_resource(s.sycad, '/active')
 api.add_resource(s.cadmastercalltable, '/incidents/cad')
 api.add_resource(s.frmain, '/incidents/fire')
