@@ -77,51 +77,120 @@ class cadmastercalltable(Resource):
         data = []
         
         if type(spillman) == dict:
-            return 
+            try:
+                callid = spillman.get("RecordNumber")
+            except:
+                callid = ""
+              
+            try:
+                nature = spillman.get("CallNature")
+            except:
+                nature = ""
+                
+            try:
+                address = spillman.get("RespondToAddress")
+                address = address.replace('"', '')
+                address = address.replace("'", "")
+                address = address.replace(";", "")  
+            except:
+                address = ""
+                
+            try:
+                city = spillman.get("CityCode")
+            except:
+                city = ""   
+
+            try:
+                occurred_dt1 = spillman.get("TimeDateOccurredEarliest")
+                occurred_dt1 = f"{occurred_dt1[15:19]}-{occurred_dt1[9:11]}-{occurred_dt1[12:14]} {occurred_dt1[0:8]}"
+            except:
+                occurred_dt1 = "1900-01-01 00:00:00"
+                
+            try:
+                occurred_dt2 = spillman.get("TimeDateOccuredLatest")
+                occurred_dt2 = f"{occurred_dt2[15:19]}-{occurred_dt2[9:11]}-{occurred_dt2[12:14]} {occurred_dt2[0:8]}"
+            except:
+                occurred_dt2 = "1900-01-01 00:00:00"
+                
+            try:
+                reported_dt = spillman.get("TimeDateReported")
+                reported_dt = f"{reported_dt[15:19]}-{reported_dt[9:11]}-{reported_dt[12:14]} {reported_dt[0:8]}"
+            except:
+                reported_dt = "1900-01-01 00:00:00"
+            
+            try:
+                howrc = spillman.get("HowReceived")
+            except:
+                howrc = ""
+                
+            if howrc == "2":
+                how_received = "CAD2CAD"
+            elif howrc == "9":
+                how_received = "911 Line"
+            elif howrc == "T":
+                how_received = "Telephone"
+            elif howrc == "O":
+                how_received = "Officer Report"
+            elif howrc == "R":
+                how_received = "Radio"
+            elif howrc == "P":
+                how_received = "In Person"
+            else:
+                how_received = "Other"
+              
+            data.append({
+                "call_id": callid,
+                "nature": nature,
+                "address": address,
+                "city": city,
+                "received_type": how_received,
+                "occurred_dt1": occurred_dt1,
+                "occurred_dt2": occurred_dt2,
+                "reported": reported_dt
+            })
 
         else:
             for row in spillman:
                 try:
-                    callid = row['RecordNumber']
-                except KeyError:
-                    continue
-                except TypeError:
-                    continue
+                    callid = row["RecordNumber"]
+                except:
+                    callid = ""
                   
                 try:
-                    nature = row['CallNature']
-                except KeyError:
+                    nature = row["CallNature"]
+                except:
                     nature = ""
                     
                 try:
-                    address = row['RespondToAddress']
+                    address = row["RespondToAddress"]
                     address = address.replace('"', '')
                     address = address.replace("'", "")
                     address = address.replace(";", "")  
-                except KeyError:
+                except:
                     address = ""
                     
                 try:
-                    city = row['CityCode']
-                except KeyError:
+                    city = row["CityCode"]
+                except:
                     city = ""   
 
                 try:
-                    occurred_dt1 = row['TimeDateOccurredEarliest']
+                    occurred_dt1 = row["TimeDateOccurredEarliest"]
                     occurred_dt1 = f"{occurred_dt1[15:19]}-{occurred_dt1[9:11]}-{occurred_dt1[12:14]} {occurred_dt1[0:8]}"
-                except KeyError:
-                    occurred_dt1 = "1900:01:01 00:00:00"
+                except:
+                    occurred_dt1 = "1900-01-01 00:00:00"
                     
                 try:
-                    occurred_dt2 = row['TimeDateOccuredLatest']
+                    occurred_dt2 = row["TimeDateOccuredLatest"]
                     occurred_dt2 = f"{occurred_dt2[15:19]}-{occurred_dt2[9:11]}-{occurred_dt2[12:14]} {occurred_dt2[0:8]}"
-                except KeyError:
-                    occurred_dt2 = "1900:01:01 00:00:00"
+                except:
+                    occurred_dt2 = "1900-01-01 00:00:00"
+                    
                 try:
-                    reported_dt = row['TimeDateReported']
+                    reported_dt = row["TimeDateReported"]
                     reported_dt = f"{reported_dt[15:19]}-{reported_dt[9:11]}-{reported_dt[12:14]} {reported_dt[0:8]}"
-                except KeyError:
-                    reported_dt = "1900:01:01 00:00:00"
+                except:
+                    reported_dt = "1900-01-01 00:00:00"
                 
                 try:
                     howrc = row["HowReceived"]

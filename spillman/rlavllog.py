@@ -57,7 +57,7 @@ class rlavllog(Resource):
                 xml = session.post(self.api_url, data=request, headers=headers, verify=False)
                 decoded = xml.content.decode('utf-8')
                 data = json.loads(json.dumps(xmltodict.parse(decoded)))
-                data = data['PublicSafetyEnvelope']['PublicSafety']['Response']['rlavllog']
+                data = data["PublicSafetyEnvelope"]["PublicSafety"]["Response"]["rlavllog"]
 
             except Exception as e:
                 error = format(str(e))
@@ -87,39 +87,99 @@ class rlavllog(Resource):
         data = []
         
         if type(spillman) == dict:
-            return 
+            try:
+                date = spillman.get("logdate")
+                logdate = f"{date[15:19]}-{date[9:11]}-{date[12:14]} {date[0:8]}"
+            except:
+                logdate = "1900-01-01 00:00:00"
+            
+            try:
+                gps_x = spillman.get("xlng")
+            except:
+                gps_x = 0
+            
+            try:
+                gps_y = spillman.get("ylat")
+            except:
+                gps_y = 0
+            
+            try:
+                agency = spillman.get("agency")
+            except:
+                agency = ""  
+            
+            try:
+                status = spillman.get("stcode")
+            except :
+                status = ""  
+            
+            try:
+                unit = spillman.get("assgnmt")
+            except:
+                unit = ""      
+                
+            try:
+                heading = spillman.get("heading")
+            except:
+                heading = ""
+                
+            try:
+                speed = spillman.get("speed")
+            except:
+                speed = ""
+              
+            data.append({
+                "agency": agency,
+                "unit": unit,
+                "status": status,
+                "latitude": gps_y,
+                "longitude": gps_x,
+                "heading": heading,
+                "speed": speed,
+                "date": logdate
+            })
 
         else:
             for row in spillman:
-                date = row['logdate']
-                logdate = f"{date[15:19]}-{date[9:11]}-{date[12:14]} {date[0:8]}"
-                
-                gps_x    = row['xlng']
-                gps_y    = row['ylat']
+                try:
+                    date = row["logdate"]
+                    logdate = f"{date[15:19]}-{date[9:11]}-{date[12:14]} {date[0:8]}"
+                except:
+                    logdate = "1900-01-01 00:00:00"
                 
                 try:
-                    agency = row['agency']
-                except KeyError:
+                    gps_x = row["xlng"]
+                except:
+                    gps_x = 0
+                
+                try:
+                    gps_y = row["ylat"]
+                except:
+                    gps_y = 0
+                
+                try:
+                    agency = row["agency"]
+                except:
                     agency = ""  
                 
                 try:
-                    status = row['stcode']
-                except KeyError:
+                    status = row["stcode"]
+                except :
                     status = ""  
                 
                 try:
-                    unit = row['assgnmt']
-                except KeyError:
+                    unit = row["assgnmt"]
+                except:
                     unit = ""      
                     
                 try:
-                    heading = row['heading']
-                except KeyError:
+                    heading = row["heading"]
+                except:
                     heading = ""
                     
                 try:
-                    speed = row['speed']
-                except KeyError:
+                    speed = row["speed"]
+                except:
                     speed = ""
                   
                 data.append({

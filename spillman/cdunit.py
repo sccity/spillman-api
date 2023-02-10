@@ -74,7 +74,51 @@ class cdunit(Resource):
         data = []
         
         if type(spillman) == dict:
-            return
+            try:
+                unit = spillman.get("unitno")
+            except:
+                unit = ""
+            
+            try:
+                desc = spillman.get("desc")
+            except:
+                desc = "" 
+              
+            agency = spillman.get("agency")
+            
+            try:
+                zone = spillman.get("zone")
+            except:
+                zone = ""
+
+            if spillman.get("type") == "l":
+                utype = "Law"
+            elif spillman.get("type") == "f":
+                utype = "Fire"
+            elif spillman.get("type") == "e":
+                utype = "EMS"
+            else:
+                utype = "Other"
+                
+            try:
+                kind = spillman.get("kind")
+            except:
+                kind = ""
+
+            try:
+                station = spillman.get("station")
+            except:
+                station = ""
+              
+            data.append({
+                "unit": unit,
+                "agency": agency,
+                "zone": zone,
+                "type": utype,
+                "kind": kind,
+                "station": station,
+                "description": desc
+            })
 
         else:
             for row in spillman:

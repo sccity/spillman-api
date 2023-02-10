@@ -57,7 +57,7 @@ class rlmain(Resource):
                 xml = session.post(self.api_url, data=request, headers=headers, verify=False)
                 decoded = xml.content.decode('utf-8')
                 data = json.loads(json.dumps(xmltodict.parse(decoded)))
-                data = data['PublicSafetyEnvelope']['PublicSafety']['Response']['rlmain']
+                data = data["PublicSafetyEnvelope"]["PublicSafety"]["Response"]["rlmain"]
 
             except Exception as e:
                 error = format(str(e))
@@ -88,50 +88,124 @@ class rlmain(Resource):
         data = []
         
         if type(spillman) == dict:
-            return 
+            try:
+                date = spillman.get("logdate")
+                logdate = f"{date[15:19]}-{date[9:11]}-{date[12:14]} {date[0:8]}"
+            except:
+                logdate = "1900-01-01 00:00:00"
+            
+            try:    
+                gps_x = f"{row['xpos'][:4]}.{row['xpos'][4:]}"
+            except:
+                gps_x = 0
+                
+            try:    
+                gps_y = f"{row['ypos'][:2]}.{row['ypos'][2:]}"
+            except:
+                gps_y = 0
+            
+            try:
+                callid = spillman.get("callid")
+            except:
+                callid = ""  
+            
+            try:
+                agency = spillman.get("agency")
+            except:
+                agency = ""  
+            
+            try:
+                zone = spillman.get("zone")
+            except:
+                zone = ""  
+            
+            try:
+                tencode = spillman.get("tencode")
+            except KeyError:
+                tencode = ""  
+            
+            try:
+                unit = spillman.get("unit")
+            except:
+                unit = ""      
+            
+            try:
+                description = spillman.get("desc")
+                description = description.replace('"', '')
+                description = description.replace("'", "")
+            except:
+                description = ""
+                
+            try:
+                calltype = spillman.get("calltyp")
+            except:
+                calltype = ""
+              
+            data.append({
+                "call_id": callid,
+                "agency": agency,
+                "unit": unit,
+                "status": tencode,
+                "zone": zone,
+                "latitude": gps_y,
+                "longitude": gps_x,
+                "description": description,
+                "date": logdate
+            })
 
         else:
             for row in spillman:
-                date = row['logdate']
-                logdate = f"{date[15:19]}-{date[9:11]}-{date[12:14]} {date[0:8]}"
-                gps_x    = f"{row['xpos'][:4]}.{row['xpos'][4:]}"
-                gps_y    = f"{row['ypos'][:2]}.{row['ypos'][2:]}"
+                try:
+                    date = row["logdate"]
+                    logdate = f"{date[15:19]}-{date[9:11]}-{date[12:14]} {date[0:8]}"
+                except:
+                    logdate = "1900-01-01 00:00:00"
+                
+                try:    
+                    gps_x = f"{row['xpos'][:4]}.{row['xpos'][4:]}"
+                except:
+                    gps_x = 0
+                    
+                try:    
+                    gps_y = f"{row['ypos'][:2]}.{row['ypos'][2:]}"
+                except:
+                    gps_y = 0
                 
                 try:
-                    callid = row['callid']
-                except KeyError:
+                    callid = row["callid"]
+                except:
                     callid = ""  
                 
                 try:
-                    agency = row['agency']
-                except KeyError:
+                    agency = row["agency"]
+                except:
                     agency = ""  
                 
                 try:
-                    zone = row['zone']
-                except KeyError:
+                    zone = row["zone"]
+                except:
                     zone = ""  
                 
                 try:
-                    tencode = row['tencode']
+                    tencode = row["tencode"]
                 except KeyError:
                     tencode = ""  
                 
                 try:
-                    unit = row['unit']
-                except KeyError:
+                    unit = row["unit"]
+                except:
                     unit = ""      
                 
                 try:
-                    description = row['desc']
+                    description = row["desc"]
                     description = description.replace('"', '')
                     description = description.replace("'", "")
-                except KeyError:
+                except:
                     description = ""
                     
                 try:
-                    calltype = row['calltyp']
-                except KeyError:
+                    calltype = row["calltyp"]
+                except:
                     calltype = ""
                   
                 data.append({
