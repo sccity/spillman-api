@@ -32,10 +32,6 @@ class auth:
             cursor.close()
         elif db_valid == 1:
             valid = True
-            cursor = db.cursor()
-            cursor.execute(f"insert into audit (token,ipaddr,resource,action,datetime) values ('{token}','{ipaddr}','AUTH','ACCESS GRANTED',now())")
-            db.commit()
-            cursor.close()
         else:
             valid = False
             cursor = db.cursor()
