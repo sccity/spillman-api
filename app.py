@@ -26,16 +26,17 @@ def http_root():
 def page_not_found(e):
     return jsonify(error=str(e)), 404
   
-api.add_resource(s.table, '/table')
-api.add_resource(s.tablelist, '/table/list')
-api.add_resource(s.sycad, '/active')
+api.add_resource(s.table, '/spillman/table')
+api.add_resource(s.tablelist, '/spillman/table/list')
+api.add_resource(s.cdunit, '/spillman/unit')
+api.add_resource(s.sycad, '/cad/active')
+api.add_resource(s.cadmastercallcommentstable, '/cad/comments')
 api.add_resource(s.cadmastercalltable, '/incidents/cad')
+api.add_resource(s.lwmain, '/incidents/law')
 api.add_resource(s.frmain, '/incidents/fire')
 api.add_resource(s.emmain, '/incidents/ems')
-api.add_resource(s.lwmain, '/incidents/law')
 api.add_resource(s.rlmain, '/radiolog')
 api.add_resource(s.rlavllog, '/avl')
-api.add_resource(s.cdunit, '/unit')
 
 if __name__ == '__main__':
     app.debug = True
