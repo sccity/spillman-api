@@ -1,4 +1,4 @@
-# Spillman API [![CircleCI](https://circleci.com/gh/sccity/spillman-api.svg?style=svg)](https://circleci.com/gh/sccity/spillman-api) [![Codacy Badge](https://app.codacy.com/project/badge/Grade/b9f3e0f2cc6b4731af46372f79cab252)](https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=sccity/spillman-api&amp;utm_campaign=Badge_Grade)
+# Spillman API [![CircleCI](https://circleci.com/gh/sccity/spillman-api.svg?style=shield)](https://circleci.com/gh/sccity/spillman-api) [![Codacy Badge](https://app.codacy.com/project/badge/Grade/b9f3e0f2cc6b4731af46372f79cab252)](https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=sccity/spillman-api&amp;utm_campaign=Badge_Grade)
 
 The Spillman API is an attempt to modernize the Spillman DataExchange for further application development on top of Spillman data. It takes a typical URL based GET request, translates it into the XML POST request DataExchange expects, and then converts the DataExchange XML output into standardized JSON. This also allows for ease of upgrades in the event Spillman changes something.
 
