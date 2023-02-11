@@ -28,31 +28,51 @@ class rlmain(Resource):
         self.api_usr = settings_data["spillman"]["user"]
         self.api_pwd = settings_data["spillman"]["password"]
         
-    def dataexchange(self, agency, unit, callid, start, end):
+    def dataexchange(self, agency, unit, callid, status, start, end):
         start_date = date(int(start[0:4]), int(start[5:7]), int(start[8:10])) - timedelta(days=1)
         start_date = str(start_date.strftime("%m/%d/%Y"))
+        start_date = f"23:59:59 {start_date}"
         end_date = date(int(end[0:4]), int(end[5:7]), int(end[8:10])) + timedelta(days=1)
         end_date = str(end_date.strftime("%m/%d/%Y"))
-        
+        end_date = f"00:00:00 {end_date}"
+
         session = requests.Session()
         session.auth = (self.api_usr, self.api_pwd)
         
-        request = f"""
-        <PublicSafetyEnvelope version="1.0">
-            <PublicSafety id="">
-                <Query>
-                    <rlmain>
-                        <agency search_type="equal_to">{agency}</agency>
-                        <unit search_type="equal_to">{unit}</unit>
-                        <callid search_type="equal_to">{callid}</callid>
-                        <logdate search_type="greater_than">23:59:59 {start_date}</logdate>
-                        <logdate search_type="less_than">00:00:00 {end_date}</logdate>
-                    </rlmain>
-                </Query>
-            </PublicSafety>
-        </PublicSafetyEnvelope>
-         """
-
+        if callid == "*":
+            request = f"""
+            <PublicSafetyEnvelope version="1.0">
+                <PublicSafety id="">
+                    <Query>
+                        <rlmain>
+                            <agency search_type="equal_to">{agency}</agency>
+                            <unit search_type="equal_to">{unit}</unit>
+                            <callid search_type="equal_to">{callid}</callid>
+                            <tencode search_type="equal_to">{status}</tencode>
+                            <logdate search_type="greater_than">{start_date}</logdate>
+                            <logdate search_type="less_than">{end_date}</logdate>
+                        </rlmain>
+                    </Query>
+                </PublicSafety>
+            </PublicSafetyEnvelope>
+             """
+             
+        else:
+            request = f"""
+            <PublicSafetyEnvelope version="1.0">
+                <PublicSafety id="">
+                    <Query>
+                        <rlmain>
+                            <agency search_type="equal_to">{agency}</agency>
+                            <unit search_type="equal_to">{unit}</unit>
+                            <callid search_type="equal_to">{callid}</callid>
+                            <tencode search_type="equal_to">{status}</tencode>
+                        </rlmain>
+                    </Query>
+                </PublicSafety>
+            </PublicSafetyEnvelope>
+             """
+         
         try:
             headers = {"Content-Type": "application/xml"}
             try:
@@ -74,7 +94,6 @@ class rlmain(Resource):
 
         except Exception as e:
             error = format(str(e))
-            print(error)
 
             if error.find("'NoneType'") != -1:
                 return
@@ -85,8 +104,8 @@ class rlmain(Resource):
 
         return data
       
-    def process(self, agency, unit, callid, start, end):
-        spillman = self.dataexchange(agency, unit, callid, start, end)
+    def process(self, agency, unit, callid, status, start, end):
+        spillman = self.dataexchange(agency, unit, callid, status, start, end)
         data = []
         
         if spillman is None:
@@ -233,6 +252,7 @@ class rlmain(Resource):
         agency = args.get("agency", default="*", type=str)
         unit = args.get("unit", default="*", type=str)
         callid = args.get("callid", default="*", type=str)
+        status = args.get("status", default="*", type=str)
         start = args.get("start", default="", type=str)
         end = args.get("end", default="", type=str)
         
@@ -254,4 +274,4 @@ class rlmain(Resource):
           
         s.auth.audit(token, request.access_route[0], "RLMAIN", f"UNIT: {unit} AGENCY: {agency} CALLID: {callid} START DATE: {start} END DATE: {end}")
         
-        return self.process(agency, unit, callid, start, end)
+        return self.process(agency, unit, callid, status, start, end)
