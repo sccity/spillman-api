@@ -152,19 +152,20 @@ class active(Resource):
                 city = ""
                     
             data.append({
-                "call_id": callid,
-                "incident_id": recid,
-                "agency": agency_id,
-                "nature": nature,
-                "zone": zone,
-                "responsible_unit": unit,
-                "address": address,
-                "city": city,
-                "latitude": gps_y,
-                "longitude": gps_x,
-                "date:": sql_date,
-                "type": call_type
-            })
+                    "call_id": callid,
+                    "incident_id": recid,
+                    "agency": agency_id,
+                    "nature": nature,
+                    "zone": zone,
+                    "responsible_unit": unit,
+                    "address": address,
+                    "city": city,
+                    "latitude": gps_y,
+                    "longitude": gps_x,
+                    "type": call_type,
+                    "status": status,
+                    "date:": sql_date
+                })
               
         else:
             for row in spillman:
