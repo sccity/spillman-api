@@ -25,7 +25,6 @@ from datetime import datetime
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from .log import setup_logger
 from .settings import settings_data
-from .database import db
 
 err = setup_logger("active", "active")
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
@@ -240,7 +239,7 @@ class active(Resource):
         city = args.get("city", default="*", type=str)
         
         if token == "":
-            s.auth.audit("Missing", request.access_route[0], "AUTH", f"ACCESS DENIED")
+            s.auth.audit("Missing", request.access_route[0], "AUTH", "ACCESS DENIED")
             return jsonify(error="No security token provided.")
         
         auth = s.auth.check(token, request.access_route[0])

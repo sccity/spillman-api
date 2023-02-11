@@ -36,7 +36,7 @@ class tablelist(Resource):
         tablelist = args.get("tablelist", default="*", type=str)
         
         if token == "":
-            s.auth.audit("Missing", request.access_route[0], "AUTH", f"ACCESS DENIED")
+            s.auth.audit("Missing", request.access_route[0], "AUTH", "ACCESS DENIED")
             return jsonify(error="No security token provided.")
         
         auth = s.auth.check(token, request.access_route[0])
@@ -45,7 +45,7 @@ class tablelist(Resource):
         else:
             return abort(403)
           
-        s.auth.audit(token, request.access_route[0], "TABLELIST", f"LIST ALL TABLES")
+        s.auth.audit(token, request.access_route[0], "TABLELIST", "LIST ALL TABLES")
           
         data = []
         
