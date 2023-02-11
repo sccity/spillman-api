@@ -69,7 +69,7 @@ class comments(Resource):
                     err.error(traceback.format_exc())
                     return
 
-        except Exception as e:
+        except:
             err.error(traceback.format_exc())
             return
 
