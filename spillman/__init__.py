@@ -21,3 +21,4 @@ from .table import *
 from .tablelist import *
 from .cadmastercallcommentstable import *
 from .database import *
+from .nmmain import *
