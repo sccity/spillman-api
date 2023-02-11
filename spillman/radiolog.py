@@ -266,7 +266,7 @@ class radiolog(Resource):
         end = args.get("end", default="", type=str)
         
         if token == "":
-            s.auth.audit("Missing", request.access_route[0], "AUTH", f"ACCESS DENIED")
+            s.auth.audit("Missing", request.access_route[0], "AUTH", "ACCESS DENIED")
             return jsonify(error="No security token provided.")
         
         auth = s.auth.check(token, request.access_route[0])

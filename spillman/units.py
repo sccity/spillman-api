@@ -25,7 +25,6 @@ from datetime import datetime
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from .log import setup_logger
 from .settings import settings_data
-from .database import db
 
 err = setup_logger("units", "units")
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)

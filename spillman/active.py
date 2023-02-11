@@ -233,7 +233,7 @@ class active(Resource):
                     except:
                         city = ""
 
-                except Exception as e:
+                except:
                     continue
                   
                 data.append({
