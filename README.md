@@ -3,9 +3,10 @@
 The Spillman API is an attempt to modernize the Spillman DataExchange for further application development on top of Spillman data. It takes a typical URL based GET request, translates it into the XML POST request DataExchange expects, and then converts the DataExchange XML output into standardized JSON. This also allows for ease of upgrades in the event Spillman changes something.
 
 ## REQUIREMENTS
+*  Spillman server with proper access rights & DataExchange enabled.
 *  A MySQL/MariaDB database with proper access rights. Currently, we are using Amazon AWS RDS.
-*  Python 3.7+
-*  AWS Elastic Beanstalk
+*  Python 3.7+.
+*  AWS Elastic Beanstalk.
 
 This project is still in the early development phase and we will update this document accordingly as required.
 
