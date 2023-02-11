@@ -1,4 +1,7 @@
-# Spillman API
+# Spillman API [![CircleCI](https://circleci.com/gh/sccity/spillman-api.svg?style=shield)](https://circleci.com/gh/sccity/spillman-api)
+
+
+
 The Spillman API is an attempt to modernize the Spillman DataExchange for further application development on top of Spillman data. It takes a typical URL based GET request, translates it into the XML POST request DataExchange expects, and then converts the DataExchange XML output into standardized JSON. This also allows for ease of upgrades in the event Spillman changes something.
 
 ## REQUIREMENTS
