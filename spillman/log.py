@@ -6,6 +6,15 @@
 # Spillman API
 # Copyright Santa Clara City
 # Developed for Santa Clara - Ivins Fire & Rescue
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.#
+#You may obtain a copy of the License at
+#http://www.apache.org/licenses/LICENSE-2.0
+#Unless required by applicable law or agreed to in writing, software
+#distributed under the License is distributed on an "AS IS" BASIS,
+#WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#See the License for the specific language governing permissions and
+#limitations under the License.
 import sys, os, logging, time
 from logging.handlers import SMTPHandler
 from spillman.settings import settings_data
@@ -35,7 +44,7 @@ def setup_logger(name, log_file, level=settings_data["global"]["loglevel"]):
         ),
         fromaddr=settings_data["global"]["smtp"]["from"],
         toaddrs=settings_data["global"]["smtp"]["to"],
-        subject="Spillman API - Application Error",
+        subject="Spillman API",
         credentials=credentials,
         secure=(),
     )

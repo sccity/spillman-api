@@ -6,6 +6,15 @@
 # Spillman API
 # Copyright Santa Clara City
 # Developed for Santa Clara - Ivins Fire & Rescue
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.#
+#You may obtain a copy of the License at
+#http://www.apache.org/licenses/LICENSE-2.0
+#Unless required by applicable law or agreed to in writing, software
+#distributed under the License is distributed on an "AS IS" BASIS,
+#WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#See the License for the specific language governing permissions and
+#limitations under the License.
 from flask_restful import Resource, Api, request
 from flask import jsonify, abort
 import sys, json, logging, xmltodict, traceback, collections
@@ -19,10 +28,10 @@ from .log import setup_logger
 from .settings import settings_data
 from .database import db
 
-err = setup_logger("lwmain", "lwmain")
+err = setup_logger("ems", "ems")
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
-class lwmain(Resource):
+class ems(Resource):
     def __init__(self):
         self.api_url = settings_data["spillman"]["url"]
         self.api_usr = settings_data["spillman"]["user"]
@@ -40,11 +49,11 @@ class lwmain(Resource):
         <PublicSafetyEnvelope version="1.0">
             <PublicSafety id="">
                 <Query>
-                    <lwmain>
+                    <emmain>
                         <agency search_type="equal_to">{agency}</agency>
                         <dispdat search_type="greater_than">{start_date}</dispdat>
                         <dispdat search_type="less_than">{end_date}</dispdat>
-                    </lwmain>
+                    </emmain>
                 </Query>
             </PublicSafety>
         </PublicSafetyEnvelope>
@@ -56,7 +65,7 @@ class lwmain(Resource):
                 xml = session.post(self.api_url, data=request, headers=headers, verify=False)
                 decoded = xml.content.decode("utf-8")
                 data = json.loads(json.dumps(xmltodict.parse(decoded)))
-                data = data["PublicSafetyEnvelope"]["PublicSafety"]["Response"]["lwmain"]
+                data = data["PublicSafetyEnvelope"]["PublicSafety"]["Response"]["emmain"]
 
             except Exception as e:
                 error = format(str(e))
@@ -213,7 +222,7 @@ class lwmain(Resource):
                 try:
                     incident_id = row["number"]
                 except:
-                    incident_id
+                    incident_id = ""
                   
                 try:
                     nature = row["nature"]
@@ -351,6 +360,6 @@ class lwmain(Resource):
         if end == "":
             end = datetime.today().strftime('%Y-%m-%d')
           
-        s.auth.audit(token, request.access_route[0], "LWMAIN", f"AGENCY: {agency} START DATE: {start} END DATE: {end}")
+        s.auth.audit(token, request.access_route[0], "EMMAIN", f"AGENCY: {agency} START DATE: {start} END DATE: {end}")
         
         return self.process(agency, start, end)

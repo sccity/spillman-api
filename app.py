@@ -6,6 +6,15 @@
 # Spillman API
 # Copyright Santa Clara City
 # Developed for Santa Clara - Ivins Fire & Rescue
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.#
+#You may obtain a copy of the License at
+#http://www.apache.org/licenses/LICENSE-2.0
+#Unless required by applicable law or agreed to in writing, software
+#distributed under the License is distributed on an "AS IS" BASIS,
+#WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#See the License for the specific language governing permissions and
+#limitations under the License.
 from flask import Flask, jsonify
 from flask_restful import Resource, Api
 import spillman as s
@@ -28,16 +37,16 @@ def page_not_found(e):
   
 api.add_resource(s.table, '/spillman/table')
 api.add_resource(s.tablelist, '/spillman/table/list')
-api.add_resource(s.cdunit, '/spillman/unit')
-api.add_resource(s.sycad, '/cad/active')
-api.add_resource(s.cadmastercallcommentstable, '/cad/comments')
-api.add_resource(s.nmmain, '/name')
-api.add_resource(s.cadmastercalltable, '/incidents/cad')
-api.add_resource(s.lwmain, '/incidents/law')
-api.add_resource(s.frmain, '/incidents/fire')
-api.add_resource(s.emmain, '/incidents/ems')
-api.add_resource(s.rlmain, '/radiolog')
-api.add_resource(s.rlavllog, '/avl')
+api.add_resource(s.units, '/spillman/unit')
+api.add_resource(s.active, '/cad/active')
+api.add_resource(s.comments, '/cad/comments')
+api.add_resource(s.names, '/name')
+api.add_resource(s.calls, '/incidents/cad')
+api.add_resource(s.law, '/incidents/law')
+api.add_resource(s.fire, '/incidents/fire')
+api.add_resource(s.ems, '/incidents/ems')
+api.add_resource(s.radiolog, '/radiolog')
+api.add_resource(s.avl, '/avl')
 
 if __name__ == '__main__':
     app.debug = True
