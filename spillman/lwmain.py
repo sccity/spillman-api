@@ -90,7 +90,7 @@ class lwmain(Resource):
             try:
                 incident_id = spillman.get("number")
             except:
-                incident_id
+                incident_id = ""
               
             try:
                 nature = spillman.get("nature")
