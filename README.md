@@ -24,7 +24,7 @@ run: eb deploy\
 In the settings.yaml file you will notice there are smtp, spillman, and database settings. The smtp settings are for error reporting outside of file logging. The spillman settings are for your specific install of the DataExchange. It should look like https://yourserver/DataExchange/REST. Finally, the database settings are for tokens and audit trail data.
 
 ## USAGE
-Will update this section sooN!
+Will update this section soon!
 
 ## LICENSE
 Copyright (c) Santa Clara City UT\
