@@ -172,7 +172,7 @@ class units(Resource):
                     except:
                         station = ""
 
-                except Exception as e:
+                except:
                     continue
                   
                 data.append({

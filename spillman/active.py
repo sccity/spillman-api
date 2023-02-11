@@ -72,7 +72,7 @@ class active(Resource):
                     err.error(traceback.format_exc())
                     return
 
-        except Exception as e:
+        except:
             err.error(traceback.format_exc())
             return
 
@@ -110,8 +110,20 @@ class active(Resource):
                 
             address = spillman.get("rtaddr")
             address = address.split(";", 1)[0]
+            
+            try:
+                xpos = spillman.get("xpos")
+            except:
+                xpos = 0
+                
+            try:
+                ypos = spillman.get("ypos")
+            except:
+                ypos = 0
+            
             gps_x = f"{xpos[:4]}.{xpos[4:]}"
             gps_y = f"{ypos[:2]}.{ypos[2:]}"
+            
             reported = spillman.get("reprtd")
             sql_date = f"{reported[15:19]}-{reported[9:11]}-{reported[12:14]} {reported[0:8]}"
             
@@ -178,8 +190,21 @@ class active(Resource):
                         
                     address = row["rtaddr"]
                     address = address.split(";", 1)[0]
-                    gps_x = f"{row['xpos'][:4]}.{row['xpos'][4:]}"
-                    gps_y = f"{row['ypos'][:2]}.{row['ypos'][2:]}"
+                    
+                    try:
+                        xpos = row["xpos"]
+                    except:
+                        xpos = 0
+                        
+                    try:
+                        ypos = row["ypos"]
+                    except:
+                        ypos = 0
+                    
+                    gps_x = f"{xpos[:4]}.{xpos[4:]}"
+                    gps_y = f"{ypos[:2]}.{ypos[2:]}"
+                    
+                    
                     reported = row["reprtd"]
                     sql_date = f"{reported[15:19]}-{reported[9:11]}-{reported[12:14]} {reported[0:8]}"
                     
