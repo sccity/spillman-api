@@ -145,6 +145,11 @@ class unitstatus(Resource):
                 callid = spillman.get("callid")
             except:
                 callid = ""
+                
+            try:
+                desc = spillman.get("desc")
+            except:
+                desc = ""
           
             data.append({
                 "unit": unit,
@@ -223,6 +228,11 @@ class unitstatus(Resource):
                         callid = row["callid"]
                     except:
                         callid = ""
+                        
+                    try:
+                        desc = row["desc"]
+                    except:
+                        desc = ""
 
                 except:
                     continue
