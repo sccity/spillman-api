@@ -202,12 +202,21 @@ class active(Resource):
                     except:
                         ypos = 0
                     
-                    gps_x = f"{xpos[:4]}.{xpos[4:]}"
-                    gps_y = f"{ypos[:2]}.{ypos[2:]}"
+                    try:
+                        gps_x = f"{xpos[:4]}.{xpos[4:]}"
+                    except:
+                        gps_x = 0
+                        
+                    try:
+                        gps_y = f"{ypos[:2]}.{ypos[2:]}"
+                    except:
+                        gps_y = 0
                     
-                    
-                    reported = row["reprtd"]
-                    sql_date = f"{reported[15:19]}-{reported[9:11]}-{reported[12:14]} {reported[0:8]}"
+                    try:
+                        reported = row["reprtd"]
+                        sql_date = f"{reported[15:19]}-{reported[9:11]}-{reported[12:14]} {reported[0:8]}"
+                    except:
+                        sql_date = "1900-01-01 00:00:00"
                     
                     if row["type"] == "l":
                         call_type = "Law"
@@ -218,7 +227,6 @@ class active(Resource):
                     else:
                         call_type = "Other"
                         
-                      
                     try:
                         status = row["stat"]
                     except:

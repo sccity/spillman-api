@@ -38,6 +38,7 @@ def page_not_found(e):
 api.add_resource(s.table, '/spillman/table')
 api.add_resource(s.tablelist, '/spillman/table/list')
 api.add_resource(s.units, '/spillman/unit')
+api.add_resource(s.unitstatus, '/spillman/unit/status')
 api.add_resource(s.active, '/cad/active')
 api.add_resource(s.comments, '/cad/comments')
 api.add_resource(s.names, '/name')
