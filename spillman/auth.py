@@ -37,37 +37,37 @@ class auth:
         
         if db_valid is None:
             valid = False
-            cursor = db.cursor()
+            #cursor = db.cursor()
             
-            try:
-                cursor.execute(f"insert into audit (token,ipaddr,resource,action,datetime) values ('{token}','{ipaddr}','AUTH','ACCESS DENIED',now())")
-                db.commit()
-                cursor.close()
-            except:
-                cursor.close()
+            #try:
+                #cursor.execute(f"insert into audit (token,ipaddr,resource,action,datetime) values ('{token}','{ipaddr}','AUTH','ACCESS DENIED',now())")
+                #db.commit()
+                #cursor.close()
+            #except:
+                #cursor.close()
                 
         elif db_valid == 1:
             valid = True
         else:
             valid = False
-            cursor = db.cursor()
+            #cursor = db.cursor()
             
-            try:
-                cursor.execute(f"insert into audit (token,ipaddr,resource,action,datetime) values ('{token}','{ipaddr}','AUTH','ACCESS DENIED',now())")
-                db.commit()
-                cursor.close()
-            except:
-                cursor.close()
+            #try:
+                #cursor.execute(f"insert into audit (token,ipaddr,resource,action,datetime) values ('{token}','{ipaddr}','AUTH','ACCESS DENIED',now())")
+                #db.commit()
+                #cursor.close()
+            #except:
+                #cursor.close()
         
         return valid
       
     def audit(token, ipaddr, resource, action):
-        cursor = db.cursor()
+        #cursor = db.cursor()
         
-        try:
-            cursor.execute(f"insert into audit (token,ipaddr,resource,action,datetime) values ('{token}','{ipaddr}','{resource}','{action}',now())")
-            db.commit()
-            cursor.close()
-        except:
-            cursor.close()
+        #try:
+            #cursor.execute(f"insert into audit (token,ipaddr,resource,action,datetime) values ('{token}','{ipaddr}','{resource}','{action}',now())")
+            #db.commit()
+            #cursor.close()
+        #except:
+            #cursor.close()
         return
