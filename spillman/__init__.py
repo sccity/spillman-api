@@ -22,6 +22,7 @@ from .auth import *
 from .table import *
 from .tablelist import *
 from .units import *
+from .unitstatus import *
 from .active import *
 from .comments import *
 from .names import *

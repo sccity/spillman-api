@@ -26,10 +26,10 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from .log import setup_logger
 from .settings import settings_data
 
-err = setup_logger("units", "units")
+err = setup_logger("unitstatus", "unitstatus")
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
-class units(Resource):
+class unitstatus(Resource):
     def __init__(self):
         self.api_url = settings_data["spillman"]["url"]
         self.api_usr = settings_data["spillman"]["user"]
@@ -42,13 +42,13 @@ class units(Resource):
         <PublicSafetyEnvelope version="1.0">
             <PublicSafety id="">
                 <Query>
-                    <cdunit>
-                        <unitno search_type="equal_to">{unit}</unitno>
+                    <syunit>
+                        <unit search_type="equal_to">{unit}</unit>
                         <agency search_type="equal_to">{agency}</agency>
                         <zone search_type="equal_to">{zone}</zone>
-                        <type search_type="equal_to">{utype}</type>
+                        <utype search_type="equal_to">{utype}</utype>
                         <kind search_type="equal_to">{kind}</kind>
-                    </cdunit>
+                    </syunit>
                 </Query>
             </PublicSafety>
         </PublicSafetyEnvelope>
@@ -60,7 +60,7 @@ class units(Resource):
                 xml = session.post(self.api_url, data=request, headers=headers, verify=False)
                 decoded = xml.content.decode("utf-8")
                 data = json.loads(json.dumps(xmltodict.parse(decoded)))
-                data = data["PublicSafetyEnvelope"]["PublicSafety"]["Response"]["cdunit"]
+                data = data["PublicSafetyEnvelope"]["PublicSafety"]["Response"]["syunit"]
 
             except Exception as e:
                 error = format(str(e))
@@ -87,27 +87,36 @@ class units(Resource):
         
         elif type(spillman) == dict:
             try:
-                unit = spillman.get("unitno")
+                unit = spillman.get("unit")
             except:
                 unit = ""
             
             try:
-                desc = spillman.get("desc")
+                status = spillman.get("stcode")
             except:
-                desc = "" 
-              
-            agency = spillman.get("agency")
+                status = "" 
+                
+            try:    
+                status_time = spillman.get("stime")
+                sql_date = f"{reported[15:19]}-{reported[9:11]}-{reported[12:14]} {reported[0:8]}"
+            except:
+                sql_date = "1900-01-01 00:00:00"
+            
+            try:  
+                agency = spillman.get("agency")
+            except:
+                agency = ""
             
             try:
                 zone = spillman.get("zone")
             except:
                 zone = ""
-
-            if spillman.get("type") == "l":
+    
+            if spillman.get("utype") == "l":
                 utype = "Law"
-            elif spillman.get("type") == "f":
+            elif spillman.get("utype") == "f":
                 utype = "Fire"
-            elif spillman.get("type") == "e":
+            elif spillman.get("utype") == "e":
                 utype = "EMS"
             else:
                 utype = "Other"
@@ -116,19 +125,44 @@ class units(Resource):
                 kind = spillman.get("kind")
             except:
                 kind = ""
-
+    
             try:
-                station = spillman.get("station")
+                station = spillman.get("statn")
             except:
                 station = ""
-              
+                
+            try:
+                gps_x = f"{xpos[:4]}.{xpos[4:]}"
+            except:
+                gps_x = 0
+            
+            try:
+                gps_y = f"{ypos[:2]}.{ypos[2:]}"
+            except:
+                gps_y = 0
+            
+            try:
+                callid = spillman.get("callid")
+            except:
+                callid = ""
+                
+            try:
+                desc = spillman.get("desc")
+            except:
+                desc = ""
+          
             data.append({
                 "unit": unit,
+                "status": status,
+                "status_time": sql_date,
+                "call_id": callid,
                 "agency": agency,
                 "zone": zone,
                 "type": utype,
                 "kind": kind,
                 "station": station,
+                "latitude": gps_y,
+                "longitude": gps_x,
                 "description": desc
             })
 
@@ -136,27 +170,36 @@ class units(Resource):
             for row in spillman:
                 try:
                     try:
-                        unit = row["unitno"]
+                        unit = row["unit"]
                     except:
                         unit = ""
                     
                     try:
-                        desc = row["desc"]
+                        status = row["stcode"]
                     except:
-                        desc = "" 
-                      
-                    agency = row["agency"]
+                        status = "" 
+                        
+                    try:    
+                        status_time = row["stime"]
+                        sql_date = f"{reported[15:19]}-{reported[9:11]}-{reported[12:14]} {reported[0:8]}"
+                    except:
+                        sql_date = "1900-01-01 00:00:00"
+                    
+                    try:  
+                        agency = row["agency"]
+                    except:
+                        agency = ""
                     
                     try:
                         zone = row["zone"]
                     except:
                         zone = ""
 
-                    if row["type"] == "l":
+                    if row["utype"] == "l":
                         utype = "Law"
-                    elif row["type"] == "f":
+                    elif row["utype"] == "f":
                         utype = "Fire"
-                    elif row["type"] == "e":
+                    elif row["utype"] == "e":
                         utype = "EMS"
                     else:
                         utype = "Other"
@@ -167,20 +210,45 @@ class units(Resource):
                         kind = ""
      
                     try:
-                        station = row["station"]
+                        station = row["statn"]
                     except:
                         station = ""
+                        
+                    try:
+                        gps_x = f"{xpos[:4]}.{xpos[4:]}"
+                    except:
+                        gps_x = 0
+                    
+                    try:
+                        gps_y = f"{ypos[:2]}.{ypos[2:]}"
+                    except:
+                        gps_y = 0
+                    
+                    try:
+                        callid = row["callid"]
+                    except:
+                        callid = ""
+                        
+                    try:
+                        desc = row["desc"]
+                    except:
+                        desc = ""
 
                 except:
                     continue
                   
                 data.append({
                     "unit": unit,
+                    "status": status,
+                    "status_time": sql_date,
+                    "call_id": callid,
                     "agency": agency,
                     "zone": zone,
                     "type": utype,
                     "kind": kind,
                     "station": station,
+                    "latitude": gps_y,
+                    "longitude": gps_x,
                     "description": desc
                 })
                 
@@ -205,6 +273,6 @@ class units(Resource):
         else:
             return abort(403)
           
-        s.auth.audit(token, request.access_route[0], "CDUNIT", f"UNIT: {unit} AGENCY: {agency} ZONE: {zone} TYPE: {utype} KIND: {kind}")
+        s.auth.audit(token, request.access_route[0], "SYUNIT", f"UNIT: {unit} AGENCY: {agency} ZONE: {zone} TYPE: {utype} KIND: {kind}")
           
         return self.process(unit, agency, zone, utype, kind)
