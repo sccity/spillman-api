@@ -1,5 +1,5 @@
 program: "Spillman API"
 version: "1.0.0"
-env: "PROD"
+env: "DEV"
 copyright: "Santa Clara City"
 author: "Lance Haynie"
