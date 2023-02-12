@@ -164,7 +164,7 @@ class active(Resource):
                     "longitude": gps_x,
                     "type": call_type,
                     "status": status,
-                    "date:": sql_date
+                    "date": sql_date
                 })
               
         else:
@@ -250,7 +250,7 @@ class active(Resource):
                     "longitude": gps_x,
                     "type": call_type,
                     "status": status,
-                    "date:": sql_date
+                    "date": sql_date
                 })
                 
         return data
