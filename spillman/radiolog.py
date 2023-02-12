@@ -71,12 +71,12 @@ class radiolog(Resource):
             <PublicSafetyEnvelope version="1.0">
                 <PublicSafety id="">
                     <Query>
-                        <radiolog>
+                        <rlmain>
                             <agency search_type="equal_to">{agency}</agency>
                             <unit search_type="equal_to">{unit}</unit>
                             <callid search_type="equal_to">{callid}</callid>
                             <tencode search_type="equal_to">{status}</tencode>
-                        </radiolog>
+                        </rlmain>
                     </Query>
                 </PublicSafety>
             </PublicSafetyEnvelope>
