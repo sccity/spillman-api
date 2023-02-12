@@ -23,36 +23,51 @@ class auth:
       
     def check(token, ipaddr):
         cursor = db.cursor()
-        cursor.execute(f"""SELECT active from tokens where token = '{token}'""")
-        db_response = cursor.fetchone()
+        try:
+            cursor.execute(f"""SELECT active from tokens where token = '{token}'""")
+            db_response = cursor.fetchone()
+            cursor.close()
+        except:
+            cursor.close()
         
         try:
             db_valid = db_response[0]
         except:
             db_valid = 0
-            
-        cursor.close()
         
         if db_valid is None:
             valid = False
             cursor = db.cursor()
-            cursor.execute(f"insert into audit (token,ipaddr,resource,action,datetime) values ('{token}','{ipaddr}','AUTH','ACCESS DENIED',now())")
-            db.commit()
-            cursor.close()
+            
+            try:
+                cursor.execute(f"insert into audit (token,ipaddr,resource,action,datetime) values ('{token}','{ipaddr}','AUTH','ACCESS DENIED',now())")
+                db.commit()
+                cursor.close()
+            except:
+                cursor.close()
+                
         elif db_valid == 1:
             valid = True
         else:
             valid = False
             cursor = db.cursor()
-            cursor.execute(f"insert into audit (token,ipaddr,resource,action,datetime) values ('{token}','{ipaddr}','AUTH','ACCESS DENIED',now())")
-            db.commit()
-            cursor.close()
+            
+            try:
+                cursor.execute(f"insert into audit (token,ipaddr,resource,action,datetime) values ('{token}','{ipaddr}','AUTH','ACCESS DENIED',now())")
+                db.commit()
+                cursor.close()
+            except:
+                cursor.close()
         
         return valid
       
     def audit(token, ipaddr, resource, action):
         cursor = db.cursor()
-        cursor.execute(f"insert into audit (token,ipaddr,resource,action,datetime) values ('{token}','{ipaddr}','{resource}','{action}',now())")
-        db.commit()
-        cursor.close()
+        
+        try:
+            cursor.execute(f"insert into audit (token,ipaddr,resource,action,datetime) values ('{token}','{ipaddr}','{resource}','{action}',now())")
+            db.commit()
+            cursor.close()
+        except:
+            cursor.close()
         return
