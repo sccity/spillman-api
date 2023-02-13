@@ -11,15 +11,15 @@ The Spillman API is an attempt to modernize the Spillman DataExchange for furthe
 This project is still in the early development phase and we will update this document accordingly as required.
 
 ## INSTALL
-run: python3 -m venv venv && source venv/bin/activate
+run: python3 -m venv venv && source venv/bin/activate\
 run: pip install -r requirements.txt
 
 Rename example.settings.yaml to settings.yaml and update with your credentials and information
 Test that everything is working with python3 app.py
 The following commands are specific to Elastic Beanstalk, eb init will ask a few questions that will be specific to your environment
 
-run: eb init
-run: eb create
+run: eb init\
+run: eb create\
 run: eb deploy
 
 ## SETTINGS
@@ -29,7 +29,7 @@ In the settings.yaml file you will notice there are smtp, spillman, and database
 Will update this section soon!
 
 ## LICENSE
-Copyright (c) Santa Clara City UT
+Copyright (c) Santa Clara City UT\
 Developed for Sanata Clara - Ivins Fire & Rescue
 
 Licensed under the Apache License, Version 2.0 (the "License");
