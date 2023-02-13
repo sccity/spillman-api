@@ -15,13 +15,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import json, logging, xmltodict, traceback, collections, requests
+import spillman as s
 from flask_restful import Resource, Api, request
 from flask import jsonify, abort
-import sys, json, logging, xmltodict, traceback, collections
-import requests, uuid
-import spillman as s
-import urllib.request as urlreq
-from datetime import datetime
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from .log import setup_logger
 from .settings import settings_data

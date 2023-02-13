@@ -16,7 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from flask import Flask, jsonify
-from flask_restful import Resource, Api
+from flask_restful import Api
 import spillman as s
 from spillman.settings import version_data
 
