@@ -23,7 +23,6 @@ from spillman.settings import version_data
 app = Flask(__name__)
 api = Api(app)
 
-
 @app.route("/")
 def http_root():
     return jsonify(
@@ -34,11 +33,9 @@ def http_root():
         author=version_data["author"],
     )
 
-
 @app.errorhandler(404)
 def page_not_found(e):
     return jsonify(error=str(e)), 404
-
 
 api.add_resource(s.table, "/spillman/table")
 api.add_resource(s.tablelist, "/spillman/table/list")
