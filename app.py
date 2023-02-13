@@ -28,7 +28,7 @@ def http_root():
     return jsonify(
         application=version_data["program"],
         version=version_data["version"],
-        environment=version_data["env"],
+        environment=settings_data["global"]["env"],
         copyright=version_data["copyright"],
         author=version_data["author"],
     )
