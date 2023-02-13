@@ -6,15 +6,15 @@
 # Spillman API
 # Copyright Santa Clara City
 # Developed for Santa Clara - Ivins Fire & Rescue
-#Licensed under the Apache License, Version 2.0 (the "License");
-#you may not use this file except in compliance with the License.#
-#You may obtain a copy of the License at
-#http://www.apache.org/licenses/LICENSE-2.0
-#Unless required by applicable law or agreed to in writing, software
-#distributed under the License is distributed on an "AS IS" BASIS,
-#WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#See the License for the specific language governing permissions and
-#limitations under the License.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.#
+# You may obtain a copy of the License at
+# http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 from flask_restful import Resource, Api, request
 from flask import jsonify, abort
 import sys, json, logging, xmltodict, traceback, collections
@@ -29,12 +29,13 @@ from .settings import settings_data
 err = setup_logger("unitstatus", "unitstatus")
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
+
 class unitstatus(Resource):
     def __init__(self):
         self.api_url = settings_data["spillman"]["url"]
         self.api_usr = settings_data["spillman"]["user"]
         self.api_pwd = settings_data["spillman"]["password"]
-        
+
     def dataexchange(self, unit, agency, zone, utype, kind):
         session = requests.Session()
         session.auth = (self.api_usr, self.api_pwd)
@@ -53,14 +54,18 @@ class unitstatus(Resource):
             </PublicSafety>
         </PublicSafetyEnvelope>
         """
-        
+
         try:
             headers = {"Content-Type": "application/xml"}
             try:
-                xml = session.post(self.api_url, data=request, headers=headers, verify=False)
+                xml = session.post(
+                    self.api_url, data=request, headers=headers, verify=False
+                )
                 decoded = xml.content.decode("utf-8")
                 data = json.loads(json.dumps(xmltodict.parse(decoded)))
-                data = data["PublicSafetyEnvelope"]["PublicSafety"]["Response"]["syunit"]
+                data = data["PublicSafetyEnvelope"]["PublicSafety"]["Response"][
+                    "syunit"
+                ]
 
             except Exception as e:
                 error = format(str(e))
@@ -77,41 +82,41 @@ class unitstatus(Resource):
             return
 
         return data
-      
+
     def process(self, unit, agency, zone, utype, kind):
         spillman = self.dataexchange(unit, agency, zone, utype, kind)
         data = []
-        
+
         if spillman is None:
             return
-        
+
         elif type(spillman) == dict:
             try:
                 unit = spillman.get("unit")
             except:
                 unit = ""
-            
+
             try:
                 status = spillman.get("stcode")
             except:
-                status = "" 
-                
-            try:    
+                status = ""
+
+            try:
                 status_time = spillman.get("stime")
                 sql_date = f"{reported[15:19]}-{reported[9:11]}-{reported[12:14]} {reported[0:8]}"
             except:
                 sql_date = "1900-01-01 00:00:00"
-            
-            try:  
+
+            try:
                 agency = spillman.get("agency")
             except:
                 agency = ""
-            
+
             try:
                 zone = spillman.get("zone")
             except:
                 zone = ""
-    
+
             if spillman.get("utype") == "l":
                 utype = "Law"
             elif spillman.get("utype") == "f":
@@ -120,51 +125,53 @@ class unitstatus(Resource):
                 utype = "EMS"
             else:
                 utype = "Other"
-                
+
             try:
                 kind = spillman.get("kind")
             except:
                 kind = ""
-    
+
             try:
                 station = spillman.get("statn")
             except:
                 station = ""
-                
+
             try:
                 gps_x = f"{xpos[:4]}.{xpos[4:]}"
             except:
                 gps_x = 0
-            
+
             try:
                 gps_y = f"{ypos[:2]}.{ypos[2:]}"
             except:
                 gps_y = 0
-            
+
             try:
                 callid = spillman.get("callid")
             except:
                 callid = ""
-                
+
             try:
                 desc = spillman.get("desc")
             except:
                 desc = ""
-          
-            data.append({
-                "unit": unit,
-                "status": status,
-                "status_time": sql_date,
-                "call_id": callid,
-                "agency": agency,
-                "zone": zone,
-                "type": utype,
-                "kind": kind,
-                "station": station,
-                "latitude": gps_y,
-                "longitude": gps_x,
-                "description": desc
-            })
+
+            data.append(
+                {
+                    "unit": unit,
+                    "status": status,
+                    "status_time": sql_date,
+                    "call_id": callid,
+                    "agency": agency,
+                    "zone": zone,
+                    "type": utype,
+                    "kind": kind,
+                    "station": station,
+                    "latitude": gps_y,
+                    "longitude": gps_x,
+                    "description": desc,
+                }
+            )
 
         else:
             for row in spillman:
@@ -173,23 +180,23 @@ class unitstatus(Resource):
                         unit = row["unit"]
                     except:
                         unit = ""
-                    
+
                     try:
                         status = row["stcode"]
                     except:
-                        status = "" 
-                        
-                    try:    
+                        status = ""
+
+                    try:
                         status_time = row["stime"]
                         sql_date = f"{reported[15:19]}-{reported[9:11]}-{reported[12:14]} {reported[0:8]}"
                     except:
                         sql_date = "1900-01-01 00:00:00"
-                    
-                    try:  
+
+                    try:
                         agency = row["agency"]
                     except:
                         agency = ""
-                    
+
                     try:
                         zone = row["zone"]
                     except:
@@ -203,32 +210,32 @@ class unitstatus(Resource):
                         utype = "EMS"
                     else:
                         utype = "Other"
-                        
+
                     try:
                         kind = row["kind"]
                     except:
                         kind = ""
-     
+
                     try:
                         station = row["statn"]
                     except:
                         station = ""
-                        
+
                     try:
                         gps_x = f"{xpos[:4]}.{xpos[4:]}"
                     except:
                         gps_x = 0
-                    
+
                     try:
                         gps_y = f"{ypos[:2]}.{ypos[2:]}"
                     except:
                         gps_y = 0
-                    
+
                     try:
                         callid = row["callid"]
                     except:
                         callid = ""
-                        
+
                     try:
                         desc = row["desc"]
                     except:
@@ -236,24 +243,26 @@ class unitstatus(Resource):
 
                 except:
                     continue
-                  
-                data.append({
-                    "unit": unit,
-                    "status": status,
-                    "status_time": sql_date,
-                    "call_id": callid,
-                    "agency": agency,
-                    "zone": zone,
-                    "type": utype,
-                    "kind": kind,
-                    "station": station,
-                    "latitude": gps_y,
-                    "longitude": gps_x,
-                    "description": desc
-                })
-                
+
+                data.append(
+                    {
+                        "unit": unit,
+                        "status": status,
+                        "status_time": sql_date,
+                        "call_id": callid,
+                        "agency": agency,
+                        "zone": zone,
+                        "type": utype,
+                        "kind": kind,
+                        "station": station,
+                        "latitude": gps_y,
+                        "longitude": gps_x,
+                        "description": desc,
+                    }
+                )
+
         return data
-                  
+
     def get(self):
         args = request.args
         token = args.get("token", default="", type=str)
@@ -262,17 +271,22 @@ class unitstatus(Resource):
         zone = args.get("zone", default="*", type=str)
         utype = args.get("type", default="*", type=str)
         kind = args.get("kind", default="*", type=str)
-        
+
         if token == "":
             s.auth.audit("Missing", request.access_route[0], "AUTH", "ACCESS DENIED")
             return jsonify(error="No security token provided.")
-        
+
         auth = s.auth.check(token, request.access_route[0])
         if auth is True:
             pass
         else:
             return abort(403)
-          
-        s.auth.audit(token, request.access_route[0], "SYUNIT", f"UNIT: {unit} AGENCY: {agency} ZONE: {zone} TYPE: {utype} KIND: {kind}")
-          
+
+        s.auth.audit(
+            token,
+            request.access_route[0],
+            "SYUNIT",
+            f"UNIT: {unit} AGENCY: {agency} ZONE: {zone} TYPE: {utype} KIND: {kind}",
+        )
+
         return self.process(unit, agency, zone, utype, kind)
