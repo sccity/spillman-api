@@ -15,12 +15,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from flask_restful import Resource, Api, request
-from flask import jsonify, abort
-import sys, json, logging, xmltodict, traceback, collections
-import requests, uuid
+import json, logging, xmltodict, traceback, collections, requests
 import spillman as s
 import urllib.request as urlreq
+from flask_restful import Resource, Api, request
+from flask import jsonify, abort
 from datetime import date, timedelta
 from datetime import datetime
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
@@ -134,9 +133,9 @@ class law(Resource):
                 state = ""
 
             try:
-                zip = spillman.get("zip")
+                zipcode = spillman.get("zip")
             except:
-                zip = ""
+                zipcode = ""
 
             try:
                 location = spillman.get("locatn")
@@ -212,7 +211,7 @@ class law(Resource):
                     "address": address,
                     "city": city,
                     "state": state,
-                    "zip": zip,
+                    "zip": zipcode,
                     "received_type": how_received,
                     "condition": condition,
                     "disposition": disposition,
@@ -259,9 +258,9 @@ class law(Resource):
                     state = ""
 
                 try:
-                    zip = row["zip"]
+                    zipcode = row["zip"]
                 except:
-                    zip = ""
+                    zipcode = ""
 
                 try:
                     location = row["locatn"]
@@ -337,7 +336,7 @@ class law(Resource):
                         "address": address,
                         "city": city,
                         "state": state,
-                        "zip": zip,
+                        "zip": zipcode,
                         "received_type": how_received,
                         "condition": condition,
                         "disposition": disposition,

@@ -15,12 +15,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import json, logging, xmltodict, traceback, collections, requests
+import spillman as s
 from flask_restful import Resource, Api, request
 from flask import jsonify, abort
-import sys, json, logging, xmltodict, traceback, collections
-import requests
-import spillman as s
-import urllib.request as urlreq
 from datetime import date, timedelta
 from datetime import datetime
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
@@ -134,6 +132,16 @@ class radiolog(Resource):
                 logdate = f"{date[15:19]}-{date[9:11]}-{date[12:14]} {date[0:8]}"
             except:
                 logdate = "1900-01-01 00:00:00"
+                
+            try:
+                xpos = spillman.get("xpos")
+            except:
+                xpos = 0
+
+            try:
+                ypos = spillman.get("ypos")
+            except:
+                ypos = 0
 
             try:
                 gps_x = f"{row['xpos'][:4]}.{row['xpos'][4:]}"

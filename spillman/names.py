@@ -255,9 +255,9 @@ class names(Resource):
                 state = ""
 
             try:
-                zip = spillman.get("zip")
+                zipcode = spillman.get("zip")
             except:
-                zip = ""
+                zipcode = ""
 
             try:
                 primary_phone = spillman.get("phone")
@@ -306,7 +306,7 @@ class names(Resource):
                     "address": address,
                     "city": city,
                     "state": state,
-                    "zip": zip,
+                    "zip": zipcode,
                     "primary_phone": primary_phone,
                     "work_phone": work_phone,
                 }
@@ -466,9 +466,9 @@ class names(Resource):
                     state = ""
 
                 try:
-                    zip = row["zip"]
+                    zipcode = row["zip"]
                 except:
-                    zip = ""
+                    zipcode = ""
 
                 try:
                     primary_phone = row["phone"]
@@ -517,7 +517,7 @@ class names(Resource):
                         "address": address,
                         "city": city,
                         "state": state,
-                        "zip": zip,
+                        "zip": zipcode,
                         "primary_phone": primary_phone,
                         "work_phone": work_phone,
                     }
