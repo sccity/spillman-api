@@ -101,7 +101,7 @@ class unitstatus(Resource):
 
             try:
                 status_time = spillman.get("stime")
-                sql_date = f"{reported[15:19]}-{reported[9:11]}-{reported[12:14]} {reported[0:8]}"
+                sql_date = f"{status_time[15:19]}-{status_time[9:11]}-{status_time[12:14]} {status_time[0:8]}"
             except:
                 sql_date = "1900-01-01 00:00:00"
 
@@ -186,7 +186,7 @@ class unitstatus(Resource):
 
                     try:
                         status_time = row["stime"]
-                        sql_date = f"{reported[15:19]}-{reported[9:11]}-{reported[12:14]} {reported[0:8]}"
+                        sql_date = f"{status_time[15:19]}-{status_time[9:11]}-{status_time[12:14]} {status_time[0:8]}"
                     except:
                         sql_date = "1900-01-01 00:00:00"
 
