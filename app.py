@@ -18,7 +18,7 @@
 from flask import Flask, jsonify
 from flask_restful import Api
 import spillman as s
-from spillman.settings import version_data
+from spillman.settings import settings_data, version_data
 
 app = Flask(__name__)
 api = Api(app)
