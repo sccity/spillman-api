@@ -16,6 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from .database import connect
+import uuid
 
 
 class auth:
@@ -26,7 +27,7 @@ class auth:
         db = connect()
         cursor = db.cursor()
         try:
-            cursor.execute(f"""SELECT active from tokens where token = '{token}'""")
+            cursor.execute(f"""SELECT active from auth where uuid = '{token}'""")
             db_response = cursor.fetchone()
             cursor.close()
             db.close()
@@ -44,10 +45,11 @@ class auth:
 
             db = connect()
             cursor = db.cursor()
+            unique_id = uuid.uuid1()
 
             try:
                 cursor.execute(
-                    f"insert into audit (token,ipaddr,resource,action,datetime) values ('{token}','{ipaddr}','AUTH','ACCESS DENIED',now())"
+                    f"insert into auditlog (uuid,token,ipaddr,resource,action,datetime) values ('{unique_id}','{token}','{ipaddr}','AUTH','ACCESS DENIED',now())"
                 )
                 db.commit()
                 cursor.close()
@@ -62,10 +64,11 @@ class auth:
             valid = False
             db = connect()
             cursor = db.cursor()
+            unique_id = uuid.uuid1()
 
             try:
                 cursor.execute(
-                    f"insert into audit (token,ipaddr,resource,action,datetime) values ('{token}','{ipaddr}','AUTH','ACCESS DENIED',now())"
+                    f"insert into auditlog (uuid,token,ipaddr,resource,action,datetime) values ('{unique_id}','{token}','{ipaddr}','AUTH','ACCESS DENIED',now())"
                 )
                 db.commit()
                 cursor.close()
@@ -79,9 +82,10 @@ class auth:
     def audit(token, ipaddr, resource, action):
         db = connect()
         cursor = db.cursor()
+        unique_id = uuid.uuid1()
         try:
             cursor.execute(
-                f"insert into audit (token,ipaddr,resource,action,datetime) values ('{token}','{ipaddr}','{resource}','{action}',now())"
+                f"insert into auditlog (uuid,token,ipaddr,resource,action,datetime) values ('{unique_id}','{token}','{ipaddr}','{resource}','{action}',now())"
             )
             db.commit()
             cursor.close()
