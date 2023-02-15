@@ -34,7 +34,7 @@ class unitstatus(Resource):
         self.api_usr = settings_data["spillman"]["user"]
         self.api_pwd = settings_data["spillman"]["password"]
 
-    def dataexchange(self, unit, agency, zone, utype, kind):
+    def dataexchange(self, unit, agency, zone, utype, kind, callid):
         session = requests.Session()
         session.auth = (self.api_usr, self.api_pwd)
         request = f"""
@@ -47,6 +47,7 @@ class unitstatus(Resource):
                         <zone search_type="equal_to">{zone}</zone>
                         <utype search_type="equal_to">{utype}</utype>
                         <kind search_type="equal_to">{kind}</kind>
+                        <callid search_type="equal_to">{callid}</callid>
                     </syunit>
                 </Query>
             </PublicSafety>
@@ -81,8 +82,8 @@ class unitstatus(Resource):
 
         return data
 
-    def process(self, unit, agency, zone, utype, kind):
-        spillman = self.dataexchange(unit, agency, zone, utype, kind)
+    def process(self, unit, agency, zone, utype, kind, callid):
+        spillman = self.dataexchange(unit, agency, zone, utype, kind, callid)
         data = []
 
         if spillman is None:
@@ -269,6 +270,7 @@ class unitstatus(Resource):
         zone = args.get("zone", default="*", type=str)
         utype = args.get("type", default="*", type=str)
         kind = args.get("kind", default="*", type=str)
+        callid = args.get("callid", default="*", type=str)
 
         if token == "":
             s.auth.audit("Missing", request.access_route[0], "AUTH", "ACCESS DENIED")
@@ -284,7 +286,7 @@ class unitstatus(Resource):
             token,
             request.access_route[0],
             "SYUNIT",
-            f"UNIT: {unit} AGENCY: {agency} ZONE: {zone} TYPE: {utype} KIND: {kind}",
+            f"UNIT: {unit} AGENCY: {agency} ZONE: {zone} TYPE: {utype} KIND: {kind} CALLID: {callid}",
         )
 
-        return self.process(unit, agency, zone, utype, kind)
+        return self.process(unit, agency, zone, utype, kind, callid)
