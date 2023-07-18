@@ -1,0 +1,18 @@
+global:
+    loglevel: "DEBUG"
+    smtp:
+        host: ""
+        port: 
+        user: ""
+        pass: ""
+        from: ""
+        to: ""
+spillman:
+    url: ""
+    user: ""
+    password: ""
+database:
+    schema: ""
+    user: ""
+    password: ""
+    host: ""
