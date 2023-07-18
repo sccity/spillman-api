@@ -17,7 +17,7 @@ requests
 six
 SQLAlchemy
 typing_extensions
-urllib3
+urllib3==1.26.14
 waitress
 Werkzeug
 xmltodict
