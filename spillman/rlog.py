@@ -15,7 +15,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import json, logging, xmltodict, traceback, collections, requests
+import json, logging, xmltodict, traceback, collections, requests, time
 import spillman as spillman
 from flask_restful import Resource, Api, request
 from flask import jsonify, abort
@@ -34,8 +34,10 @@ err = setup_logger("rlog", "rlog")
 
 class rlog(Resource):
     def rlog(self, rlog_unit, rlog_status, rlog_comment, rlog_user, rlog_pass):
-        s = Service(settings_data["global"]["webdriver"])
+        s = Service("/usr/bin/chromedriver")
         o = Options()
+        o.binary_location = "/usr/bin/google-chrome-beta"
+        o.add_argument("--start-maximized")
         o.add_argument("--no-sandbox")
         o.add_argument("--disable-extensions")
         o.add_argument("--disable-dev-shm-usage")
