@@ -85,7 +85,7 @@ class rlog(Resource):
     
         try:
             comment = browser.find_element(By.NAME, "comment")
-            comment.send_keys(rlog_comment + " - Fire MDC")
+            comment.send_keys(rlog_comment + " - SCIF Mobile Data Command")
     
         except:
             return jsonify(result="error")
