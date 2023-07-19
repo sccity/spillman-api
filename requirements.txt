@@ -22,5 +22,5 @@ waitress
 Werkzeug
 xmltodict
 uuid
-selenium==4
+selenium
 webdriver_manager

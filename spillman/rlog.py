@@ -34,7 +34,6 @@ err = setup_logger("rlog", "rlog")
 
 class rlog(Resource):
     def rlog(self, rlog_unit, rlog_status, rlog_comment, rlog_user, rlog_pass):
-        s = Service("/usr/bin/chromedriver")
         o = Options()
         o.binary_location = "/usr/bin/google-chrome"
         o.add_argument("--no-sandbox")
@@ -45,7 +44,7 @@ class rlog(Resource):
         o.add_argument("--remote-debugging-port=9222")
         
         try:
-            browser = webdriver.Chrome(service=s, options=o)
+            browser = webdriver.Chrome(executable_path='/usr/bin/chromedriver', options=o)
             browser.get(settings_data["spillman"]["touch_url"])
     
         except:
