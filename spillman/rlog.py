@@ -36,12 +36,12 @@ class rlog(Resource):
     def rlog(self, rlog_unit, rlog_status, rlog_comment, rlog_user, rlog_pass):
         s = Service("/usr/bin/chromedriver")
         o = Options()
-        o.binary_location = "/usr/bin/google-chrome-beta"
-        o.add_argument("--start-maximized")
+        o.binary_location = "/usr/bin/google-chrome"
         o.add_argument("--no-sandbox")
         o.add_argument("--disable-extensions")
         o.add_argument("--disable-dev-shm-usage")
-        o.add_argument("--headless")
+        o.add_argument("--headless=new")
+        o.add_argument("--disable-gpu")
         o.add_argument("--remote-debugging-port=9222")
         
         try:
@@ -50,7 +50,7 @@ class rlog(Resource):
     
         except:
             err.error(traceback.format_exc())
-            return traceback.format_exc()
+            return jsonify(result="error")
     
         time.sleep(0.1)
     
@@ -66,14 +66,14 @@ class rlog(Resource):
         try:
             browser.find_element(By.XPATH, value='//input[@value="Login"]').submit()
         except:
-            return traceback.format_exc()
+            return jsonify(result="error")
     
         time.sleep(0.1)
     
         try:
             browser.get(settings_data["spillman"]["touch_url"] + "secure/radiolog")
         except:
-            return traceback.format_exc()
+            return jsonify(result="error")
     
         time.sleep(0.1)
     
@@ -82,14 +82,14 @@ class rlog(Resource):
             rlog.select_by_value(rlog_status)
     
         except:
-            return traceback.format_exc()
+            return jsonify(result="error")
     
         try:
             comment = browser.find_element(By.NAME, "comment")
             comment.send_keys(rlog_comment + " - Fire MDC")
     
         except:
-            return traceback.format_exc()
+            return jsonify(result="error")
     
         time.sleep(0.1)
     
@@ -97,10 +97,10 @@ class rlog(Resource):
             browser.find_element(By.XPATH, value='//input[@value="Submit"]').submit()
     
         except:
-            return traceback.format_exc()
+            return jsonify(result="error")
     
         browser.quit()
-        return
+        return jsonify(result="success")
 
     def get(self):
         args = request.args
