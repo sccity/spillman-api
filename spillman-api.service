@@ -4,7 +4,7 @@ After=syslog.target network.target
 
 [Service]
 WorkingDirectory=/opt/spillman-api/prod
-ExecStart=/usr/bin/python3 /opt/spillman-api/app.py
+ExecStart=/usr/bin/python3 /opt/spillman-api/dev/app.py
 
 Restart=always
 RestartSec=120
