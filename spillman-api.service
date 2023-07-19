@@ -1,0 +1,13 @@
+[Unit]
+Description=Spillman API Production
+After=syslog.target network.target
+
+[Service]
+WorkingDirectory=/opt/spillman-api/prod
+ExecStart=/usr/bin/python3 /opt/spillman-api/app.py
+
+Restart=always
+RestartSec=120
+
+[Install]
+WantedBy=multi-user.target
