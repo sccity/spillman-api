@@ -48,6 +48,7 @@ class rlog(Resource):
             browser.get(settings_data["spillman"]["touch_url"])
     
         except:
+            browser.quit()
             err.error(traceback.format_exc())
             return jsonify(result="error")
     
@@ -65,6 +66,8 @@ class rlog(Resource):
         try:
             browser.find_element(By.XPATH, value='//input[@value="Login"]').submit()
         except:
+            browser.quit()
+            err.error(traceback.format_exc())
             return jsonify(result="error")
     
         time.sleep(0.1)
@@ -72,6 +75,8 @@ class rlog(Resource):
         try:
             browser.get(settings_data["spillman"]["touch_url"] + "secure/radiolog")
         except:
+            browser.quit()
+            err.error(traceback.format_exc())
             return jsonify(result="error")
     
         time.sleep(0.1)
@@ -81,6 +86,8 @@ class rlog(Resource):
             rlog.select_by_value(rlog_status)
     
         except:
+            browser.quit()
+            err.error(traceback.format_exc())
             return jsonify(result="error")
     
         try:
@@ -88,6 +95,8 @@ class rlog(Resource):
             comment.send_keys(rlog_comment + " - SCIF Mobile Data Command")
     
         except:
+            browser.quit()
+            err.error(traceback.format_exc())
             return jsonify(result="error")
     
         time.sleep(0.1)
@@ -96,6 +105,8 @@ class rlog(Resource):
             browser.find_element(By.XPATH, value='//input[@value="Submit"]').submit()
     
         except:
+            browser.quit()
+            err.error(traceback.format_exc())
             return jsonify(result="error")
     
         browser.quit()
