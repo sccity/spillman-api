@@ -58,7 +58,7 @@ class rlog(Resource):
             elementUser = WebDriverWait(browser, 10).until(
                 EC.presence_of_element_located((By.ID, "j_username"))
             )
-        finally:
+        except:
             browser.quit()
     
         username = browser.find_element(By.ID, "j_username")
@@ -90,7 +90,7 @@ class rlog(Resource):
                 elementStatus = WebDriverWait(browser, 10).until(
                     EC.presence_of_element_located((By.XPATH, "//select[@name='status']"))
                 )
-            finally:
+            except:
                 browser.quit()
                 
             rlog = Select(browser.find_element(By.XPATH, "//select[@name='status']"))
