@@ -52,7 +52,7 @@ class rlog(Resource):
             err.error(traceback.format_exc())
             return jsonify(result="error")
     
-        time.sleep(0.1)
+        time.sleep(0.25)
     
         username = browser.find_element(By.ID, "j_username")
         username.send_keys(rlog_user)
@@ -61,7 +61,7 @@ class rlog(Resource):
         password = browser.find_element(By.ID, "unit")
         password.send_keys(rlog_unit)
     
-        time.sleep(0.1)
+        time.sleep(0.25)
     
         try:
             browser.find_element(By.XPATH, value='//input[@value="Login"]').submit()
@@ -70,7 +70,7 @@ class rlog(Resource):
             err.error(traceback.format_exc())
             return jsonify(result="error")
     
-        time.sleep(0.1)
+        time.sleep(0.25)
     
         try:
             browser.get(settings_data["spillman"]["touch_url"] + "secure/radiolog")
@@ -79,11 +79,10 @@ class rlog(Resource):
             err.error(traceback.format_exc())
             return jsonify(result="error")
     
-        time.sleep(0.1)
+        time.sleep(0.25)
     
         try:
-            #rlog = Select(browser.find_element(By.XPATH, "//select[@name='status']"))
-            rlog = Select(browser.find_element(By.NAME, "status"))
+            rlog = Select(browser.find_element(By.XPATH, "//select[@name='status']"))
             rlog.select_by_value(rlog_status)
     
         except:
@@ -100,7 +99,7 @@ class rlog(Resource):
             err.error(traceback.format_exc())
             return jsonify(result="error")
     
-        time.sleep(0.1)
+        time.sleep(0.25)
     
         try:
             browser.find_element(By.XPATH, value='//input[@value="Submit"]').submit()
