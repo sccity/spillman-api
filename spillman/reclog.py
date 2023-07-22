@@ -106,7 +106,7 @@ class reclog(Resource):
                 desc = ""
 
             try:
-                functn = spillman.get("funtcn")
+                funtcn = spillman.get("funtcn")
             except:
                 funtcn = ""
 
