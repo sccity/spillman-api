@@ -132,13 +132,6 @@ class rlog(Resource):
             return jsonify(result="error")
     
         try:
-            try:
-                element = WebDriverWait(browser, 10).until(
-                    EC.presence_of_element_located((By.XPATH, value='//input[@value="Submit"]'))
-                )
-            finally:
-                browser.quit()
-                
             browser.find_element(By.XPATH, value='//input[@value="Submit"]').submit()
     
         except:
