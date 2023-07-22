@@ -56,23 +56,23 @@ class rlog(Resource):
           
         try:
             element = WebDriverWait(browser, 10).until(
-                EC.presence_of_element_located(By.ID, "j_username")
+                EC.presence_of_element_located((By.ID, "j_username"))
             )
-        except:
+        finally:
             browser.quit()
             
         try:
             element = WebDriverWait(browser, 10).until(
-                EC.presence_of_element_located(By.ID, "j_password")
+                EC.presence_of_element_located((By.ID, "j_password"))
             )
-        except:
+        finally:
             browser.quit()
             
         try:
             element = WebDriverWait(browser, 10).until(
-                EC.presence_of_element_located(By.ID, "unit")
+                EC.presence_of_element_located((By.ID, "unit"))
             )
-        except:
+        finally:
             browser.quit()
     
         username = browser.find_element(By.ID, "j_username")
@@ -104,7 +104,7 @@ class rlog(Resource):
                 element = WebDriverWait(browser, 10).until(
                     EC.presence_of_element_located((By.XPATH, "//select[@name='status']"))
                 )
-            except:
+            finally:
                 browser.quit()
                 
             rlog = Select(browser.find_element(By.XPATH, "//select[@name='status']"))
@@ -118,9 +118,9 @@ class rlog(Resource):
         try:
             try:
                 element = WebDriverWait(browser, 10).until(
-                    EC.presence_of_element_located(By.NAME, "comment")
+                    EC.presence_of_element_located((By.NAME, "comment"))
                 )
-            except:
+            finally:
                 browser.quit()
                 
             comment = browser.find_element(By.NAME, "comment")
@@ -134,9 +134,9 @@ class rlog(Resource):
         try:
             try:
                 element = WebDriverWait(browser, 10).until(
-                    EC.presence_of_element_located(By.XPATH, value='//input[@value="Submit"]')
+                    EC.presence_of_element_located((By.XPATH, value='//input[@value="Submit"]'))
                 )
-            except:
+            finally:
                 browser.quit()
                 
             browser.find_element(By.XPATH, value='//input[@value="Submit"]').submit()
