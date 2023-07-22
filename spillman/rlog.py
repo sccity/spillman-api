@@ -48,13 +48,6 @@ class rlog(Resource):
         try:
             browser = webdriver.Chrome(executable_path='/usr/bin/chromedriver', options=o)
             browser.get(settings_data["spillman"]["touch_url"])
-            
-            try:
-                element = WebDriverWait(browser, 10).until(
-                    EC.presence_of_element_located(By.XPATH, value='//input[@value="Login"]')
-                )
-            except:
-                browser.quit()
     
         except:
             browser.quit()
@@ -62,22 +55,8 @@ class rlog(Resource):
             return jsonify(result="error")
           
         try:
-            element = WebDriverWait(browser, 10).until(
-                EC.presence_of_element_located(By.ID, "j_username")
-            )
-        except:
-            browser.quit()
-            
-        try:
-            element = WebDriverWait(browser, 10).until(
-                EC.presence_of_element_located(By.ID, "j_password")
-            )
-        except:
-            browser.quit()
-            
-        try:
-            element = WebDriverWait(browser, 10).until(
-                EC.presence_of_element_located(By.ID, "unit")
+            elementUser = WebDriverWait(browser, 10).until(
+                EC.presence_of_element_located((By.ID, "j_username"))
             )
         except:
             browser.quit()
@@ -108,7 +87,7 @@ class rlog(Resource):
     
         try:
             try:
-                element = WebDriverWait(browser, 10).until(
+                elementStatus = WebDriverWait(browser, 10).until(
                     EC.presence_of_element_located((By.XPATH, "//select[@name='status']"))
                 )
             except:
@@ -123,13 +102,6 @@ class rlog(Resource):
             return jsonify(result="error")
     
         try:
-            try:
-                element = WebDriverWait(browser, 10).until(
-                    EC.presence_of_element_located(By.NAME, "comment")
-                )
-            except:
-                browser.quit()
-                
             comment = browser.find_element(By.NAME, "comment")
             comment.send_keys(rlog_comment + " - SCIF Mobile Data Command")
     
@@ -139,13 +111,6 @@ class rlog(Resource):
             return jsonify(result="error")
     
         try:
-            try:
-                element = WebDriverWait(browser, 10).until(
-                    EC.presence_of_element_located(By.XPATH, value='//input[@value="Submit"]')
-                )
-            except:
-                browser.quit()
-                
             browser.find_element(By.XPATH, value='//input[@value="Submit"]').submit()
     
         except:
