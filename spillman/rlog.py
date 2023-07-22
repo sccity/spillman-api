@@ -60,6 +60,7 @@ class rlog(Resource):
             )
         except:
             browser.quit()
+            return jsonify(result="error")
     
         username = browser.find_element(By.ID, "j_username")
         username.send_keys(rlog_user)
@@ -88,12 +89,13 @@ class rlog(Resource):
         try:
             try:
                 elementStatus = WebDriverWait(browser, 10).until(
-                    EC.presence_of_element_located((By.NAME, "status"))
+                    EC.presence_of_element_located((By.ID, "status"))
                 )
             except:
                 browser.quit()
+                return jsonify(result="error")
                 
-            rlog = Select(browser.find_element(By.NAME, "status"))
+            rlog = Select(browser.find_element(By.ID, "status"))
             rlog.select_by_value(rlog_status)
     
         except:
