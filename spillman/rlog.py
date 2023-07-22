@@ -55,21 +55,21 @@ class rlog(Resource):
             return jsonify(result="error")
           
         try:
-            element = WebDriverWait(browser, 10).until(
+            elementUser = WebDriverWait(browser, 10).until(
                 EC.presence_of_element_located((By.ID, "j_username"))
             )
         finally:
             browser.quit()
             
         try:
-            element = WebDriverWait(browser, 10).until(
+            elementPass = WebDriverWait(browser, 10).until(
                 EC.presence_of_element_located((By.ID, "j_password"))
             )
         finally:
             browser.quit()
             
         try:
-            element = WebDriverWait(browser, 10).until(
+            elementUnit = WebDriverWait(browser, 10).until(
                 EC.presence_of_element_located((By.ID, "unit"))
             )
         finally:
@@ -101,7 +101,7 @@ class rlog(Resource):
     
         try:
             try:
-                element = WebDriverWait(browser, 10).until(
+                elementStatus = WebDriverWait(browser, 10).until(
                     EC.presence_of_element_located((By.XPATH, "//select[@name='status']"))
                 )
             finally:
@@ -117,7 +117,7 @@ class rlog(Resource):
     
         try:
             try:
-                element = WebDriverWait(browser, 10).until(
+                elementComment = WebDriverWait(browser, 10).until(
                     EC.presence_of_element_located((By.NAME, "comment"))
                 )
             finally:
