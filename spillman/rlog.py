@@ -60,6 +60,27 @@ class rlog(Resource):
             browser.quit()
             err.error(traceback.format_exc())
             return jsonify(result="error")
+          
+        try:
+            element = WebDriverWait(browser, 10).until(
+                EC.presence_of_element_located(By.ID, "j_username")
+            )
+        except:
+            browser.quit()
+            
+        try:
+            element = WebDriverWait(browser, 10).until(
+                EC.presence_of_element_located(By.ID, "j_password")
+            )
+        except:
+            browser.quit()
+            
+        try:
+            element = WebDriverWait(browser, 10).until(
+                EC.presence_of_element_located(By.ID, "unit")
+            )
+        except:
+            browser.quit()
     
         username = browser.find_element(By.ID, "j_username")
         username.send_keys(rlog_user)
