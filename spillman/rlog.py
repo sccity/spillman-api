@@ -26,6 +26,8 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from .log import setup_logger
 from .settings import settings_data
 from .database import db
@@ -46,13 +48,18 @@ class rlog(Resource):
         try:
             browser = webdriver.Chrome(executable_path='/usr/bin/chromedriver', options=o)
             browser.get(settings_data["spillman"]["touch_url"])
+            
+            try:
+                element = WebDriverWait(browser, 10).until(
+                    EC.presence_of_element_located(By.XPATH, value='//input[@value="Login"]')
+                )
+            except:
+                browser.quit()
     
         except:
             browser.quit()
             err.error(traceback.format_exc())
             return jsonify(result="error")
-    
-        time.sleep(0.25)
     
         username = browser.find_element(By.ID, "j_username")
         username.send_keys(rlog_user)
@@ -61,16 +68,15 @@ class rlog(Resource):
         password = browser.find_element(By.ID, "unit")
         password.send_keys(rlog_unit)
     
-        time.sleep(0.25)
-    
         try:
             browser.find_element(By.XPATH, value='//input[@value="Login"]').submit()
+            
         except:
             browser.quit()
             err.error(traceback.format_exc())
             return jsonify(result="error")
     
-        time.sleep(0.25)
+        time.sleep(0.1)
     
         try:
             browser.get(settings_data["spillman"]["touch_url"] + "secure/radiolog")
@@ -79,9 +85,14 @@ class rlog(Resource):
             err.error(traceback.format_exc())
             return jsonify(result="error")
     
-        time.sleep(0.25)
-    
         try:
+            try:
+                element = WebDriverWait(browser, 10).until(
+                    EC.presence_of_element_located((By.XPATH, "//select[@name='status']"))
+                )
+            except:
+                browser.quit()
+                
             rlog = Select(browser.find_element(By.XPATH, "//select[@name='status']"))
             rlog.select_by_value(rlog_status)
     
@@ -91,6 +102,13 @@ class rlog(Resource):
             return jsonify(result="error")
     
         try:
+            try:
+                element = WebDriverWait(browser, 10).until(
+                    EC.presence_of_element_located(By.NAME, "comment")
+                )
+            except:
+                browser.quit()
+                
             comment = browser.find_element(By.NAME, "comment")
             comment.send_keys(rlog_comment + " - SCIF Mobile Data Command")
     
@@ -99,9 +117,14 @@ class rlog(Resource):
             err.error(traceback.format_exc())
             return jsonify(result="error")
     
-        time.sleep(0.25)
-    
         try:
+            try:
+                element = WebDriverWait(browser, 10).until(
+                    EC.presence_of_element_located(By.XPATH, value='//input[@value="Submit"]')
+                )
+            except:
+                browser.quit()
+                
             browser.find_element(By.XPATH, value='//input[@value="Submit"]').submit()
     
         except:
