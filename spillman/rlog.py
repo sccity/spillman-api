@@ -82,8 +82,7 @@ class rlog(Resource):
         time.sleep(0.1)
     
         try:
-            #rlog = Select(browser.find_element(By.XPATH, "//select[@name='status']"))
-            rlog = Select(browser.find_element(By.NAME, "status"))
+            rlog = Select(browser.find_element(By.XPATH, "//select[@name='status']"))
             rlog.select_by_value(rlog_status)
     
         except:
