@@ -60,20 +60,6 @@ class rlog(Resource):
             )
         finally:
             browser.quit()
-            
-        try:
-            elementPass = WebDriverWait(browser, 10).until(
-                EC.presence_of_element_located((By.ID, "j_password"))
-            )
-        finally:
-            browser.quit()
-            
-        try:
-            elementUnit = WebDriverWait(browser, 10).until(
-                EC.presence_of_element_located((By.ID, "unit"))
-            )
-        finally:
-            browser.quit()
     
         username = browser.find_element(By.ID, "j_username")
         username.send_keys(rlog_user)
@@ -116,13 +102,6 @@ class rlog(Resource):
             return jsonify(result="error")
     
         try:
-            try:
-                elementComment = WebDriverWait(browser, 10).until(
-                    EC.presence_of_element_located((By.NAME, "comment"))
-                )
-            finally:
-                browser.quit()
-                
             comment = browser.find_element(By.NAME, "comment")
             comment.send_keys(rlog_comment + " - SCIF Mobile Data Command")
     
