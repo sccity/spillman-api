@@ -48,13 +48,6 @@ class rlog(Resource):
         try:
             browser = webdriver.Chrome(executable_path='/usr/bin/chromedriver', options=o)
             browser.get(settings_data["spillman"]["touch_url"])
-            
-            try:
-                element = WebDriverWait(browser, 10).until(
-                    EC.presence_of_element_located(By.XPATH, value='//input[@value="Login"]')
-                )
-            except:
-                browser.quit()
     
         except:
             browser.quit()
