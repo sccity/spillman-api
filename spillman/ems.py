@@ -36,15 +36,20 @@ class ems(Resource):
         self.api_usr = settings_data["spillman"]["user"]
         self.api_pwd = settings_data["spillman"]["password"]
 
-    def dataexchange(self, agency, start, end):
-        start_date = date(
-            int(start[0:4]), int(start[5:7]), int(start[8:10])
-        ) - timedelta(days=1)
-        start_date = str(start_date.strftime("%m/%d/%Y"))
-        end_date = date(int(end[0:4]), int(end[5:7]), int(end[8:10])) + timedelta(
-            days=1
-        )
-        end_date = str(end_date.strftime("%m/%d/%Y"))
+    def dataexchange(self, agency, incident_id, start, end):
+        if incident_id == "*":
+            start_date = date(
+                int(start[0:4]), int(start[5:7]), int(start[8:10])
+            ) - timedelta(days=1)
+            start_date = str(start_date.strftime("%m/%d/%Y"))
+        
+            end_date = date(int(end[0:4]), int(end[5:7]), int(end[8:10])) + timedelta(
+                days=1
+            )
+            end_date = str(end_date.strftime("%m/%d/%Y"))
+        else:
+            start_date = "01/01/1900"
+            end_date = "12/31/9999"
 
         session = requests.Session()
         session.auth = (self.api_usr, self.api_pwd)
@@ -55,6 +60,7 @@ class ems(Resource):
                 <Query>
                     <emmain>
                         <agency search_type="equal_to">{agency}</agency>
+                        <number search_type="equal_to">{incident_id}</number>
                         <dispdat search_type="greater_than">{start_date}</dispdat>
                         <dispdat search_type="less_than">{end_date}</dispdat>
                     </emmain>
@@ -91,8 +97,8 @@ class ems(Resource):
 
         return data
 
-    def process(self, agency, start, end):
-        spillman = self.dataexchange(agency, start, end)
+    def process(self, agency, incident_id, start, end):
+        spillman = self.dataexchange(agency, incident_id, start, end)
         data = []
 
         if spillman is None:
@@ -353,6 +359,7 @@ class ems(Resource):
         args = request.args
         token = args.get("token", default="", type=str)
         agency = args.get("agency", default="*", type=str)
+        incident_id = args.get("incident_id", default="*", type=str)
         start = args.get("start", default="", type=str)
         end = args.get("end", default="", type=str)
 
@@ -379,4 +386,4 @@ class ems(Resource):
             f"AGENCY: {agency} START DATE: {start} END DATE: {end}",
         )
 
-        return self.process(agency, start, end)
+        return self.process(agency, incident_id, start, end)
