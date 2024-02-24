@@ -37,3 +37,4 @@ from .reclog import *
 from .rlog import *
 from .nameInvolvements import *
 from .nameImage import *
+from .lawNarrative import *
