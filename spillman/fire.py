@@ -98,7 +98,7 @@ class fire(Resource):
 
         return data
 
-    def process(self, agency, incident_id, start, end):
+    def process(self, agency, incident_id, start, end, page, limit):
         spillman = self.dataexchange(agency, incident_id, start, end)
         data = []
 
@@ -368,7 +368,11 @@ class fire(Resource):
                     }
                 )
 
-        return data
+        start_index = (page - 1) * limit
+        end_index = start_index + limit
+        paginated_data = data[start_index:end_index]
+
+        return paginated_data
 
     def get(self):
         args = request.args
@@ -377,6 +381,8 @@ class fire(Resource):
         incident_id = args.get("incident_id", default="*", type=str)
         start = args.get("start", default="", type=str)
         end = args.get("end", default="", type=str)
+        page = args.get('page', default=1, type=int)
+        limit = args.get('limit', default=10, type=int)
 
         if token == "":
             s.auth.audit("Missing", request.access_route[0], "AUTH", f"ACCESS DENIED")
@@ -401,4 +407,4 @@ class fire(Resource):
             f"AGENCY: {agency} START DATE: {start} END DATE: {end}",
         )
 
-        return self.process(agency, incident_id, start, end)
+        return self.process(agency, incident_id, start, end, page, limit)
