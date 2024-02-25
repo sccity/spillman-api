@@ -235,9 +235,12 @@ class nameInvolvements(Resource):
         else:
             threads = []
             for row in spillman:
-                thread = threading.Thread(target=self.process_row, args=(name_id, row, data))
-                threads.append(thread)
-                thread.start()
+                try:
+                    thread = threading.Thread(target=self.process_row, args=(name_id, row, data))
+                    threads.append(thread)
+                    thread.start()
+                except:
+                    continue
                 
             for thread in threads:
                     thread.join()

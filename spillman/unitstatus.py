@@ -16,6 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import sys, json, logging, xmltodict, traceback, collections, requests
+import threading
 import spillman as s
 from flask_restful import Resource, Api, request
 from flask import jsonify, abort
@@ -23,12 +24,15 @@ from datetime import datetime
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from .log import setup_logger
 from .settings import settings_data
+from cachetools import cached, TTLCache
 
 err = setup_logger("unitstatus", "unitstatus")
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
 class unitstatus(Resource):
+    cache = TTLCache(maxsize=2500, ttl=3600)
+    
     def __init__(self):
         self.api_url = settings_data["spillman"]["url"]
         self.api_usr = settings_data["spillman"]["user"]
@@ -82,6 +86,149 @@ class unitstatus(Resource):
             return
 
         return data
+      
+    @cached(cache)
+    def getName(self, unit_id):
+        session = requests.Session()
+        session.auth = (self.api_usr, self.api_pwd)
+        request = f"""
+        <PublicSafetyEnvelope version="1.0">
+            <From>Spillman API - XML to JSON</From>
+            <PublicSafety id="">
+                <Query>
+                    <PatrolUnitOfficerDetail>
+                        <UnitNumber search_type="equal_to">{unit_id}</UnitNumber>
+                        <SequenceNumber search_type="equal_to">1</SequenceNumber>
+                    </PatrolUnitOfficerDetail>
+                    <Columns>
+                      <ColumnName>OfficerName</ColumnName>
+                    </Columns>
+                    <RowCount>1</RowCount>
+                </Query>
+            </PublicSafety>
+        </PublicSafetyEnvelope>
+        """
+
+        try:
+            headers = {"Content-Type": "application/xml"}
+            try:
+                xml = session.post(
+                    self.api_url, data=request, headers=headers, verify=False
+                )
+                decoded = xml.content.decode("utf-8")
+                data = json.loads(json.dumps(xmltodict.parse(decoded)))
+                data = data["PublicSafetyEnvelope"]["PublicSafety"]["Response"]["PatrolUnitOfficerDetail"]
+
+            except Exception as e:
+                error = format(str(e))
+
+                if error.find("'NoneType'") != -1:
+                    return
+
+                else:
+                    err.error(traceback.format_exc())
+                    return
+
+        except:
+            err.error(traceback.format_exc())
+            return
+          
+        return data['OfficerName']
+      
+    def process_row(self, row, data):
+        try:
+            unit = row["unit"]
+        except:
+            unit = ""
+
+        try:
+            status = row["stcode"]
+        except:
+            status = ""
+
+        try:
+            status_time = row["stime"]
+            sql_date = f"{status_time[15:19]}-{status_time[9:11]}-{status_time[12:14]} {status_time[0:8]}"
+        except:
+            sql_date = "1900-01-01 00:00:00"
+
+        try:
+            agency = row["agency"]
+        except:
+            agency = ""
+
+        try:
+            zone = row["zone"]
+        except:
+            zone = ""
+
+        try:
+            if row["utype"] == "l":
+                utype = "Law"
+            elif row["utype"] == "f":
+                utype = "Fire"
+            elif row["utype"] == "e":
+                utype = "EMS"
+            else:
+                utype = "Other"
+        except:
+            utype = "Other"
+
+        try:
+            kind = row["kind"]
+        except:
+            kind = ""
+
+        try:
+            station = row["statn"]
+        except:
+            station = ""
+
+        try:
+            gps_x = f"{xpos[:4]}.{xpos[4:]}"
+        except:
+            gps_x = 0
+
+        try:
+            gps_y = f"{ypos[:2]}.{ypos[2:]}"
+        except:
+            gps_y = 0
+
+        try:
+            callid = row["callid"]
+        except:
+            callid = ""
+
+        try:
+            desc = row["desc"]
+        except:
+            desc = ""
+            
+        try:
+            if status != "OFFDT":
+                name = self.getName(unit)
+            else:
+                name = ""
+        except:
+            name = ""
+    
+        data.append(
+            {
+                "unit": unit,
+                "status": status,
+                "status_time": sql_date,
+                "call_id": callid,
+                "agency": agency,
+                "zone": zone,
+                "type": utype,
+                "kind": kind,
+                "station": station,
+                "latitude": gps_y,
+                "longitude": gps_x,
+                "description": desc,
+                "name": name,
+            }
+        )
 
     def process(self, unit, agency, zone, utype, kind, callid, page, limit):
         spillman = self.dataexchange(unit, agency, zone, utype, kind, callid)
@@ -155,6 +302,11 @@ class unitstatus(Resource):
                 desc = spillman.get("desc")
             except:
                 desc = ""
+                
+            try:
+                name = self.getName(unit)
+            except:
+                name = ""
 
             data.append(
                 {
@@ -170,96 +322,23 @@ class unitstatus(Resource):
                     "latitude": gps_y,
                     "longitude": gps_x,
                     "description": desc,
+                    "name": name,
                 }
             )
 
         else:
+            threads = []
             for row in spillman:
                 try:
-                    try:
-                        unit = row["unit"]
-                    except:
-                        unit = ""
-
-                    try:
-                        status = row["stcode"]
-                    except:
-                        status = ""
-
-                    try:
-                        status_time = row["stime"]
-                        sql_date = f"{status_time[15:19]}-{status_time[9:11]}-{status_time[12:14]} {status_time[0:8]}"
-                    except:
-                        sql_date = "1900-01-01 00:00:00"
-
-                    try:
-                        agency = row["agency"]
-                    except:
-                        agency = ""
-
-                    try:
-                        zone = row["zone"]
-                    except:
-                        zone = ""
-
-                    if row["utype"] == "l":
-                        utype = "Law"
-                    elif row["utype"] == "f":
-                        utype = "Fire"
-                    elif row["utype"] == "e":
-                        utype = "EMS"
-                    else:
-                        utype = "Other"
-
-                    try:
-                        kind = row["kind"]
-                    except:
-                        kind = ""
-
-                    try:
-                        station = row["statn"]
-                    except:
-                        station = ""
-
-                    try:
-                        gps_x = f"{xpos[:4]}.{xpos[4:]}"
-                    except:
-                        gps_x = 0
-
-                    try:
-                        gps_y = f"{ypos[:2]}.{ypos[2:]}"
-                    except:
-                        gps_y = 0
-
-                    try:
-                        callid = row["callid"]
-                    except:
-                        callid = ""
-
-                    try:
-                        desc = row["desc"]
-                    except:
-                        desc = ""
-
+                    thread = threading.Thread(target=self.process_row, args=(row, data))
+                    threads.append(thread)
+                    thread.start()
                 except:
                     continue
+                
+            for thread in threads:
+                    thread.join()
 
-                data.append(
-                    {
-                        "unit": unit,
-                        "status": status,
-                        "status_time": sql_date,
-                        "call_id": callid,
-                        "agency": agency,
-                        "zone": zone,
-                        "type": utype,
-                        "kind": kind,
-                        "station": station,
-                        "latitude": gps_y,
-                        "longitude": gps_x,
-                        "description": desc,
-                    }
-                )
                 
         data = sorted(data, key=lambda x: x.get("status_time", ""), reverse=True)
 
