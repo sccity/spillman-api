@@ -16,6 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import json, logging, xmltodict, traceback, collections, requests
+import threading
 import spillman as s
 import urllib.request as urlreq
 from flask_restful import Resource, Api, request
@@ -98,6 +99,7 @@ class nameInvolvements(Resource):
                     <Columns>
                       <ColumnName>nature</ColumnName>
                     </Columns>
+                    <RowCount>1</RowCount>
                 </Query>
             </PublicSafety>
         </PublicSafetyEnvelope>
@@ -130,6 +132,52 @@ class nameInvolvements(Resource):
             return
           
         return data['nature']
+
+    def process_row(self, name_id, row, data):
+        try:
+            incident_id = row["RecIDThisRecordsIDNo"]
+        except:
+            incident_id = ""
+    
+        try:
+            involvement_type = row["RelationshipToOtherRecord"]
+        except:
+            involvement_type = ""
+            
+        try:
+            record_type = row["TypeOfThisRecord"]
+        except:
+            record_type = ""
+    
+        if record_type == "1000":
+            incident_type = "Fire"
+            nature = self.getNature(incident_id,"frmain")
+        elif record_type == "1100":
+            incident_type = "EMS"
+            nature = self.getNature(incident_id,"emmain")
+        elif record_type == "1200":
+            incident_type = "Law"
+            nature = self.getNature(incident_id,"lwmain")
+        else:
+            incident_type = "Other"
+            nature = "Other"
+    
+        try:
+            involvement_date = row["DateInvolvementOccurred"]
+            involvement_date = f"{involvement_date[6:10]}-{involvement_date[0:2]}-{involvement_date[3:5]} 00:00:00"
+        except:
+            involvement_date = "1900-01-01 00:00:00"
+    
+        data.append(
+            {
+                "name_id": name_id,
+                "incident_id": incident_id,
+                "nature": nature,
+                "involvement_type": involvement_type,
+                "incident_type": incident_type,
+                "involvement_date": involvement_date,
+            }
+        )
 
     def process(self, name_id, page, limit):
         spillman = self.dataexchange(name_id)
@@ -185,51 +233,16 @@ class nameInvolvements(Resource):
             )
 
         else:
+            threads = []
             for row in spillman:
-                try:
-                    incident_id = row["RecIDThisRecordsIDNo"]
-                except:
-                    incident_id = ""
-
-                try:
-                    involvement_type = row["RelationshipToOtherRecord"]
-                except:
-                    involvement_type = ""
+                thread = threading.Thread(target=self.process_row, args=(name_id, row, data))
+                threads.append(thread)
+                thread.start()
+                
+            for thread in threads:
+                    thread.join()
                     
-                try:
-                    record_type = row["TypeOfThisRecord"]
-                except:
-                    record_type = ""
-    
-                if record_type == "1000":
-                    incident_type = "Fire"
-                    nature = self.getNature(incident_id,"frmain")
-                elif record_type == "1100":
-                    incident_type = "EMS"
-                    nature = self.getNature(incident_id,"emmain")
-                elif record_type == "1200":
-                    incident_type = "Law"
-                    nature = self.getNature(incident_id,"lwmain")
-                else:
-                    incident_type = "Other"
-                    nature = "Other"
-
-                try:
-                    involvement_date = row["DateInvolvementOccurred"]
-                    involvement_date = f"{involvement_date[6:10]}-{involvement_date[0:2]}-{involvement_date[3:5]} 00:00:00"
-                except:
-                    involvement_date = "1900-01-01 00:00:00"
-
-                data.append(
-                    {
-                        "name_id": name_id,
-                        "incident_id": incident_id,
-                        "nature": nature,
-                        "involvement_type": involvement_type,
-                        "incident_type": incident_type,
-                        "involvement_date": involvement_date,
-                    }
-                )
+        data = sorted(data, key=lambda x: x.get("involvement_date", ""), reverse=True)
                 
         start_index = (page - 1) * limit
         end_index = start_index + limit
