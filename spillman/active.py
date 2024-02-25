@@ -81,7 +81,7 @@ class active(Resource):
 
         return data
 
-    def process(self, agency, status, ctype, city, cadcallid):
+    def process(self, agency, status, ctype, city, cadcallid, page, limit):
         spillman = self.dataexchange(agency, status, ctype, city, cadcallid)
         data = []
 
@@ -270,7 +270,11 @@ class active(Resource):
                     }
                 )
 
-        return data
+        start_index = (page - 1) * limit
+        end_index = start_index + limit
+        paginated_data = data[start_index:end_index]
+
+        return paginated_data
 
     def get(self):
         args = request.args
@@ -280,6 +284,8 @@ class active(Resource):
         status = args.get("status", default="*", type=str)
         ctype = args.get("type", default="*", type=str)
         city = args.get("city", default="*", type=str)
+        page = args.get('page', default=1, type=int)
+        limit = args.get('limit', default=100, type=int)
 
         if token == "":
             s.auth.audit("Missing", request.access_route[0], "AUTH", "ACCESS DENIED")
@@ -298,4 +304,4 @@ class active(Resource):
             f"CALLID: {cadcallid} AGENCY: {agency} STATUS: {status} TYPE: {ctype} CITY: {city}",
         )
 
-        return self.process(agency, status, ctype, city, cadcallid)
+        return self.process(agency, status, ctype, city, cadcallid, page, limit)

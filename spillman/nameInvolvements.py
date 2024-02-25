@@ -84,7 +84,7 @@ class nameInvolvements(Resource):
 
         return data
 
-    def process(self, name_id):
+    def process(self, name_id, page, limit):
         spillman = self.dataexchange(name_id)
         data = []
 
@@ -173,13 +173,19 @@ class nameInvolvements(Resource):
                         "involvement_date": involvement_date,
                     }
                 )
+                
+        start_index = (page - 1) * limit
+        end_index = start_index + limit
+        paginated_data = data[start_index:end_index]
 
-        return data
+        return paginated_data
 
     def get(self):
         args = request.args
         token = args.get("token", default="", type=str)
         name_id = args.get("name_id", default="", type=str)
+        page = args.get('page', default=1, type=int)
+        limit = args.get('limit', default=10, type=int)
 
         if token == "":
             s.auth.audit("Missing", request.access_route[0], "AUTH", f"ACCESS DENIED")
@@ -198,4 +204,4 @@ class nameInvolvements(Resource):
             f"NAME ID: {name_id}",
         )
 
-        return self.process(name_id)
+        return self.process(name_id, page, limit)

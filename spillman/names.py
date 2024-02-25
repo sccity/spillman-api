@@ -93,7 +93,7 @@ class names(Resource):
         return data
 
     def process(
-        self, number, last, first, middle, phone, ntype, dl, dlstate, stateid, ssn
+        self, number, last, first, middle, phone, ntype, dl, dlstate, stateid, ssn, page, limit
     ):
         spillman = self.dataexchange(
             number, last, first, middle, phone, ntype, dl, dlstate, stateid, ssn
@@ -524,7 +524,11 @@ class names(Resource):
                     }
                 )
 
-        return data
+        start_index = (page - 1) * limit
+        end_index = start_index + limit
+        paginated_data = data[start_index:end_index]
+
+        return paginated_data
 
     def get(self):
         args = request.args
@@ -539,6 +543,8 @@ class names(Resource):
         dlstate = args.get("dlstate", default="*", type=str)
         stateid = args.get("stateid", default="*", type=str)
         ssn = args.get("ssn", default="*", type=str)
+        page = args.get('page', default=1, type=int)
+        limit = args.get('limit', default=10, type=int)
 
         if token == "":
             s.auth.audit("Missing", request.access_route[0], "AUTH", f"ACCESS DENIED")
@@ -564,5 +570,5 @@ class names(Resource):
         )
 
         return self.process(
-            number, last, first, middle, phone, ntype, dl, dlstate, stateid, ssn
+            number, last, first, middle, phone, ntype, dl, dlstate, stateid, ssn, page, limit
         )
