@@ -37,8 +37,18 @@ class fire(Resource):
         self.api_usr = settings_data["spillman"]["user"]
         self.api_pwd = settings_data["spillman"]["password"]
 
-    def dataexchange(self, agency, incident_id, start, end):
+    def dataexchange(self, agency, incident_id, call_id, start, end):
         if incident_id == "*":
+            start_date = date(
+                int(start[0:4]), int(start[5:7]), int(start[8:10])
+            ) - timedelta(days=1)
+            start_date = str(start_date.strftime("%m/%d/%Y"))
+        
+            end_date = date(int(end[0:4]), int(end[5:7]), int(end[8:10])) + timedelta(
+                days=1
+            )
+            end_date = str(end_date.strftime("%m/%d/%Y"))
+        elif call_id == "*":
             start_date = date(
                 int(start[0:4]), int(start[5:7]), int(start[8:10])
             ) - timedelta(days=1)
@@ -62,6 +72,7 @@ class fire(Resource):
                     <frmain>
                         <agency search_type="equal_to">{agency}</agency>
                         <number search_type="equal_to">{incident_id}</number>
+                        <callid search_type="equal_to">{call_id}</callid>
                         <dispdat search_type="greater_than">{start_date}</dispdat>
                         <dispdat search_type="less_than">{end_date}</dispdat>
                     </frmain>
@@ -98,8 +109,8 @@ class fire(Resource):
 
         return data
 
-    def process(self, agency, incident_id, start, end, page, limit):
-        spillman = self.dataexchange(agency, incident_id, start, end)
+    def process(self, agency, incident_id, call_id, start, end, page, limit):
+        spillman = self.dataexchange(agency, incident_id, call_id, start, end)
         data = []
 
         if spillman is None:
@@ -381,6 +392,7 @@ class fire(Resource):
         token = args.get("token", default="", type=str)
         agency = args.get("agency", default="*", type=str)
         incident_id = args.get("incident_id", default="*", type=str)
+        call_id = args.get("call_id", default="*", type=str)
         start = args.get("start", default="", type=str)
         end = args.get("end", default="", type=str)
         page = args.get('page', default=1, type=int)
@@ -409,4 +421,4 @@ class fire(Resource):
             f"AGENCY: {agency} START DATE: {start} END DATE: {end}",
         )
 
-        return self.process(agency, incident_id, start, end, page, limit)
+        return self.process(agency, incident_id, call_id, start, end, page, limit)
