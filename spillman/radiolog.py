@@ -273,6 +273,8 @@ class radiolog(Resource):
                         "date": logdate,
                     }
                 )
+                
+        data = sorted(data, key=lambda x: x.get("logdate", ""), reverse=True)
 
         start_index = (page - 1) * limit
         end_index = start_index + limit

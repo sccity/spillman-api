@@ -83,7 +83,7 @@ class unitstatus(Resource):
 
         return data
 
-    def process(self, unit, agency, zone, utype, kind, callid):
+    def process(self, unit, agency, zone, utype, kind, callid, page, limit):
         spillman = self.dataexchange(unit, agency, zone, utype, kind, callid)
         data = []
 
@@ -260,8 +260,14 @@ class unitstatus(Resource):
                         "description": desc,
                     }
                 )
+                
+        data = sorted(data, key=lambda x: x.get("status_time", ""), reverse=True)
 
-        return data
+        start_index = (page - 1) * limit
+        end_index = start_index + limit
+        paginated_data = data[start_index:end_index]
+
+        return paginated_data
 
     def get(self):
         args = request.args
@@ -272,6 +278,8 @@ class unitstatus(Resource):
         utype = args.get("type", default="*", type=str)
         kind = args.get("kind", default="*", type=str)
         callid = args.get("callid", default="*", type=str)
+        page = args.get('page', default=1, type=int)
+        limit = args.get('limit', default=10, type=int)
 
         if token == "":
             s.auth.audit("Missing", request.access_route[0], "AUTH", "ACCESS DENIED")
@@ -290,4 +298,4 @@ class unitstatus(Resource):
             f"UNIT: {unit} AGENCY: {agency} ZONE: {zone} TYPE: {utype} KIND: {kind} CALLID: {callid}",
         )
 
-        return self.process(unit, agency, zone, utype, kind, callid)
+        return self.process(unit, agency, zone, utype, kind, callid, page, limit)

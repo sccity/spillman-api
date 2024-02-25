@@ -269,6 +269,8 @@ class active(Resource):
                         "date": sql_date,
                     }
                 )
+                
+        data = sorted(data, key=lambda x: x.get("date", ""), reverse=True)
 
         start_index = (page - 1) * limit
         end_index = start_index + limit

@@ -355,6 +355,8 @@ class law(Resource):
                         "date": dispatch_dt,
                     }
                 )
+                
+        data = sorted(data, key=lambda x: x.get("dispatch_dt", ""), reverse=True)
 
         start_index = (page - 1) * limit
         end_index = start_index + limit
