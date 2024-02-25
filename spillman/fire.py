@@ -61,6 +61,13 @@ class fire(Resource):
         else:
             start_date = "01/01/1900"
             end_date = "12/31/9999"
+            
+        if incident_id is not None and incident_id != "*":
+            start_date = "01/01/1900"
+            end_date = "12/31/9999"
+        if call_id is not None and call_id != "*":
+            start_date = "01/01/1900"
+            end_date = "12/31/9999"
 
         session = requests.Session()
         session.auth = (self.api_usr, self.api_pwd)
@@ -80,7 +87,7 @@ class fire(Resource):
             </PublicSafety>
         </PublicSafetyEnvelope>
         """
-
+        
         try:
             headers = {"Content-Type": "application/xml"}
             try:
