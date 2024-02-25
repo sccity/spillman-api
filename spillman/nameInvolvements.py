@@ -83,6 +83,53 @@ class nameInvolvements(Resource):
             return
 
         return data
+      
+    def getNature(self, incident_id, table_name):
+        session = requests.Session()
+        session.auth = (self.api_usr, self.api_pwd)
+        request = f"""
+        <PublicSafetyEnvelope version="1.0">
+            <From>Spillman API - XML to JSON</From>
+            <PublicSafety id="">
+                <Query>
+                    <{table_name}>
+                        <number search_type="equal_to">{incident_id}</number>
+                    </{table_name}>
+                    <Columns>
+                      <ColumnName>nature</ColumnName>
+                    </Columns>
+                </Query>
+            </PublicSafety>
+        </PublicSafetyEnvelope>
+        """
+
+        try:
+            headers = {"Content-Type": "application/xml"}
+            try:
+                xml = session.post(
+                    self.api_url, data=request, headers=headers, verify=False
+                )
+                decoded = xml.content.decode("utf-8")
+                data = json.loads(json.dumps(xmltodict.parse(decoded)))
+                data = data["PublicSafetyEnvelope"]["PublicSafety"]["Response"][
+                    f"{table_name}"
+                ]
+
+            except Exception as e:
+                error = format(str(e))
+
+                if error.find("'NoneType'") != -1:
+                    return
+
+                else:
+                    err.error(traceback.format_exc())
+                    return
+
+        except:
+            err.error(traceback.format_exc())
+            return
+          
+        return data['nature']
 
     def process(self, name_id, page, limit):
         spillman = self.dataexchange(name_id)
@@ -109,12 +156,16 @@ class nameInvolvements(Resource):
 
             if record_type == "1000":
                 incident_type = "Fire"
+                nature = self.getNature(incident_id,"frmain")
             elif record_type == "1100":
                 incident_type = "EMS"
+                nature = self.getNature(incident_id,"emmain")
             elif record_type == "1200":
                 incident_type = "Law"
+                nature = self.getNature(incident_id,"lwmain")
             else:
                 incident_type = "Other"
+                nature = "Other"
                 
             try:
                 involvement_date = row["DateInvolvementOccurred"]
@@ -126,6 +177,7 @@ class nameInvolvements(Resource):
                 {
                     "name_id": name_id,
                     "incident_id": incident_id,
+                    "nature": nature,
                     "involvement_type": involvement_type,
                     "incident_type": incident_type,
                     "involvement_date": involvement_date,
@@ -151,12 +203,16 @@ class nameInvolvements(Resource):
     
                 if record_type == "1000":
                     incident_type = "Fire"
+                    nature = self.getNature(incident_id,"frmain")
                 elif record_type == "1100":
                     incident_type = "EMS"
+                    nature = self.getNature(incident_id,"emmain")
                 elif record_type == "1200":
                     incident_type = "Law"
+                    nature = self.getNature(incident_id,"lwmain")
                 else:
                     incident_type = "Other"
+                    nature = "Other"
 
                 try:
                     involvement_date = row["DateInvolvementOccurred"]
@@ -168,6 +224,7 @@ class nameInvolvements(Resource):
                     {
                         "name_id": name_id,
                         "incident_id": incident_id,
+                        "nature": nature,
                         "involvement_type": involvement_type,
                         "incident_type": incident_type,
                         "involvement_date": involvement_date,
