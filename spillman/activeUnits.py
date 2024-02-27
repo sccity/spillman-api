@@ -37,6 +37,9 @@ class activeUnits(Resource):
         rlog = s.radiolog()
         spillman = rlog.process("*", "*", cadcallid, "*", date, date, 1, 100)
     
+        if spillman is None:
+            return []
+    
         unique_units = set()
         result = []
     
