@@ -145,8 +145,8 @@ class rlog(Resource):
         spillman.auth.audit(
             token,
             request.access_route[0],
-            "RLOG",
-            f"UNIT: {rlog_unit} STATUS: {rlog_status} COMMENNT: {rlog_comment}",
+            "rlog",
+            json.dumps([args]),
         )
 
         return self.rlog(rlog_unit, rlog_status, rlog_comment, rlog_user, rlog_pass)

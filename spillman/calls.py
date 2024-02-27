@@ -258,6 +258,8 @@ class calls(Resource):
     def get(self):
         args = request.args
         token = args.get("token", default="", type=str)
+        app = args.get("app", default="*", type=str)
+        uid = args.get("uid", default="*", type=str)
         start = args.get("start", default="", type=str)
         end = args.get("end", default="", type=str)
         page = args.get('page', default=1, type=int)
@@ -279,11 +281,6 @@ class calls(Resource):
         if end == "":
             end = datetime.today().strftime("%Y-%m-%d")
 
-        s.auth.audit(
-            token,
-            request.access_route[0],
-            "CADMASTERCALLTABLE",
-            f"START DATE: {start} END DATE: {end}",
-        )
+        s.auth.audit(token, request.access_route[0], "calls", json.dumps([args]))
 
         return self.process(start, end, page, limit)

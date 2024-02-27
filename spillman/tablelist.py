@@ -34,6 +34,8 @@ class tablelist(Resource):
     def get(self):
         args = request.args
         token = args.get("token", default="", type=str)
+        app = args.get("app", default="*", type=str)
+        uid = args.get("uid", default="*", type=str)
         tablelist = args.get("tablelist", default="*", type=str)
 
         if token == "":
@@ -46,7 +48,7 @@ class tablelist(Resource):
         else:
             return abort(403)
 
-        s.auth.audit(token, request.access_route[0], "TABLELIST", "LIST ALL TABLES")
+        s.auth.audit(token, request.access_route[0], "tablelist", json.dumps([args]))
 
         data = []
 

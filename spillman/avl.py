@@ -229,6 +229,8 @@ class avl(Resource):
     def get(self):
         args = request.args
         token = args.get("token", default="", type=str)
+        app = args.get("app", default="*", type=str)
+        uid = args.get("uid", default="*", type=str)
         agency = args.get("agency", default="*", type=str)
         unit = args.get("unit", default="*", type=str)
         start = args.get("start", default="", type=str)
@@ -251,11 +253,6 @@ class avl(Resource):
         if end == "":
             end = datetime.today().strftime("%Y-%m-%d")
 
-        s.auth.audit(
-            token,
-            request.access_route[0],
-            "RLAVLLOG",
-            f"UNIT: {unit} AGENCY: {agency} START DATE: {start} END DATE: {end}",
-        )
+        s.auth.audit(token, request.access_route[0], "avl", json.dumps([args]))
 
         return self.process(agency, unit, start, end)

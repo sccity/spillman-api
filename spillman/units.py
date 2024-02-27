@@ -199,6 +199,8 @@ class units(Resource):
     def get(self):
         args = request.args
         token = args.get("token", default="", type=str)
+        app = args.get("app", default="*", type=str)
+        uid = args.get("uid", default="*", type=str)
         unit = args.get("unit", default="*", type=str)
         agency = args.get("agency", default="*", type=str)
         zone = args.get("zone", default="*", type=str)
@@ -215,11 +217,6 @@ class units(Resource):
         else:
             return abort(403)
 
-        s.auth.audit(
-            token,
-            request.access_route[0],
-            "CDUNIT",
-            f"UNIT: {unit} AGENCY: {agency} ZONE: {zone} TYPE: {utype} KIND: {kind}",
-        )
+        s.auth.audit(token, request.access_route[0], "units", json.dumps([args]))
 
         return self.process(unit, agency, zone, utype, kind)

@@ -124,6 +124,8 @@ class nameImage(Resource):
     def get(self):
         args = request.args
         token = args.get("token", default="", type=str)
+        app = args.get("app", default="*", type=str)
+        uid = args.get("uid", default="*", type=str)
         name_id = args.get("name_id", default="", type=str)
 
         if token == "":
@@ -136,11 +138,6 @@ class nameImage(Resource):
         else:
             return abort(403)
 
-        s.auth.audit(
-            token,
-            request.access_route[0],
-            "Images",
-            f"NAME ID: {name_id}",
-        )
+        s.auth.audit(token, request.access_route[0], "nameImage", json.dumps([args]))
 
         return self.process(name_id)
