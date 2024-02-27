@@ -242,6 +242,8 @@ class reclog(Resource):
     def get(self):
         args = request.args
         token = args.get("token", default="", type=str)
+        app = args.get("app", default="*", type=str)
+        uid = args.get("uid", default="*", type=str)
         cadcallid = args.get("callid", default="*", type=str)
 
         if token == "":
@@ -254,11 +256,6 @@ class reclog(Resource):
         else:
             return abort(403)
 
-        s.auth.audit(
-            token,
-            request.access_route[0],
-            "CDRECLST",
-            f"CALLID: {cadcallid}",
-        )
+        s.auth.audit(token, request.access_route[0], "reclog", json.dumps([args]))
 
         return self.process(cadcallid)

@@ -24,3 +24,4 @@ xmltodict
 uuid
 selenium
 webdriver_manager
+cachetools

@@ -80,6 +80,8 @@ class table(Resource):
     def get(self):
         args = request.args
         token = args.get("token", default="", type=str)
+        app = args.get("app", default="*", type=str)
+        uid = args.get("uid", default="*", type=str)
         table = args.get("table", default="", type=str)
 
         if token == "":
@@ -95,6 +97,6 @@ class table(Resource):
         else:
             return abort(403)
 
-        s.auth.audit(token, request.access_route[0], "TABLE", f"TABLE: {table}")
+        s.auth.audit(token, request.access_route[0], "table", json.dumps([args]))
 
         return self.dataexchange(table)

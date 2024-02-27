@@ -285,6 +285,8 @@ class radiolog(Resource):
     def get(self):
         args = request.args
         token = args.get("token", default="", type=str)
+        app = args.get("app", default="*", type=str)
+        uid = args.get("uid", default="*", type=str)
         agency = args.get("agency", default="*", type=str)
         unit = args.get("unit", default="*", type=str)
         callid = args.get("callid", default="*", type=str)
@@ -310,11 +312,6 @@ class radiolog(Resource):
         if end == "":
             end = datetime.today().strftime("%Y-%m-%d")
 
-        s.auth.audit(
-            token,
-            request.access_route[0],
-            "RLMAIN",
-            f"UNIT: {unit} AGENCY: {agency} CALLID: {callid} START DATE: {start} END DATE: {end}",
-        )
-
+        s.auth.audit(token, request.access_route[0], "radiolog", json.dumps([args]))
+        
         return self.process(agency, unit, callid, status, start, end, page, limit)

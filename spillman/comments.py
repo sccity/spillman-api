@@ -101,6 +101,8 @@ class comments(Resource):
     def get(self):
         args = request.args
         token = args.get("token", default="", type=str)
+        app = args.get("app", default="*", type=str)
+        uid = args.get("uid", default="*", type=str)
         cadcallid = args.get("callid", default="", type=str)
 
         if token == "":
@@ -116,11 +118,6 @@ class comments(Resource):
         if cadcallid == "":
             return jsonify(error="Missing callid argument.")
 
-        s.auth.audit(
-            token,
-            request.access_route[0],
-            "CADMASTERCALLCOMMENTSTABLE",
-            f"CALLID: {cadcallid}",
-        )
+        s.auth.audit(token, request.access_route[0], "comments", json.dumps([args]))
 
         return self.process(cadcallid)

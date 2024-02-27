@@ -130,6 +130,8 @@ class lawNarrative(Resource):
     def get(self):
         args = request.args
         token = args.get("token", default="", type=str)
+        app = args.get("app", default="*", type=str)
+        uid = args.get("uid", default="*", type=str)
         incident_id = args.get("incident_id", default="", type=str)
 
         if token == "":
@@ -142,11 +144,6 @@ class lawNarrative(Resource):
         else:
             return abort(403)
 
-        s.auth.audit(
-            token,
-            request.access_route[0],
-            "lawNarrative",
-            f"INCIDENT ID: {incident_id}",
-        )
+        s.auth.audit(token, request.access_route[0], "lawNarrative", json.dumps([args]))
 
         return self.process(incident_id)

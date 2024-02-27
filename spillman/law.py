@@ -385,6 +385,8 @@ class law(Resource):
     def get(self):
         args = request.args
         token = args.get("token", default="", type=str)
+        app = args.get("app", default="*", type=str)
+        uid = args.get("uid", default="*", type=str)
         agency = args.get("agency", default="*", type=str)
         incident_id = args.get("incident_id", default="*", type=str)
         call_id = args.get("call_id", default="*", type=str)
@@ -409,11 +411,6 @@ class law(Resource):
         if end == "":
             end = datetime.today().strftime("%Y-%m-%d")
 
-        s.auth.audit(
-            token,
-            request.access_route[0],
-            "LWMAIN",
-            f"AGENCY: {agency} START DATE: {start} END DATE: {end}",
-        )
+        s.auth.audit(token, request.access_route[0], "law", json.dumps([args]))
 
         return self.process(agency, incident_id, call_id, start, end, page, limit)

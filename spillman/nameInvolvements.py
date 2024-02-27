@@ -256,6 +256,8 @@ class nameInvolvements(Resource):
     def get(self):
         args = request.args
         token = args.get("token", default="", type=str)
+        app = args.get("app", default="*", type=str)
+        uid = args.get("uid", default="*", type=str)
         name_id = args.get("name_id", default="", type=str)
         page = args.get('page', default=1, type=int)
         limit = args.get('limit', default=10, type=int)
@@ -270,11 +272,6 @@ class nameInvolvements(Resource):
         else:
             return abort(403)
 
-        s.auth.audit(
-            token,
-            request.access_route[0],
-            "TableOfInvolvements",
-            f"NAME ID: {name_id}",
-        )
+        s.auth.audit(token, request.access_route[0], "nameInvolvements", json.dumps([args]))
 
         return self.process(name_id, page, limit)

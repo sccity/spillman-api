@@ -281,6 +281,8 @@ class active(Resource):
     def get(self):
         args = request.args
         token = args.get("token", default="", type=str)
+        app = args.get("app", default="*", type=str)
+        uid = args.get("uid", default="*", type=str)
         cadcallid = args.get("callid", default="*", type=str)
         agency = args.get("agency", default="*", type=str)
         status = args.get("status", default="*", type=str)
@@ -299,11 +301,6 @@ class active(Resource):
         else:
             return abort(403)
 
-        s.auth.audit(
-            token,
-            request.access_route[0],
-            "SYCAD",
-            f"CALLID: {cadcallid} AGENCY: {agency} STATUS: {status} TYPE: {ctype} CITY: {city}",
-        )
-
+        s.auth.audit(token, request.access_route[0], "active", json.dumps([args]))
+        
         return self.process(agency, status, ctype, city, cadcallid, page, limit)

@@ -533,6 +533,8 @@ class names(Resource):
     def get(self):
         args = request.args
         token = args.get("token", default="", type=str)
+        app = args.get("app", default="*", type=str)
+        uid = args.get("uid", default="*", type=str)
         number = args.get("num", default="*", type=str)
         last = args.get("last", default="*", type=str)
         first = args.get("first", default="*", type=str)
@@ -562,12 +564,7 @@ class names(Resource):
         else:
             ssn = f"{ssn[0:3]}-{ssn[3:5]}-{ssn[5:10]}"
 
-        s.auth.audit(
-            token,
-            request.access_route[0],
-            "NMMAIN",
-            f"NUMBER: {number} LAST: {last} FIRST: {first} MIDDLE: {middle} PHONE: {phone} TYPE: {ntype} DLNUM: {dl} DLSTATE: {dlstate} STATEID: {stateid} SSN: {ssn}",
-        )
+        s.auth.audit(token, request.access_route[0], "names", json.dumps([args]))
 
         return self.process(
             number, last, first, middle, phone, ntype, dl, dlstate, stateid, ssn, page, limit

@@ -351,6 +351,8 @@ class unitstatus(Resource):
     def get(self):
         args = request.args
         token = args.get("token", default="", type=str)
+        app = args.get("app", default="*", type=str)
+        uid = args.get("uid", default="*", type=str)
         unit = args.get("unit", default="*", type=str)
         agency = args.get("agency", default="*", type=str)
         zone = args.get("zone", default="*", type=str)
@@ -370,11 +372,6 @@ class unitstatus(Resource):
         else:
             return abort(403)
 
-        s.auth.audit(
-            token,
-            request.access_route[0],
-            "SYUNIT",
-            f"UNIT: {unit} AGENCY: {agency} ZONE: {zone} TYPE: {utype} KIND: {kind} CALLID: {callid}",
-        )
+        s.auth.audit(token, request.access_route[0], "unitstatus", json.dumps([args]))
 
         return self.process(unit, agency, zone, utype, kind, callid, page, limit)
