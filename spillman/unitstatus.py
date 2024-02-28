@@ -31,12 +31,11 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
 class unitstatus(Resource):
-    cache = TTLCache(maxsize=2500, ttl=3600)
-    
     def __init__(self):
         self.api_url = settings_data["spillman"]["url"]
         self.api_usr = settings_data["spillman"]["user"]
         self.api_pwd = settings_data["spillman"]["password"]
+        self.functions = s.functions()
 
     def dataexchange(self, unit, agency, zone, utype, kind, callid):
         session = requests.Session()
@@ -86,54 +85,6 @@ class unitstatus(Resource):
             return
 
         return data
-      
-    @cached(cache)
-    def getName(self, unit_id):
-        session = requests.Session()
-        session.auth = (self.api_usr, self.api_pwd)
-        request = f"""
-        <PublicSafetyEnvelope version="1.0">
-            <From>Spillman API - XML to JSON</From>
-            <PublicSafety id="">
-                <Query>
-                    <PatrolUnitOfficerDetail>
-                        <UnitNumber search_type="equal_to">{unit_id}</UnitNumber>
-                        <SequenceNumber search_type="equal_to">1</SequenceNumber>
-                    </PatrolUnitOfficerDetail>
-                    <Columns>
-                      <ColumnName>OfficerName</ColumnName>
-                    </Columns>
-                    <RowCount>1</RowCount>
-                </Query>
-            </PublicSafety>
-        </PublicSafetyEnvelope>
-        """
-
-        try:
-            headers = {"Content-Type": "application/xml"}
-            try:
-                xml = session.post(
-                    self.api_url, data=request, headers=headers, verify=False
-                )
-                decoded = xml.content.decode("utf-8")
-                data = json.loads(json.dumps(xmltodict.parse(decoded)))
-                data = data["PublicSafetyEnvelope"]["PublicSafety"]["Response"]["PatrolUnitOfficerDetail"]
-
-            except Exception as e:
-                error = format(str(e))
-
-                if error.find("'NoneType'") != -1:
-                    return
-
-                else:
-                    err.error(traceback.format_exc())
-                    return
-
-        except:
-            err.error(traceback.format_exc())
-            return
-          
-        return data['OfficerName']
       
     def process_row(self, row, data):
         try:
@@ -206,7 +157,7 @@ class unitstatus(Resource):
             
         try:
             if status != "OFFDT":
-                name = self.getName(unit)
+                name = self.functions.getUnitName(unit)
             else:
                 name = ""
         except:
@@ -304,7 +255,7 @@ class unitstatus(Resource):
                 desc = ""
                 
             try:
-                name = self.getName(unit)
+                name = self.functions.getUnitName(unit)
             except:
                 name = ""
 
