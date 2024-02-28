@@ -39,3 +39,4 @@ from .nameInvolvements import *
 from .nameImage import *
 from .lawNarrative import *
 from .activeUnits import *
+from .functions import *
