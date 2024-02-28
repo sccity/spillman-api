@@ -91,6 +91,13 @@ class names(Resource):
             return
 
         return data
+  
+    def processAlerts(self, name_id):
+        f = s.functions()
+        alert_list = f.nameAlertCodes(name_id)
+        alert_names = [f.getAlertName(alert) for alert in alert_list]
+        result = ', '.join(alert_names)
+        return result
 
     def process(
         self, number, last, first, middle, phone, ntype, dl, dlstate, stateid, ssn, page, limit
@@ -275,6 +282,11 @@ class names(Resource):
                 work_phone = work_phone.replace("-", "")
             except:
                 work_phone = ""
+                
+            try:
+                alerts = self.processAlerts(name_id)
+            except:
+                alerts = "NONE"
 
             data.append(
                 {
@@ -310,6 +322,7 @@ class names(Resource):
                     "zip": zipcode,
                     "primary_phone": primary_phone,
                     "work_phone": work_phone,
+                    "alerts": alerts,
                 }
             )
 
@@ -486,6 +499,11 @@ class names(Resource):
                     work_phone = work_phone.replace("-", "")
                 except:
                     work_phone = ""
+                    
+                try:
+                    alerts = self.processAlerts(name_id)
+                except:
+                    alerts = "NONE"
 
                 data.append(
                     {
@@ -521,6 +539,7 @@ class names(Resource):
                         "zip": zipcode,
                         "primary_phone": primary_phone,
                         "work_phone": work_phone,
+                        "alerts": alerts,
                     }
                 )
 
