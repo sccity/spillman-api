@@ -23,35 +23,43 @@ import spillman as s
 import urllib.request as urlreq
 from datetime import datetime
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
-from .log import setup_logger
+from .log import SetupLogger
 from .settings import settings_data
 
-err = setup_logger("activeUnits", "activeUnits")
+err = SetupLogger("active_units", "active_units")
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
-class activeUnits(Resource):
-
-    def process(self, cadcallid):
+class ActiveUnits(Resource):
+    def process(self, cad_call_id):
         date = datetime.today().strftime("%Y-%m-%d")
-        rlog = s.radiolog()
-        spillman = rlog.process("*", "*", cadcallid, "*", date, date, 1, 100)
-    
+        rlog = s.RadioLog()
+        spillman = rlog.process("*", "*", cad_call_id, "*", date, date, 1, 100)
+
         if spillman is None:
             return []
-    
+
         unique_units = set()
         result = []
-    
+
         for entry in spillman:
             unit = entry["unit"]
-    
+
             if unit not in unique_units:
                 unique_units.add(unit)
-                result.append({"unit": unit, "status": entry["status"]})
-    
-        result = [{"unit": entry["unit"], "status": entry["status"]} for entry in result if entry["status"] not in ["CMPLT", "8", "ONDT", None, ""]]
-    
+                past_time = datetime.strptime(entry["date"], "%Y-%m-%d %H:%M:%S")
+                current_time = datetime.now()
+                time_difference = current_time - past_time
+                minutes, seconds = divmod(time_difference.seconds, 60)
+                formatted_time = f"{minutes}m {seconds}s"
+                result.append({"agency": entry["agency"], "unit": unit, "status": entry["status"], "elapsed": formatted_time})
+
+        result = [
+            {"agency": entry["agency"], "unit": entry["unit"], "status": entry["status"], "elapsed": formatted_time}
+            for entry in result
+            if entry["status"] not in ["CMPLT", "8", "ONDT", None, ""]
+        ]
+
         return result
 
     def get(self):
@@ -59,18 +67,22 @@ class activeUnits(Resource):
         token = args.get("token", default="", type=str)
         app = args.get("app", default="*", type=str)
         uid = args.get("uid", default="*", type=str)
-        cadcallid = args.get("callid", default="", type=str)
+        cad_call_id = args.get("callid", default="", type=str)
 
         if token == "":
-            s.auth.audit("Missing", request.access_route[0], "AUTH", "ACCESS DENIED")
+            s.AuthService.audit_request(
+                "Missing", request.access_route[0], "AUTH", "ACCESS DENIED"
+            )
             return jsonify(error="No security token provided.")
 
-        auth = s.auth.check(token, request.access_route[0])
+        auth = s.AuthService.validate_token(token, request.access_route[0])
         if auth is True:
             pass
         else:
             return abort(403)
 
-        s.auth.audit(token, request.access_route[0], "units", json.dumps([args]))
+        s.AuthService.audit_request(
+            token, request.access_route[0], "units", json.dumps([args])
+        )
 
-        return self.process(cadcallid)
+        return self.process(cad_call_id)

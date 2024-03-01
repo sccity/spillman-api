@@ -25,7 +25,7 @@ formatter = logging.Formatter(
 )
 
 
-def setup_logger(name, log_file, level=settings_data["global"]["loglevel"]):
+def SetupLogger(name, log_file, level=settings_data["global"]["loglevel"]):
     log_path = os.path.exists("./logs/")
     if not log_path:
         os.makedirs("./logs")

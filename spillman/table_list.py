@@ -18,18 +18,18 @@
 from flask_restful import Resource, Api, request
 from flask import jsonify, abort
 import spillman as s
-from .log import setup_logger
+from .log import SetupLogger
 from .settings import settings_data
 from .database import db
 
-err = setup_logger("tablelist", "tablelist")
+err = SetupLogger("table_list", "table_list")
 
 
-class tablelist(Resource):
+class TableList(Resource):
     def __init__(self):
         self.api_url = settings_data["spillman"]["url"]
-        self.api_usr = settings_data["spillman"]["user"]
-        self.api_pwd = settings_data["spillman"]["password"]
+        self.api_user = settings_data["spillman"]["user"]
+        self.api_password = settings_data["spillman"]["password"]
 
     def get(self):
         args = request.args
@@ -39,16 +39,20 @@ class tablelist(Resource):
         tablelist = args.get("tablelist", default="*", type=str)
 
         if token == "":
-            s.auth.audit("Missing", request.access_route[0], "AUTH", "ACCESS DENIED")
+            s.AuthService.audit_request(
+                "Missing", request.access_route[0], "AUTH", "ACCESS DENIED"
+            )
             return jsonify(error="No security token provided.")
 
-        auth = s.auth.check(token, request.access_route[0])
+        auth = s.AuthService.validate_token(token, request.access_route[0])
         if auth is True:
             pass
         else:
             return abort(403)
 
-        s.auth.audit(token, request.access_route[0], "tablelist", json.dumps([args]))
+        s.AuthService.audit_request(
+            token, request.access_route[0], "tablelist", json.dumps([args])
+        )
 
         data = []
 

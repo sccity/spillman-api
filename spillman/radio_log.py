@@ -22,21 +22,21 @@ from flask import jsonify, abort
 from datetime import date, timedelta
 from datetime import datetime
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
-from .log import setup_logger
+from .log import SetupLogger
 from .settings import settings_data
 from .database import db
 
-err = setup_logger("radiolog", "radiolog")
+err = SetupLogger("radio_log", "radio_log")
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
-class radiolog(Resource):
+class RadioLog(Resource):
     def __init__(self):
         self.api_url = settings_data["spillman"]["url"]
-        self.api_usr = settings_data["spillman"]["user"]
-        self.api_pwd = settings_data["spillman"]["password"]
+        self.api_user = settings_data["spillman"]["user"]
+        self.api_password = settings_data["spillman"]["password"]
 
-    def dataexchange(self, agency, unit, callid, status, start, end):
+    def data_exchange(self, agency, unit, callid, status, start, end):
         start_date = date(
             int(start[0:4]), int(start[5:7]), int(start[8:10])
         ) - timedelta(days=1)
@@ -49,7 +49,7 @@ class radiolog(Resource):
         end_date = f"00:00:00 {end_date}"
 
         session = requests.Session()
-        session.auth = (self.api_usr, self.api_pwd)
+        session.auth = (self.api_user, self.api_password)
 
         if callid == "*":
             request = f"""
@@ -121,7 +121,7 @@ class radiolog(Resource):
         return data
 
     def process(self, agency, unit, callid, status, start, end, page, limit):
-        spillman = self.dataexchange(agency, unit, callid, status, start, end)
+        spillman = self.data_exchange(agency, unit, callid, status, start, end)
         data = []
 
         if spillman is None:
@@ -133,7 +133,7 @@ class radiolog(Resource):
                 logdate = f"{date[15:19]}-{date[9:11]}-{date[12:14]} {date[0:8]}"
             except:
                 logdate = "1900-01-01 00:00:00"
-                
+
             try:
                 xpos = spillman.get("xpos")
             except:
@@ -273,7 +273,7 @@ class radiolog(Resource):
                         "date": logdate,
                     }
                 )
-                
+
         data = sorted(data, key=lambda x: x.get("logdate", ""), reverse=True)
 
         start_index = (page - 1) * limit
@@ -293,14 +293,16 @@ class radiolog(Resource):
         status = args.get("status", default="*", type=str)
         start = args.get("start", default="", type=str)
         end = args.get("end", default="", type=str)
-        page = args.get('page', default=1, type=int)
-        limit = args.get('limit', default=10, type=int)
+        page = args.get("page", default=1, type=int)
+        limit = args.get("limit", default=10, type=int)
 
         if token == "":
-            s.auth.audit("Missing", request.access_route[0], "AUTH", "ACCESS DENIED")
+            s.AuthService.audit_request(
+                "Missing", request.access_route[0], "AUTH", "ACCESS DENIED"
+            )
             return jsonify(error="No security token provided.")
 
-        auth = s.auth.check(token, request.access_route[0])
+        auth = s.AuthService.validate_token(token, request.access_route[0])
         if auth is True:
             pass
         else:
@@ -312,6 +314,8 @@ class radiolog(Resource):
         if end == "":
             end = datetime.today().strftime("%Y-%m-%d")
 
-        s.auth.audit(token, request.access_route[0], "radiolog", json.dumps([args]))
-        
+        s.AuthService.audit_request(
+            token, request.access_route[0], "radiolog", json.dumps([args])
+        )
+
         return self.process(agency, unit, callid, status, start, end, page, limit)

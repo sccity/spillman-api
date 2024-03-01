@@ -1,4 +1,3 @@
-"""SPILLMAN."""
 # **********************************************************
 # * CATEGORY  SOFTWARE
 # * GROUP     DISPATCH
@@ -16,27 +15,30 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from .active_calls import *
-from .active_units import *
-from .api import *
-from .auth import *
-from .avl import *
-from .calls import *
-from .comments import *
-from .database import *
-from .ems import *
-from .emd import *
-from .fire import *
-from .law import *
-from .law_narrative import *
-from .log import *
-from .name_image import *
-from .name_involvements import *
-from .names import *
-from .radio_log import *
-from .rec_log import *
-from .spillman_functions import *
-from .table import *
-from .table_list import *
-from .unit_status import *
-from .units import *
+from flask import Flask, jsonify
+from flask_restful import Resource, Api
+from apifairy import APIFairy
+import spillman as s
+from .settings import settings_data, version_data
+
+apifairy = APIFairy()
+
+def spillman_api():
+    app = Flask(__name__)
+    app.config['APIFAIRY_TITLE'] = version_data["program"]
+    app.config['APIFAIRY_VERSION'] = version_data["version"]
+    apifairy.init_app(app)
+    return app
+
+# flask run --host=0.0.0.0 --port=8080
+# pip3 install -U -r requirements.txt
+# pipreqs --force ~/spillman-api/dev
+
+# python3 -m venv venv
+# source venv/bin/activate
+# deactivate
+
+
+
+
+
