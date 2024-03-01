@@ -22,21 +22,22 @@ from flask import jsonify, abort
 from datetime import date, timedelta
 from datetime import datetime
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
-from .log import setup_logger
+from .log import SetupLogger
 from .settings import settings_data
 from .database import db
 
-err = setup_logger("avl", "avl")
+err = SetupLogger("avl", "avl")
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
-class avl(Resource):
+class Avl(Resource):
     def __init__(self):
         self.api_url = settings_data["spillman"]["url"]
-        self.api_usr = settings_data["spillman"]["user"]
-        self.api_pwd = settings_data["spillman"]["password"]
+        self.api_user = settings_data["spillman"]["user"]
+        self.api_password = settings_data["spillman"]["password"]
+        self.f = s.SpillmanFunctions()
 
-    def dataexchange(self, agency, unit, start, end):
+    def data_exchange(self, agency, unit, start, end):
         start_date = date(
             int(start[0:4]), int(start[5:7]), int(start[8:10])
         ) - timedelta(days=1)
@@ -47,7 +48,7 @@ class avl(Resource):
         end_date = str(end_date.strftime("%m/%d/%Y"))
 
         session = requests.Session()
-        session.auth = (self.api_usr, self.api_pwd)
+        session.auth = (self.api_user, self.api_password)
 
         request = f"""
         <PublicSafetyEnvelope version="1.0">
@@ -101,53 +102,21 @@ class avl(Resource):
         return data
 
     def process(self, agency, unit, start, end):
-        spillman = self.dataexchange(agency, unit, start, end)
+        spillman = self.data_exchange(agency, unit, start, end)
         data = []
 
         if spillman is None:
             return
 
         elif type(spillman) == dict:
-            try:
-                date = spillman.get("logdate")
-                logdate = f"{date[15:19]}-{date[9:11]}-{date[12:14]} {date[0:8]}"
-            except:
-                logdate = "1900-01-01 00:00:00"
-
-            try:
-                gps_x = spillman.get("xlng")
-            except:
-                gps_x = 0
-
-            try:
-                gps_y = spillman.get("ylat")
-            except:
-                gps_y = 0
-
-            try:
-                agency = spillman.get("agency")
-            except:
-                agency = ""
-
-            try:
-                status = spillman.get("stcode")
-            except:
-                status = ""
-
-            try:
-                unit = spillman.get("assgnmt")
-            except:
-                unit = ""
-
-            try:
-                heading = spillman.get("heading")
-            except:
-                heading = ""
-
-            try:
-                speed = spillman.get("speed")
-            except:
-                speed = ""
+            log_date = self.f.validate_datetime(spillman.get("logdate"))
+            gps_x = self.f.validate_number(spillman.get("xlng"))
+            gps_y = self.f.validate_number(spillman.get("ylat"))
+            agency = self.f.validate_string(spillman.get("agency"))
+            status = self.f.validate_string(spillman.get("stcode"))
+            unit = self.f.validate_string(spillman.get("assgnmt"))
+            heading = self.f.validate_number(spillman.get("heading"))
+            speed = self.f.validate_number(spillman.get("speed"))
 
             data.append(
                 {
@@ -158,56 +127,21 @@ class avl(Resource):
                     "longitude": gps_x,
                     "heading": heading,
                     "speed": speed,
-                    "date": logdate,
+                    "date": log_date,
                 }
             )
 
         else:
             for row in spillman:
                 try:
-                    try:
-                        date = row["logdate"]
-                        logdate = (
-                            f"{date[15:19]}-{date[9:11]}-{date[12:14]} {date[0:8]}"
-                        )
-                    except:
-                        logdate = "1900-01-01 00:00:00"
-
-                    try:
-                        gps_x = row["xlng"]
-                    except:
-                        gps_x = 0
-
-                    try:
-                        gps_y = row["ylat"]
-                    except:
-                        gps_y = 0
-
-                    try:
-                        agency = row["agency"]
-                    except:
-                        agency = ""
-
-                    try:
-                        status = row["stcode"]
-                    except:
-                        status = ""
-
-                    try:
-                        unit = row["assgnmt"]
-                    except:
-                        unit = ""
-
-                    try:
-                        heading = row["heading"]
-                    except:
-                        heading = ""
-
-                    try:
-                        speed = row["speed"]
-                    except:
-                        speed = ""
-
+                    log_date = self.f.validate_datetime(row.get("logdate", ""))
+                    gps_x = self.f.validate_number(row.get("xlng", ""))
+                    gps_y = self.f.validate_number(row.get("ylat", ""))
+                    agency = self.f.validate_string(row.get("agency", ""))
+                    status = self.f.validate_string(row.get("stcode", ""))
+                    unit = self.f.validate_string(row.get("assgnmt", ""))
+                    heading = self.f.validate_number(row.get("heading", ""))
+                    speed = self.f.validate_number(row.get("speed", ""))
                 except:
                     continue
 
@@ -220,7 +154,7 @@ class avl(Resource):
                         "longitude": gps_x,
                         "heading": heading,
                         "speed": speed,
-                        "date": logdate,
+                        "date": log_date,
                     }
                 )
 
@@ -237,10 +171,12 @@ class avl(Resource):
         end = args.get("end", default="", type=str)
 
         if token == "":
-            s.auth.audit("Missing", request.access_route[0], "AUTH", f"ACCESS DENIED")
+            s.AuthService.audit_request(
+                "Missing", request.access_route[0], "AUTH", f"ACCESS DENIED"
+            )
             return jsonify(error="No security token provided.")
 
-        auth = s.auth.check(token, request.access_route[0])
+        auth = s.AuthService.validate_token(token, request.access_route[0])
 
         if auth is True:
             pass
@@ -253,6 +189,8 @@ class avl(Resource):
         if end == "":
             end = datetime.today().strftime("%Y-%m-%d")
 
-        s.auth.audit(token, request.access_route[0], "avl", json.dumps([args]))
+        s.AuthService.audit_request(
+            token, request.access_route[0], "avl", json.dumps([args])
+        )
 
         return self.process(agency, unit, start, end)

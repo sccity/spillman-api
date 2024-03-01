@@ -19,11 +19,11 @@ from .database import connect
 import uuid
 
 
-class auth:
+class AuthService:
     def __init__(self):
         return
 
-    def check(token, ipaddr):
+    def validate_token(token, ip_address):
         db = connect()
         cursor = db.cursor()
         try:
@@ -49,7 +49,7 @@ class auth:
 
             try:
                 cursor.execute(
-                    f"insert into auditlog (uuid,token,ipaddr,resource,action,datetime) values ('{unique_id}','{token}','{ipaddr}','AUTH','ACCESS DENIED',now())"
+                    f"insert into auditlog (uuid,token,ip_address,resource,action,datetime) values ('{unique_id}','{token}','{ip_address}','AUTH','ACCESS DENIED',now())"
                 )
                 db.commit()
                 cursor.close()
@@ -68,7 +68,7 @@ class auth:
 
             try:
                 cursor.execute(
-                    f"insert into auditlog (uuid,token,ipaddr,resource,action,datetime) values ('{unique_id}','{token}','{ipaddr}','AUTH','ACCESS DENIED',now())"
+                    f"insert into auditlog (uuid,token,ip_address,resource,action,datetime) values ('{unique_id}','{token}','{ip_address}','AUTH','ACCESS DENIED',now())"
                 )
                 db.commit()
                 cursor.close()
@@ -79,13 +79,13 @@ class auth:
 
         return valid
 
-    def audit(token, ipaddr, resource, action):
+    def audit_request(token, ip_address, resource, action):
         db = connect()
         cursor = db.cursor()
         unique_id = uuid.uuid1()
         try:
             cursor.execute(
-                f"insert into auditlog (uuid,token,ipaddr,resource,action,datetime) values ('{unique_id}','{token}','{ipaddr}','{resource}','{action}',now())"
+                f"insert into auditlog (uuid,token,ip_address,resource,action,datetime) values ('{unique_id}','{token}','{ip_address}','{resource}','{action}',now())"
             )
             db.commit()
             cursor.close()

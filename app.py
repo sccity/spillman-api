@@ -15,16 +15,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#from spillman.api import create_app
 from flask import Flask, jsonify
-from flask_restful import Api
+from flask_restful import Resource, Api
 import spillman as s
 from spillman.settings import settings_data, version_data
 
-app = Flask(__name__)
+app = s.spillman_api()
 api = Api(app)
 
-@app.route("/")
-def http_root():
+@app.route("/", methods=['GET'])
+def HttpRoot():
     return jsonify(
         application=version_data["program"],
         version=version_data["version"],
@@ -34,31 +35,29 @@ def http_root():
     )
 
 @app.errorhandler(404)
-def page_not_found(e):
+def PageNotFound(e):
     return jsonify(error=str(e)), 404
 
-api.add_resource(s.table, "/spillman/table")
-api.add_resource(s.tablelist, "/spillman/table/list")
-api.add_resource(s.units, "/spillman/unit")
-api.add_resource(s.unitstatus, "/spillman/unit/status")
-api.add_resource(s.active, "/cad/active")
-api.add_resource(s.activeUnits, "/cad/active/units")
-api.add_resource(s.comments, "/cad/comments")
-api.add_resource(s.names, "/name")
-api.add_resource(s.nameImage, "/name/image")
-api.add_resource(s.nameInvolvements, "/name/involvements")
-api.add_resource(s.calls, "/incidents/cad")
-api.add_resource(s.law, "/incidents/law")
-api.add_resource(s.lawNarrative, "/incidents/law/narrative")
-api.add_resource(s.fire, "/incidents/fire")
-api.add_resource(s.ems, "/incidents/ems")
-api.add_resource(s.reclog, "/incidents/reclog")
-api.add_resource(s.radiolog, "/radiolog")
-api.add_resource(s.avl, "/avl")
-api.add_resource(s.emd, "/emd")
-api.add_resource(s.rlog, "/rlog")
+api.add_resource(s.ActiveCalls, "/cad/active")
+api.add_resource(s.ActiveUnits, "/cad/active/units")
+api.add_resource(s.Avl, "/avl")
+api.add_resource(s.Calls, "/incidents/cad")
+api.add_resource(s.Comments, "/cad/comments")
+api.add_resource(s.Ems, "/incidents/ems")
+api.add_resource(s.Emd, "/emd")
+api.add_resource(s.Fire, "/incidents/fire")
+api.add_resource(s.Law, "/incidents/law")
+api.add_resource(s.LawNarrative, "/incidents/law/narrative")
+api.add_resource(s.NameImage, "/name/image")
+api.add_resource(s.NameInvolvements, "/name/involvements")
+api.add_resource(s.Names, "/name")
+api.add_resource(s.RadioLog, "/radiolog")
+api.add_resource(s.RecLog, "/incidents/reclog")
+api.add_resource(s.Table, "/spillman/table")
+api.add_resource(s.TableList, "/spillman/table/list")
+api.add_resource(s.UnitStatus, "/spillman/unit/status")
+api.add_resource(s.Units, "/spillman/unit")
 
-#flask run --host=0.0.0.0 --port=8080
 if __name__ == "__main__":
     from waitress import serve
     serve(app, host="0.0.0.0", port=settings_data["global"]["port"], threads=100)

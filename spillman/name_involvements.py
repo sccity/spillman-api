@@ -24,23 +24,23 @@ from flask import jsonify, abort
 from datetime import date, timedelta
 from datetime import datetime
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
-from .log import setup_logger
+from .log import SetupLogger
 from .settings import settings_data
 from .database import db
 
-err = setup_logger("nameInvolvements", "nameInvolvements")
+err = SetupLogger("name_involvements", "name_involvements")
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
-class nameInvolvements(Resource):
+class NameInvolvements(Resource):
     def __init__(self):
         self.api_url = settings_data["spillman"]["url"]
-        self.api_usr = settings_data["spillman"]["user"]
-        self.api_pwd = settings_data["spillman"]["password"]
+        self.api_user = settings_data["spillman"]["user"]
+        self.api_password = settings_data["spillman"]["password"]
 
-    def dataexchange(self, name_id):
+    def data_exchange(self, name_id):
         session = requests.Session()
-        session.auth = (self.api_usr, self.api_pwd)
+        session.auth = (self.api_user, self.api_password)
         request = f"""
         <PublicSafetyEnvelope version="1.0">
             <From>Spillman API - XML to JSON</From>
@@ -84,10 +84,10 @@ class nameInvolvements(Resource):
             return
 
         return data
-      
-    def getNature(self, incident_id, table_name):
+
+    def get_nature(self, incident_id, table_name):
         session = requests.Session()
-        session.auth = (self.api_usr, self.api_pwd)
+        session.auth = (self.api_user, self.api_password)
         request = f"""
         <PublicSafetyEnvelope version="1.0">
             <From>Spillman API - XML to JSON</From>
@@ -130,44 +130,44 @@ class nameInvolvements(Resource):
         except:
             err.error(traceback.format_exc())
             return
-          
-        return data['nature']
+
+        return data["nature"]
 
     def process_row(self, name_id, row, data):
         try:
             incident_id = row["RecIDThisRecordsIDNo"]
         except:
             incident_id = ""
-    
+
         try:
             involvement_type = row["RelationshipToOtherRecord"]
         except:
             involvement_type = ""
-            
+
         try:
             record_type = row["TypeOfThisRecord"]
         except:
             record_type = ""
-    
+
         if record_type == "1000":
             incident_type = "Fire"
-            nature = self.getNature(incident_id,"frmain")
+            nature = self.get_nature(incident_id, "frmain")
         elif record_type == "1100":
             incident_type = "EMS"
-            nature = self.getNature(incident_id,"emmain")
+            nature = self.get_nature(incident_id, "emmain")
         elif record_type == "1200":
             incident_type = "Law"
-            nature = self.getNature(incident_id,"lwmain")
+            nature = self.get_nature(incident_id, "lwmain")
         else:
             incident_type = "Other"
             nature = "Other"
-    
+
         try:
             involvement_date = row["DateInvolvementOccurred"]
             involvement_date = f"{involvement_date[6:10]}-{involvement_date[0:2]}-{involvement_date[3:5]} 00:00:00"
         except:
             involvement_date = "1900-01-01 00:00:00"
-    
+
         data.append(
             {
                 "name_id": name_id,
@@ -180,7 +180,7 @@ class nameInvolvements(Resource):
         )
 
     def process(self, name_id, page, limit):
-        spillman = self.dataexchange(name_id)
+        spillman = self.data_exchange(name_id)
         data = []
 
         if spillman is None:
@@ -196,7 +196,7 @@ class nameInvolvements(Resource):
                 involvement_type = spillman.get("RelationshipToOtherRecord")
             except:
                 involvement_type = ""
-                
+
             try:
                 record_type = spillman.get("TypeOfThisRecord")
             except:
@@ -204,17 +204,17 @@ class nameInvolvements(Resource):
 
             if record_type == "1000":
                 incident_type = "Fire"
-                nature = self.getNature(incident_id,"frmain")
+                nature = self.get_nature(incident_id, "frmain")
             elif record_type == "1100":
                 incident_type = "EMS"
-                nature = self.getNature(incident_id,"emmain")
+                nature = self.get_nature(incident_id, "emmain")
             elif record_type == "1200":
                 incident_type = "Law"
-                nature = self.getNature(incident_id,"lwmain")
+                nature = self.get_nature(incident_id, "lwmain")
             else:
                 incident_type = "Other"
                 nature = "Other"
-                
+
             try:
                 involvement_date = row["DateInvolvementOccurred"]
                 involvement_date = f"{involvement_date[6:10]}-{involvement_date[0:2]}-{involvement_date[3:5]} 00:00:00"
@@ -236,17 +236,19 @@ class nameInvolvements(Resource):
             threads = []
             for row in spillman:
                 try:
-                    thread = threading.Thread(target=self.process_row, args=(name_id, row, data))
+                    thread = threading.Thread(
+                        target=self.Process_row, args=(name_id, row, data)
+                    )
                     threads.append(thread)
                     thread.start()
                 except:
                     continue
-                
+
             for thread in threads:
-                    thread.join()
-                    
+                thread.join()
+
         data = sorted(data, key=lambda x: x.get("involvement_date", ""), reverse=True)
-                
+
         start_index = (page - 1) * limit
         end_index = start_index + limit
         paginated_data = data[start_index:end_index]
@@ -259,19 +261,23 @@ class nameInvolvements(Resource):
         app = args.get("app", default="*", type=str)
         uid = args.get("uid", default="*", type=str)
         name_id = args.get("name_id", default="", type=str)
-        page = args.get('page', default=1, type=int)
-        limit = args.get('limit', default=10, type=int)
+        page = args.get("page", default=1, type=int)
+        limit = args.get("limit", default=10, type=int)
 
         if token == "":
-            s.auth.audit("Missing", request.access_route[0], "AUTH", f"ACCESS DENIED")
+            s.AuthService.audit_request(
+                "Missing", request.access_route[0], "AUTH", f"ACCESS DENIED"
+            )
             return jsonify(error="No security token provided.")
 
-        auth = s.auth.check(token, request.access_route[0])
+        auth = s.AuthService.validate_token(token, request.access_route[0])
         if auth is True:
             pass
         else:
             return abort(403)
 
-        s.auth.audit(token, request.access_route[0], "nameInvolvements", json.dumps([args]))
+        s.AuthService.audit_request(
+            token, request.access_route[0], "nameInvolvements", json.dumps([args])
+        )
 
         return self.process(name_id, page, limit)

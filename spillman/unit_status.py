@@ -22,24 +22,24 @@ from flask_restful import Resource, Api, request
 from flask import jsonify, abort
 from datetime import datetime
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
-from .log import setup_logger
+from .log import SetupLogger
 from .settings import settings_data
 from cachetools import cached, TTLCache
 
-err = setup_logger("unitstatus", "unitstatus")
+err = SetupLogger("unit_status", "unit_status")
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
-class unitstatus(Resource):
+class UnitStatus(Resource):
     def __init__(self):
         self.api_url = settings_data["spillman"]["url"]
-        self.api_usr = settings_data["spillman"]["user"]
-        self.api_pwd = settings_data["spillman"]["password"]
-        self.functions = s.functions()
+        self.api_user = settings_data["spillman"]["user"]
+        self.api_password = settings_data["spillman"]["password"]
+        self.f = s.SpillmanFunctions()
 
-    def dataexchange(self, unit, agency, zone, utype, kind, callid):
+    def data_exchange(self, unit, agency, zone, utype, kind, callid):
         session = requests.Session()
-        session.auth = (self.api_usr, self.api_pwd)
+        session.auth = (self.api_user, self.api_password)
         request = f"""
         <PublicSafetyEnvelope version="1.0">
             <From>Spillman API - XML to JSON</From>
@@ -85,7 +85,7 @@ class unitstatus(Resource):
             return
 
         return data
-      
+
     def process_row(self, row, data):
         try:
             unit = row["unit"]
@@ -154,15 +154,15 @@ class unitstatus(Resource):
             desc = row["desc"]
         except:
             desc = ""
-            
+
         try:
             if status != "OFFDT":
-                name = self.functions.getUnitName(unit)
+                name = self.f.get_unit_name(unit)
             else:
                 name = ""
         except:
             name = ""
-    
+
         data.append(
             {
                 "unit": unit,
@@ -182,7 +182,7 @@ class unitstatus(Resource):
         )
 
     def process(self, unit, agency, zone, utype, kind, callid, page, limit):
-        spillman = self.dataexchange(unit, agency, zone, utype, kind, callid)
+        spillman = self.data_exchange(unit, agency, zone, utype, kind, callid)
         data = []
 
         if spillman is None:
@@ -253,9 +253,9 @@ class unitstatus(Resource):
                 desc = spillman.get("desc")
             except:
                 desc = ""
-                
+
             try:
-                name = self.functions.getUnitName(unit)
+                name = self.f.get_unit_name(unit)
             except:
                 name = ""
 
@@ -281,16 +281,15 @@ class unitstatus(Resource):
             threads = []
             for row in spillman:
                 try:
-                    thread = threading.Thread(target=self.process_row, args=(row, data))
+                    thread = threading.Thread(target=self.Process_row, args=(row, data))
                     threads.append(thread)
                     thread.start()
                 except:
                     continue
-                
-            for thread in threads:
-                    thread.join()
 
-                
+            for thread in threads:
+                thread.join()
+
         data = sorted(data, key=lambda x: x.get("status_time", ""), reverse=True)
 
         start_index = (page - 1) * limit
@@ -310,19 +309,23 @@ class unitstatus(Resource):
         utype = args.get("type", default="*", type=str)
         kind = args.get("kind", default="*", type=str)
         callid = args.get("callid", default="*", type=str)
-        page = args.get('page', default=1, type=int)
-        limit = args.get('limit', default=10, type=int)
+        page = args.get("page", default=1, type=int)
+        limit = args.get("limit", default=10, type=int)
 
         if token == "":
-            s.auth.audit("Missing", request.access_route[0], "AUTH", "ACCESS DENIED")
+            s.AuthService.audit_request(
+                "Missing", request.access_route[0], "AUTH", "ACCESS DENIED"
+            )
             return jsonify(error="No security token provided.")
 
-        auth = s.auth.check(token, request.access_route[0])
+        auth = s.AuthService.validate_token(token, request.access_route[0])
         if auth is True:
             pass
         else:
             return abort(403)
 
-        s.auth.audit(token, request.access_route[0], "unitstatus", json.dumps([args]))
+        s.AuthService.audit_request(
+            token, request.access_route[0], "unitstatus", json.dumps([args])
+        )
 
         return self.process(unit, agency, zone, utype, kind, callid, page, limit)

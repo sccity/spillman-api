@@ -24,24 +24,25 @@ import urllib.request as urlreq
 from datetime import date, timedelta
 from datetime import datetime
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
-from .log import setup_logger
+from .log import SetupLogger
 from .settings import settings_data
 
-err = setup_logger("names", "names")
+err = SetupLogger("names", "names")
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
-class names(Resource):
+class Names(Resource):
     def __init__(self):
         self.api_url = settings_data["spillman"]["url"]
-        self.api_usr = settings_data["spillman"]["user"]
-        self.api_pwd = settings_data["spillman"]["password"]
+        self.api_user = settings_data["spillman"]["user"]
+        self.api_password = settings_data["spillman"]["password"]
+        self.f = s.SpillmanFunctions()
 
-    def dataexchange(
+    def data_exchange(
         self, number, last, first, middle, phone, ntype, dl, dlstate, stateid, ssn
     ):
         session = requests.Session()
-        session.auth = (self.api_usr, self.api_pwd)
+        session.auth = (self.api_user, self.api_password)
         request = f"""
         <PublicSafetyEnvelope version="1.0">
             <From>Spillman API - XML to JSON</From>
@@ -91,18 +92,33 @@ class names(Resource):
             return
 
         return data
-  
-    def processAlerts(self, name_id):
-        f = s.functions()
-        alert_list = f.nameAlertCodes(name_id)
-        alert_names = [f.getAlertName(alert) for alert in alert_list]
-        result = ', '.join(alert_names)
-        return result
+
+    def process_alerts(self, name_id):
+        try:
+            f = s.SpillmanFunctions()
+            alert_list = f.name_alert_codes(name_id)
+            alert_names = [f.get_alert_name(alert) for alert in alert_list]
+            result = ", ".join(alert_names)
+            return result
+        except:
+            return "NONE"
 
     def process(
-        self, number, last, first, middle, phone, ntype, dl, dlstate, stateid, ssn, page, limit
+        self,
+        number,
+        last,
+        first,
+        middle,
+        phone,
+        ntype,
+        dl,
+        dlstate,
+        stateid,
+        ssn,
+        page,
+        limit,
     ):
-        spillman = self.dataexchange(
+        spillman = self.data_exchange(
             number, last, first, middle, phone, ntype, dl, dlstate, stateid, ssn
         )
         data = []
@@ -111,182 +127,44 @@ class names(Resource):
             return
 
         elif type(spillman) == dict:
-            try:
-                name_id = spillman.get("number")
-            except:
-                name_id = ""
-
-            try:
-                name_type = spillman.get("nametyp")
-            except:
-                name_type = ""
-
-            try:
-                ssn = spillman.get("ssnum")
-            except:
-                ssn = ""
-
-            try:
-                license_num = spillman.get("dlnum")
-            except:
-                license_num = ""
-
-            try:
-                license_state = spillman.get("dlstate")
-            except:
-                license_state = ""
-
-            try:
-                state_id = spillman.get("stateid")
-            except:
-                state_id = ""
-
-            try:
-                first_name = spillman.get("first")
-            except:
-                first_name = ""
-
-            try:
-                last_name = spillman.get("last")
-            except:
-                last_name = ""
-
-            try:
-                middle_name = spillman.get("middle")
-            except:
-                middle_name = ""
-
-            try:
-                suffix = spillman.get("suffix")
-            except:
-                suffix = ""
-
-            try:
-                alias = spillman.get("aka")
-            except:
-                alias = ""
-
-            try:
-                bday = spillman.get("birthd")
-                birth_day = f"{bday[6:10]}-{bday[0:2]}-{bday[3:5]}"
-            except:
-                birth_day = "1900-01-01 00:00:00"
-
-            try:
-                height = spillman.get("height")
-                height = height.replace("'", "ft ")
-                height = height.replace('"', "in")
-            except:
-                height = ""
-
-            try:
-                weight = spillman.get("weight")
-            except:
-                weight = ""
-
-            try:
-                sex = spillman.get("sex")
-            except:
-                sex = ""
-
-            try:
-                gender = spillman.get("gender")
-            except:
-                gender = ""
-
-            try:
-                race = spillman.get("race")
-            except:
-                race = ""
-
-            try:
-                ethnic = spillman.get("ethnic")
-            except:
-                ethnic = ""
-
-            try:
-                hair = spillman.get("hair")
-            except:
-                hair = ""
-
-            try:
-                hairstyle = spillman.get("hairsty")
-            except:
-                hairstyle = ""
-
-            try:
-                eyes = spillman.get("eyes")
-            except:
-                eyes = ""
-
-            try:
-                glasses = spillman.get("glasses")
-            except:
-                glasses = ""
-
-            try:
-                build = spillman.get("build")
-            except:
-                build = ""
-
-            try:
-                complexion = spillman.get("cmplx")
-            except:
-                complexion = ""
-
-            try:
-                facial = spillman.get("facial")
-            except:
-                facial = ""
-
-            try:
-                speech = spillman.get("speech")
-            except:
-                speech = ""
-
-            try:
-                address = spillman.get("street")
-                address = address.replace('"', "")
-                address = address.replace("'", "")
-                address = address.replace(";", "")
-            except:
-                address = ""
-
-            try:
-                city = spillman.get("city")
-            except:
-                city = ""
-
-            try:
-                state = spillman.get("state")
-            except:
-                state = ""
-
-            try:
-                zipcode = spillman.get("zip")
-            except:
-                zipcode = ""
-
-            try:
-                primary_phone = spillman.get("phone")
-                primary_phone = primary_phone.replace("(", "")
-                primary_phone = primary_phone.replace(")", "")
-                primary_phone = primary_phone.replace("-", "")
-            except:
-                primary_phone = ""
-
-            try:
-                work_phone = spillman.get("wrkphn")
-                work_phone = work_phone.replace("(", "")
-                work_phone = work_phone.replace(")", "")
-                work_phone = work_phone.replace("-", "")
-            except:
-                work_phone = ""
-                
-            try:
-                alerts = self.processAlerts(name_id)
-            except:
-                alerts = "NONE"
+            name_id = self.f.validate_string(spillman.get("number"))
+            name_type = self.f.validate_string(spillman.get("nametyp"))
+            ssn = self.f.validate_string(spillman.get("ssnum"))
+            license_num = self.f.validate_string(spillman.get("dlnum"))
+            license_state = self.f.validate_string(spillman.get("dlstate"))
+            state_id = self.f.validate_string(spillman.get("stateid"))
+            first_name = self.f.validate_string(spillman.get("first"))
+            last_name = self.f.validate_string(spillman.get("last"))
+            middle_name = self.f.validate_string(spillman.get("middle"))
+            suffix = self.f.validate_string(spillman.get("suffix"))
+            alias = self.f.validate_string(spillman.get("aka"))
+            birth_day = self.f.validate_date(spillman.get("birthd"))
+            height = self.f.validate_string(spillman.get("height"))
+            height = height.replace("'", "ft ")
+            height = height.replace('"', "in")
+            weight = self.f.validate_string(spillman.get("weight"))
+            sex = self.f.validate_string(spillman.get("sex"))
+            gender = self.f.validate_string(spillman.get("gender"))
+            race = self.f.validate_string(spillman.get("race"))
+            ethnic = self.f.validate_string(spillman.get("ethnic"))
+            hair = self.f.validate_string(spillman.get("hair"))
+            hairstyle = self.f.validate_string(spillman.get("hairsty"))
+            eyes = self.f.validate_string(spillman.get("eyes"))
+            glasses = self.f.validate_string(spillman.get("glasses"))
+            build = self.f.validate_string(spillman.get("build"))
+            complexion = self.f.validate_string(spillman.get("cmplx"))
+            facial = self.f.validate_string(spillman.get("facial"))
+            speech = self.f.validate_string(spillman.get("speech"))
+            address = self.f.validate_string(spillman.get("street"))
+            address = address.replace('"', "")
+            address = address.replace("'", "")
+            address = address.replace(";", "")
+            city = self.f.validate_string(spillman.get("city"))
+            state = self.f.validate_string(spillman.get("state"))
+            zipcode = self.f.validate_string(spillman.get("zip"))
+            primary_phone = self.f.validate_phone(spillman.get("phone"))
+            work_phone = self.f.validate_phone(spillman.get("wrkphn"))
+            alerts = self.process_alerts(name_id)
 
             data.append(
                 {
@@ -329,181 +207,47 @@ class names(Resource):
         else:
             for row in spillman:
                 try:
-                    name_id = row["number"]
-                except:
-                    name_id = ""
-
-                try:
-                    name_type = row["nametyp"]
-                except:
-                    name_type = ""
-
-                try:
-                    ssn = row["ssnum"]
-                except:
-                    ssn = ""
-
-                try:
-                    license_num = row["dlnum"]
-                except:
-                    license_num = ""
-
-                try:
-                    license_state = row["dlstate"]
-                except:
-                    license_state = ""
-
-                try:
-                    state_id = row["stateid"]
-                except:
-                    state_id = ""
-
-                try:
-                    first_name = row["first"]
-                except:
-                    first_name = ""
-
-                try:
-                    last_name = row["last"]
-                except:
-                    last_name = ""
-
-                try:
-                    middle_name = row["middle"]
-                except:
-                    middle_name = ""
-
-                try:
-                    suffix = row["suffix"]
-                except:
-                    suffix = ""
-
-                try:
-                    alias = row["aka"]
-                except:
-                    alias = ""
-
-                try:
-                    bday = row["birthd"]
-                    birth_day = f"{bday[6:10]}-{bday[0:2]}-{bday[3:5]}"
-                except:
-                    birth_day = "1900-01-01 00:00:00"
-
-                try:
-                    height = row["height"]
+                    name_id = self.f.validate_string(row.get("number", ""))
+                    name_type = self.f.validate_string(row.get("nametyp", ""))
+                    ssn = self.f.validate_string(row.get("ssnum", ""))
+                    license_num = self.f.validate_string(row.get("dlnum", ""))
+                    license_state = self.f.validate_string(row.get("dlstate", ""))
+                    state_id = self.f.validate_string(row.get("stateid", ""))
+                    first_name = self.f.validate_string(row.get("first", ""))
+                    last_name = self.f.validate_string(row.get("last", ""))
+                    middle_name = self.f.validate_string(row.get("middle", ""))
+                    suffix = self.f.validate_string(row.get("suffix", ""))
+                    alias = self.f.validate_string(row.get("aka", ""))
+                    birth_day = self.f.validate_date(row.get("birthd", ""))
+                    height = self.f.validate_string(row.get("height", ""))
                     height = height.replace("'", "ft ")
                     height = height.replace('"', "in")
-                except:
-                    height = ""
-
-                try:
-                    weight = row["weight"]
-                except:
-                    weight = ""
-
-                try:
-                    sex = row["sex"]
-                except:
-                    sex = ""
-
-                try:
-                    gender = row["gender"]
-                except:
-                    gender = ""
-
-                try:
-                    race = row["race"]
-                except:
-                    race = ""
-
-                try:
-                    ethnic = row["ethnic"]
-                except:
-                    ethnic = ""
-
-                try:
-                    hair = row["hair"]
-                except:
-                    hair = ""
-
-                try:
-                    hairstyle = row["hairsty"]
-                except:
-                    hairstyle = ""
-
-                try:
-                    eyes = row["eyes"]
-                except:
-                    eyes = ""
-
-                try:
-                    glasses = row["glasses"]
-                except:
-                    glasses = ""
-
-                try:
-                    build = row["build"]
-                except:
-                    build = ""
-
-                try:
-                    complexion = row["cmplx"]
-                except:
-                    complexion = ""
-
-                try:
-                    facial = row["facial"]
-                except:
-                    facial = ""
-
-                try:
-                    speech = row["speech"]
-                except:
-                    speech = ""
-
-                try:
-                    address = row["street"]
+                    weight = self.f.validate_string(row.get("weight", ""))
+                    sex = self.f.validate_string(row.get("sex", ""))
+                    gender = self.f.validate_string(row.get("gender", ""))
+                    race = self.f.validate_string(row.get("race", ""))
+                    ethnic = self.f.validate_string(row.get("ethnic", ""))
+                    hair = self.f.validate_string(row.get("hair", ""))
+                    hairstyle = self.f.validate_string(row.get("hairsty", ""))
+                    eyes = self.f.validate_string(row.get("eyes", ""))
+                    glasses = self.f.validate_string(row.get("glasses", ""))
+                    build = self.f.validate_string(row.get("build", ""))
+                    complexion = self.f.validate_string(row.get("cmplx", ""))
+                    facial = self.f.validate_string(row.get("facial", ""))
+                    speech = self.f.validate_string(row.get("speech", ""))
+                    address = self.f.validate_string(row.get("street", ""))
                     address = address.replace('"', "")
                     address = address.replace("'", "")
                     address = address.replace(";", "")
-                except:
-                    address = ""
-
-                try:
-                    city = row["city"]
-                except:
-                    city = ""
-
-                try:
-                    state = row["state"]
-                except:
-                    state = ""
-
-                try:
-                    zipcode = row["zip"]
-                except:
-                    zipcode = ""
-
-                try:
-                    primary_phone = row["phone"]
-                    primary_phone = primary_phone.replace("(", "")
-                    primary_phone = primary_phone.replace(")", "")
-                    primary_phone = primary_phone.replace("-", "")
-                except:
-                    primary_phone = ""
-
-                try:
-                    work_phone = row["wrkphn"]
-                    work_phone = work_phone.replace("(", "")
-                    work_phone = work_phone.replace(")", "")
-                    work_phone = work_phone.replace("-", "")
-                except:
-                    work_phone = ""
+                    city = self.f.validate_string(row.get("city", ""))
+                    state = self.f.validate_string(row.get("state", ""))
+                    zipcode = self.f.validate_string(row.get("zip", ""))
+                    primary_phone = self.f.validate_phone(row.get("phone", ""))
+                    work_phone = self.f.validate_phone(row.get("wrkphn", ""))
+                    alerts = self.process_alerts(name_id)
                     
-                try:
-                    alerts = self.processAlerts(name_id)
                 except:
-                    alerts = "NONE"
+                    continue
 
                 data.append(
                     {
@@ -564,14 +308,16 @@ class names(Resource):
         dlstate = args.get("dlstate", default="*", type=str)
         stateid = args.get("stateid", default="*", type=str)
         ssn = args.get("ssn", default="*", type=str)
-        page = args.get('page', default=1, type=int)
-        limit = args.get('limit', default=10, type=int)
+        page = args.get("page", default=1, type=int)
+        limit = args.get("limit", default=10, type=int)
 
         if token == "":
-            s.auth.audit("Missing", request.access_route[0], "AUTH", f"ACCESS DENIED")
+            s.AuthService.audit_request(
+                "Missing", request.access_route[0], "AUTH", f"ACCESS DENIED"
+            )
             return jsonify(error="No security token provided.")
 
-        auth = s.auth.check(token, request.access_route[0])
+        auth = s.AuthService.validate_token(token, request.access_route[0])
 
         if auth is True:
             pass
@@ -583,8 +329,21 @@ class names(Resource):
         else:
             ssn = f"{ssn[0:3]}-{ssn[3:5]}-{ssn[5:10]}"
 
-        s.auth.audit(token, request.access_route[0], "names", json.dumps([args]))
+        s.AuthService.audit_request(
+            token, request.access_route[0], "names", json.dumps([args])
+        )
 
         return self.process(
-            number, last, first, middle, phone, ntype, dl, dlstate, stateid, ssn, page, limit
+            number,
+            last,
+            first,
+            middle,
+            phone,
+            ntype,
+            dl,
+            dlstate,
+            stateid,
+            ssn,
+            page,
+            limit,
         )

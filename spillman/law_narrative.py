@@ -23,33 +23,31 @@ from flask import jsonify, abort
 from datetime import date, timedelta
 from datetime import datetime
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
-from .log import setup_logger
+from .log import SetupLogger
 from .settings import settings_data
 from .database import db
 
-err = setup_logger("nameImage", "nameImage")
+err = SetupLogger("law_narrative", "law_narrative")
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
-class nameImage(Resource):
+class LawNarrative(Resource):
     def __init__(self):
         self.api_url = settings_data["spillman"]["url"]
-        self.api_usr = settings_data["spillman"]["user"]
-        self.api_pwd = settings_data["spillman"]["password"]
+        self.api_user = settings_data["spillman"]["user"]
+        self.api_password = settings_data["spillman"]["password"]
 
-    def dataexchange(self, name_id):
+    def data_exchange(self, incident_id):
         session = requests.Session()
-        session.auth = (self.api_usr, self.api_pwd)
+        session.auth = (self.api_user, self.api_password)
         request = f"""
         <PublicSafetyEnvelope version="1.0">
             <From>Spillman API - XML to JSON</From>
             <PublicSafety id="">
                 <Query>
-                    <Images>
-                        <Parnum search_type="equal_to">{name_id}</Parnum>
-                        <Partype search_type="equal_to">nmmain</Partype>
-                        <Thumb1 search_type="equal_to">Y</Thumb1>
-                    </Images>
+                    <LawIncidentNarrative>
+                        <number search_type="equal_to">{incident_id}</number>
+                    </LawIncidentNarrative>
                 </Query>
             </PublicSafety>
         </PublicSafetyEnvelope>
@@ -64,7 +62,7 @@ class nameImage(Resource):
                 decoded = xml.content.decode("utf-8")
                 data = json.loads(json.dumps(xmltodict.parse(decoded)))
                 data = data["PublicSafetyEnvelope"]["PublicSafety"]["Response"][
-                    "Images"
+                    "LawIncidentNarrative"
                 ]
 
             except Exception as e:
@@ -83,8 +81,8 @@ class nameImage(Resource):
 
         return data
 
-    def process(self, name_id):
-        spillman = self.dataexchange(name_id)
+    def process(self, incident_id):
+        spillman = self.data_exchange(incident_id)
         data = []
 
         if spillman is None:
@@ -92,30 +90,38 @@ class nameImage(Resource):
 
         elif type(spillman) == dict:
             try:
-                image_file = spillman.get("Name")
+                incident_id = spillman.get("IncidentNumber")
             except:
-                image_file = ""
+                incident_id = ""
+
+            try:
+                narrative = spillman.get("Narrative")
+            except:
+                narrative = ""
 
             data.append(
                 {
-                    "name_id": name_id,
-                    "image_path": "/sds/files/images/",
-                    "image_file": image_file,
+                    "incident_id": incident_id,
+                    "narrative": narrative,
                 }
             )
 
         else:
             for row in spillman:
                 try:
-                    image_file = row["Name"]
+                    incident_id = row["IncidentNumber"]
                 except:
-                    image_file = ""
+                    incident_id = ""
+
+                try:
+                    narrative = row["Narrative"]
+                except:
+                    narrative = ""
 
                 data.append(
                     {
-                        "name_id": name_id,
-                        "image_path": "/sds/files/images/",
-                        "image_file": image_file,
+                        "incident_id": incident_id,
+                        "narrative": narrative,
                     }
                 )
 
@@ -126,18 +132,22 @@ class nameImage(Resource):
         token = args.get("token", default="", type=str)
         app = args.get("app", default="*", type=str)
         uid = args.get("uid", default="*", type=str)
-        name_id = args.get("name_id", default="", type=str)
+        incident_id = args.get("incident_id", default="", type=str)
 
         if token == "":
-            s.auth.audit("Missing", request.access_route[0], "AUTH", f"ACCESS DENIED")
+            s.AuthService.audit_request(
+                "Missing", request.access_route[0], "AUTH", f"ACCESS DENIED"
+            )
             return jsonify(error="No security token provided.")
 
-        auth = s.auth.check(token, request.access_route[0])
+        auth = s.AuthService.validate_token(token, request.access_route[0])
         if auth is True:
             pass
         else:
             return abort(403)
 
-        s.auth.audit(token, request.access_route[0], "nameImage", json.dumps([args]))
+        s.AuthService.audit_request(
+            token, request.access_route[0], "lawNarrative", json.dumps([args])
+        )
 
-        return self.process(name_id)
+        return self.process(incident_id)
