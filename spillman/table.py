@@ -22,23 +22,23 @@ import requests
 import spillman as s
 import urllib.request as urlreq
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
-from .log import setup_logger
+from .log import SetupLogger
 from .settings import settings_data
 from .database import db
 
-err = setup_logger("table", "table")
+err = SetupLogger("table", "table")
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
-class table(Resource):
+class Table(Resource):
     def __init__(self):
         self.api_url = settings_data["spillman"]["url"]
-        self.api_usr = settings_data["spillman"]["user"]
-        self.api_pwd = settings_data["spillman"]["password"]
+        self.api_user = settings_data["spillman"]["user"]
+        self.api_password = settings_data["spillman"]["password"]
 
-    def dataexchange(self, table):
+    def data_exchange(self, table):
         session = requests.Session()
-        session.auth = (self.api_usr, self.api_pwd)
+        session.auth = (self.api_user, self.api_password)
         request = f"""
         <PublicSafetyEnvelope version="1.0">
             <From>Spillman API - XML to JSON</From>
@@ -46,6 +46,7 @@ class table(Resource):
                 <Query>
                     <{table}>
                     </{table}>
+                    <RowCount>100</RowCount>
                 </Query>
             </PublicSafety>
         </PublicSafetyEnvelope>
@@ -85,18 +86,22 @@ class table(Resource):
         table = args.get("table", default="", type=str)
 
         if token == "":
-            s.auth.audit("Missing", request.access_route[0], "AUTH", f"ACCESS DENIED")
+            s.AuthService.audit_request(
+                "Missing", request.access_route[0], "AUTH", f"ACCESS DENIED"
+            )
             return jsonify(error="No security token provided.")
 
         if table == "":
             table = "sycad"
 
-        auth = s.auth.check(token, request.access_route[0])
+        auth = s.AuthService.validate_token(token, request.access_route[0])
         if auth is True:
             pass
         else:
             return abort(403)
 
-        s.auth.audit(token, request.access_route[0], "table", json.dumps([args]))
+        s.AuthService.audit_request(
+            token, request.access_route[0], "table", json.dumps([args])
+        )
 
-        return self.dataexchange(table)
+        return self.data_exchange(table)

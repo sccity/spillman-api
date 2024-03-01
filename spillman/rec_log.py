@@ -22,29 +22,29 @@ import requests, uuid
 import spillman as s
 from datetime import datetime
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
-from .log import setup_logger
+from .log import SetupLogger
 from .settings import settings_data
 
-err = setup_logger("reclog", "reclog")
+err = SetupLogger("rec_log", "rec_log")
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
-class reclog(Resource):
+class RecLog(Resource):
     def __init__(self):
         self.api_url = settings_data["spillman"]["url"]
-        self.api_usr = settings_data["spillman"]["user"]
-        self.api_pwd = settings_data["spillman"]["password"]
+        self.api_user = settings_data["spillman"]["user"]
+        self.api_password = settings_data["spillman"]["password"]
 
-    def dataexchange(self, cadcallid):
+    def data_exchange(self, cad_call_id):
         session = requests.Session()
-        session.auth = (self.api_usr, self.api_pwd)
+        session.auth = (self.api_user, self.api_password)
         request = f"""
         <PublicSafetyEnvelope version="1.0">
             <From>Spillman API - XML to JSON</From>
             <PublicSafety id="">
                 <Query>
                     <cdreclst>
-                        <callid search_type="equal_to">{cadcallid}</callid>
+                        <callid search_type="equal_to">{cad_call_id}</callid>
                     </cdreclst>
                 </Query>
             </PublicSafety>
@@ -59,7 +59,9 @@ class reclog(Resource):
                 )
                 decoded = xml.content.decode("utf-8")
                 data = json.loads(json.dumps(xmltodict.parse(decoded)))
-                data = data["PublicSafetyEnvelope"]["PublicSafety"]["Response"]["cdreclst"]
+                data = data["PublicSafetyEnvelope"]["PublicSafety"]["Response"][
+                    "cdreclst"
+                ]
 
             except Exception as e:
                 error = format(str(e))
@@ -77,8 +79,8 @@ class reclog(Resource):
 
         return data
 
-    def process(self,cadcallid):
-        spillman = self.dataexchange(cadcallid)
+    def process(self, cad_call_id):
+        spillman = self.data_exchange(cad_call_id)
         data = []
 
         if spillman is None:
@@ -124,21 +126,21 @@ class reclog(Resource):
                 disptch = spillman.get("disptch")
             except:
                 disptch = ""
-                
+
             if recom == "Y":
                 recom = "Yes"
             elif recom == "N":
                 recom = "No"
             else:
                 recom = "ERR"
-                
+
             if select == "Y":
                 select = "Yes"
             elif select == "N":
                 select = "No"
             else:
                 select = "ERR"
-                
+
             if disptch == "Y":
                 disptch = "Yes"
             elif disptch == "N":
@@ -173,47 +175,46 @@ class reclog(Resource):
                         unit = row["unit"]
                     except:
                         unit = ""
-                        
+
                     try:
                         funtcn = row["funtcn"]
                     except:
                         funtcn = ""
-                        
+
                     try:
                         recom = row["recom"]
                     except:
                         recom = ""
-                        
+
                     try:
                         select = row["select"]
                     except:
                         select = ""
-                        
+
                     try:
                         disptch = row["disptch"]
                     except:
                         disptch = ""
-                        
+
                     try:
                         desc = row["desc"]
                     except:
                         desc = ""
-                        
-                        
+
                     if recom == "Y":
                         recom = "Yes"
                     elif recom == "N":
                         recom = "No"
                     else:
                         recom = "ERR"
-                        
+
                     if select == "Y":
                         select = "Yes"
                     elif select == "N":
                         select = "No"
                     else:
                         select = "ERR"
-                        
+
                     if disptch == "Y":
                         disptch = "Yes"
                     elif disptch == "N":
@@ -244,18 +245,22 @@ class reclog(Resource):
         token = args.get("token", default="", type=str)
         app = args.get("app", default="*", type=str)
         uid = args.get("uid", default="*", type=str)
-        cadcallid = args.get("callid", default="*", type=str)
+        cad_call_id = args.get("callid", default="*", type=str)
 
         if token == "":
-            s.auth.audit("Missing", request.access_route[0], "AUTH", "ACCESS DENIED")
+            s.AuthService.audit_request(
+                "Missing", request.access_route[0], "AUTH", "ACCESS DENIED"
+            )
             return jsonify(error="No security token provided.")
 
-        auth = s.auth.check(token, request.access_route[0])
+        auth = s.AuthService.validate_token(token, request.access_route[0])
         if auth is True:
             pass
         else:
             return abort(403)
 
-        s.auth.audit(token, request.access_route[0], "reclog", json.dumps([args]))
+        s.AuthService.audit_request(
+            token, request.access_route[0], "reclog", json.dumps([args])
+        )
 
-        return self.process(cadcallid)
+        return self.process(cad_call_id)

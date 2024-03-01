@@ -20,29 +20,29 @@ import spillman as s
 from flask_restful import Resource, Api, request
 from flask import jsonify, abort
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
-from .log import setup_logger
+from .log import SetupLogger
 from .settings import settings_data
 
-err = setup_logger("comments", "comments")
+err = SetupLogger("comments", "comments")
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
-class comments(Resource):
+class Comments(Resource):
     def __init__(self):
         self.api_url = settings_data["spillman"]["url"]
-        self.api_usr = settings_data["spillman"]["user"]
-        self.api_pwd = settings_data["spillman"]["password"]
+        self.api_user = settings_data["spillman"]["user"]
+        self.api_password = settings_data["spillman"]["password"]
 
-    def dataexchange(self, cadcallid):
+    def data_exchange(self, cad_call_id):
         session = requests.Session()
-        session.auth = (self.api_usr, self.api_pwd)
+        session.auth = (self.api_user, self.api_password)
         request = f"""
         <PublicSafetyEnvelope version="1.0">
             <From>Spillman API - XML to JSON</From>
             <PublicSafety id="">
                 <Query>
                     <CADMasterCallCommentsTable>
-                        <LongTermCallID search_type="equal_to">{cadcallid}</LongTermCallID>
+                        <LongTermCallID search_type="equal_to">{cad_call_id}</LongTermCallID>
                     </CADMasterCallCommentsTable>
                 </Query>
             </PublicSafety>
@@ -77,8 +77,8 @@ class comments(Resource):
 
         return data
 
-    def process(self, cadcallid):
-        spillman = self.dataexchange(cadcallid)
+    def process(self, cad_call_id):
+        spillman = self.data_exchange(cad_call_id)
         data = []
 
         if spillman is None:
@@ -103,21 +103,25 @@ class comments(Resource):
         token = args.get("token", default="", type=str)
         app = args.get("app", default="*", type=str)
         uid = args.get("uid", default="*", type=str)
-        cadcallid = args.get("callid", default="", type=str)
+        cad_call_id = args.get("callid", default="", type=str)
 
         if token == "":
-            s.auth.audit("Missing", request.access_route[0], "AUTH", "ACCESS DENIED")
+            s.AuthService.audit_request(
+                "Missing", request.access_route[0], "AUTH", "ACCESS DENIED"
+            )
             return jsonify(error="No security token provided.")
 
-        auth = s.auth.check(token, request.access_route[0])
+        auth = s.AuthService.validate_token(token, request.access_route[0])
         if auth is True:
             pass
         else:
             return abort(403)
 
-        if cadcallid == "":
+        if cad_call_id == "":
             return jsonify(error="Missing callid argument.")
 
-        s.auth.audit(token, request.access_route[0], "comments", json.dumps([args]))
+        s.AuthService.audit_request(
+            token, request.access_route[0], "comments", json.dumps([args])
+        )
 
-        return self.process(cadcallid)
+        return self.process(cad_call_id)

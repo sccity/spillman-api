@@ -22,32 +22,33 @@ import requests, uuid
 import spillman as s
 from datetime import datetime
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
-from .log import setup_logger
+from .log import SetupLogger
 from .settings import settings_data
 
-err = setup_logger("active", "active")
+err = SetupLogger("active_calls", "active_calls")
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
-class active(Resource):
+class ActiveCalls(Resource):
     def __init__(self):
         self.api_url = settings_data["spillman"]["url"]
-        self.api_usr = settings_data["spillman"]["user"]
-        self.api_pwd = settings_data["spillman"]["password"]
+        self.api_user = settings_data["spillman"]["user"]
+        self.api_password = settings_data["spillman"]["password"]
+        self.f = s.SpillmanFunctions()
 
-    def dataexchange(self, agency, status, ctype, city, cadcallid):
+    def data_exchange(self, agency, status, call_type, city, cad_call_id):
         session = requests.Session()
-        session.auth = (self.api_usr, self.api_pwd)
+        session.auth = (self.api_user, self.api_password)
         request = f"""
         <PublicSafetyEnvelope version="1.0">
             <From>Spillman API - XML to JSON</From>
             <PublicSafety id="">
                 <Query>
                     <sycad>
-                        <callid search_type="equal_to">{cadcallid}</callid>
+                        <callid search_type="equal_to">{cad_call_id}</callid>
                         <agency search_type="equal_to">{agency}</agency>
                         <stat search_type="equal_to">{status}</stat>
-                        <type search_type="equal_to">{ctype}</type>
+                        <type search_type="equal_to">{call_type}</type>
                         <rtcity search_type="equal_to">{city}</rtcity>
                     </sycad>
                 </Query>
@@ -81,56 +82,29 @@ class active(Resource):
 
         return data
 
-    def process(self, agency, status, ctype, city, cadcallid, page, limit):
-        spillman = self.dataexchange(agency, status, ctype, city, cadcallid)
+    def process(self, agency, status, call_type, city, cad_call_id, page, limit):
+        spillman = self.data_exchange(agency, status, call_type, city, cad_call_id)
         data = []
 
         if spillman is None:
             return
 
         elif type(spillman) == dict:
-            try:
-                callid = spillman.get("callid")
-            except:
-                callid = ""
-
-            try:
-                recid = spillman.get("recid")
-            except:
-                recid = ""
-
-            agency_id = spillman.get("agency")
-
-            try:
-                zone = spillman.get("zone")
-            except:
-                zone = ""
-
-            try:
-                unit = spillman.get("unit")
-            except:
-                unit = ""
-
-            address = spillman.get("rtaddr")
+            callid = self.f.validate_string(spillman.get("callid"))
+            recid = self.f.validate_string(spillman.get("recid"))
+            agency_id = self.f.validate_string(spillman.get("agency"))
+            zone = self.f.validate_string(spillman.get("zone"))
+            unit = self.f.validate_string(spillman.get("unit"))
+            address = self.f.validate_string(spillman.get("rtaddr"))
             address = address.split(";", 1)[0]
-
-            try:
-                xpos = spillman.get("xpos")
-            except:
-                xpos = 0
-
-            try:
-                ypos = spillman.get("ypos")
-            except:
-                ypos = 0
-
+            xpos = self.f.validate_number(spillman.get("xpos"))
+            ypos = self.f.validate_number(spillman.get("ypos"))
             gps_x = f"{xpos[:4]}.{xpos[4:]}"
             gps_y = f"{ypos[:2]}.{ypos[2:]}"
-
-            reported = spillman.get("reprtd")
-            sql_date = (
-                f"{reported[15:19]}-{reported[9:11]}-{reported[12:14]} {reported[0:8]}"
-            )
+            reported_dt = self.f.validate_datetime(spillman.get("reprtd"))
+            status = self.f.validate_string(spillman.get("stat"))
+            nature = self.f.validate_string(spillman.get("nature"))
+            city = self.f.validate_string(spillman.get("rtcity"))
 
             if spillman.get("type") == "l":
                 call_type = "Law"
@@ -140,21 +114,6 @@ class active(Resource):
                 call_type = "EMS"
             else:
                 call_type = "Other"
-
-            try:
-                status = spillman.get("stat")
-            except:
-                status = ""
-
-            try:
-                nature = spillman.get("nature")
-            except:
-                nature = ""
-
-            try:
-                city = spillman.get("rtcity")
-            except:
-                city = ""
 
             data.append(
                 {
@@ -170,84 +129,37 @@ class active(Resource):
                     "longitude": gps_x,
                     "type": call_type,
                     "status": status,
-                    "date": sql_date,
+                    "date": reported_dt,
                 }
             )
 
         else:
             for row in spillman:
                 try:
-                    callid = row["callid"]
-
-                    try:
-                        recid = row["recid"]
-                    except:
-                        recid = ""
-
-                    agency_id = row["agency"]
-
-                    try:
-                        zone = row["zone"]
-                    except:
-                        zone = ""
-
-                    try:
-                        unit = row["unit"]
-                    except:
-                        unit = ""
-
-                    address = row["rtaddr"]
+                    callid = self.f.validate_string(row.get("callid", ""))
+                    recid = self.f.validate_string(row.get("recid", ""))
+                    agency_id = self.f.validate_string(row.get("agency", ""))
+                    zone = self.f.validate_string(row.get("zone", ""))
+                    unit = self.f.validate_string(row.get("unit", ""))
+                    address = self.f.validate_string(row.get("rtaddr", ""))
                     address = address.split(";", 1)[0]
-
-                    try:
-                        xpos = row["xpos"]
-                    except:
-                        xpos = 0
-
-                    try:
-                        ypos = row["ypos"]
-                    except:
-                        ypos = 0
-
-                    try:
-                        gps_x = f"{xpos[:4]}.{xpos[4:]}"
-                    except:
-                        gps_x = 0
-
-                    try:
-                        gps_y = f"{ypos[:2]}.{ypos[2:]}"
-                    except:
-                        gps_y = 0
-
-                    try:
-                        reported = row["reprtd"]
-                        sql_date = f"{reported[15:19]}-{reported[9:11]}-{reported[12:14]} {reported[0:8]}"
-                    except:
-                        sql_date = "1900-01-01 00:00:00"
-
-                    if row["type"] == "l":
+                    xpos = self.f.validate_number(row.get("xpos", ""))
+                    ypos = self.f.validate_number(row.get("ypos", ""))
+                    gps_x = f"{xpos[:4]}.{xpos[4:]}"
+                    gps_y = f"{ypos[:2]}.{ypos[2:]}"
+                    reported_dt = self.f.validate_datetime(row.get("reprtd", ""))
+                    status = self.f.validate_string(row.get("stat", ""))
+                    nature = self.f.validate_string(row.get("nature", ""))
+                    city = self.f.validate_string(row.get("rtcity", ""))
+        
+                    if row.get("type") == "l":
                         call_type = "Law"
-                    elif row["type"] == "f":
+                    elif row.get("type") == "f":
                         call_type = "Fire"
-                    elif row["type"] == "e":
+                    elif row.get("type") == "e":
                         call_type = "EMS"
                     else:
                         call_type = "Other"
-
-                    try:
-                        status = row["stat"]
-                    except:
-                        status = ""
-
-                    try:
-                        nature = row["nature"]
-                    except:
-                        nature = ""
-
-                    try:
-                        city = row["rtcity"]
-                    except:
-                        city = ""
 
                 except:
                     continue
@@ -266,10 +178,10 @@ class active(Resource):
                         "longitude": gps_x,
                         "type": call_type,
                         "status": status,
-                        "date": sql_date,
+                        "date": reported_dt,
                     }
                 )
-                
+
         data = sorted(data, key=lambda x: x.get("date", ""), reverse=True)
 
         start_index = (page - 1) * limit
@@ -278,29 +190,35 @@ class active(Resource):
 
         return paginated_data
 
+    #@s.app.route('/cad/active', methods=['POST'])
     def get(self):
+        """Register a new user"""
         args = request.args
         token = args.get("token", default="", type=str)
         app = args.get("app", default="*", type=str)
         uid = args.get("uid", default="*", type=str)
-        cadcallid = args.get("callid", default="*", type=str)
+        cad_call_id = args.get("callid", default="*", type=str)
         agency = args.get("agency", default="*", type=str)
         status = args.get("status", default="*", type=str)
-        ctype = args.get("type", default="*", type=str)
+        call_type = args.get("type", default="*", type=str)
         city = args.get("city", default="*", type=str)
-        page = args.get('page', default=1, type=int)
-        limit = args.get('limit', default=100, type=int)
+        page = args.get("page", default=1, type=int)
+        limit = args.get("limit", default=100, type=int)
 
         if token == "":
-            s.auth.audit("Missing", request.access_route[0], "AUTH", "ACCESS DENIED")
+            s.AuthService.audit_request(
+                "Missing", request.access_route[0], "AUTH", "ACCESS DENIED"
+            )
             return jsonify(error="No security token provided.")
 
-        auth = s.auth.check(token, request.access_route[0])
+        auth = s.AuthService.validate_token(token, request.access_route[0])
         if auth is True:
             pass
         else:
             return abort(403)
 
-        s.auth.audit(token, request.access_route[0], "active", json.dumps([args]))
-        
-        return self.process(agency, status, ctype, city, cadcallid, page, limit)
+        s.AuthService.audit_request(
+            token, request.access_route[0], "active", json.dumps([args])
+        )
+
+        return self.process(agency, status, call_type, city, cad_call_id, page, limit)

@@ -23,22 +23,23 @@ import spillman as s
 import urllib.request as urlreq
 from datetime import datetime
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
-from .log import setup_logger
+from .log import SetupLogger
 from .settings import settings_data
 
-err = setup_logger("units", "units")
+err = SetupLogger("units", "units")
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
-class units(Resource):
+class Units(Resource):
     def __init__(self):
         self.api_url = settings_data["spillman"]["url"]
-        self.api_usr = settings_data["spillman"]["user"]
-        self.api_pwd = settings_data["spillman"]["password"]
+        self.api_user = settings_data["spillman"]["user"]
+        self.api_password = settings_data["spillman"]["password"]
+        self.f = s.SpillmanFunctions()
 
-    def dataexchange(self, unit, agency, zone, utype, kind):
+    def data_exchange(self, unit, agency, zone, utype, kind):
         session = requests.Session()
-        session.auth = (self.api_usr, self.api_pwd)
+        session.auth = (self.api_user, self.api_password)
         request = f"""
         <PublicSafetyEnvelope version="1.0">
             <From>Spillman API - XML to JSON</From>
@@ -85,7 +86,7 @@ class units(Resource):
         return data
 
     def process(self, unit, agency, zone, utype, kind):
-        spillman = self.dataexchange(unit, agency, zone, utype, kind)
+        spillman = self.data_exchange(unit, agency, zone, utype, kind)
         data = []
 
         if spillman is None:
@@ -127,16 +128,28 @@ class units(Resource):
                 station = spillman.get("station")
             except:
                 station = ""
+                
+            try:
+                name = self.f.get_unit_name(unit)
+            except:
+                name = ""
+                
+            try:
+                contact = self.f.get_unit_contact(unit)
+            except:
+                contact = ""
 
             data.append(
                 {
                     "unit": unit,
+                    "name": name,
                     "agency": agency,
                     "zone": zone,
                     "type": utype,
                     "kind": kind,
                     "station": station,
                     "description": desc,
+                    "contact": contact,
                 }
             )
 
@@ -178,6 +191,16 @@ class units(Resource):
                         station = row["station"]
                     except:
                         station = ""
+                        
+                    try:
+                        name = self.f.get_unit_name(unit)
+                    except:
+                        name = ""
+                        
+                    try:
+                        contact = self.f.get_unit_contact(unit)
+                    except:
+                        contact = ""
 
                 except:
                     continue
@@ -185,12 +208,14 @@ class units(Resource):
                 data.append(
                     {
                         "unit": unit,
+                        "name": name,
                         "agency": agency,
                         "zone": zone,
                         "type": utype,
                         "kind": kind,
                         "station": station,
                         "description": desc,
+                        "contact": contact,
                     }
                 )
 
@@ -208,15 +233,19 @@ class units(Resource):
         kind = args.get("kind", default="*", type=str)
 
         if token == "":
-            s.auth.audit("Missing", request.access_route[0], "AUTH", "ACCESS DENIED")
+            s.AuthService.audit_request(
+                "Missing", request.access_route[0], "AUTH", "ACCESS DENIED"
+            )
             return jsonify(error="No security token provided.")
 
-        auth = s.auth.check(token, request.access_route[0])
+        auth = s.AuthService.validate_token(token, request.access_route[0])
         if auth is True:
             pass
         else:
             return abort(403)
 
-        s.auth.audit(token, request.access_route[0], "units", json.dumps([args]))
+        s.AuthService.audit_request(
+            token, request.access_route[0], "units", json.dumps([args])
+        )
 
         return self.process(unit, agency, zone, utype, kind)

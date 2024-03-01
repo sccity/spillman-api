@@ -23,27 +23,27 @@ from flask import jsonify, abort
 from datetime import date, timedelta
 from datetime import datetime
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
-from .log import setup_logger
+from .log import SetupLogger
 from .settings import settings_data
 from .database import db
 
-err = setup_logger("fire", "fire")
+err = SetupLogger("fire", "fire")
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
-class fire(Resource):
+class Fire(Resource):
     def __init__(self):
         self.api_url = settings_data["spillman"]["url"]
-        self.api_usr = settings_data["spillman"]["user"]
-        self.api_pwd = settings_data["spillman"]["password"]
+        self.api_user = settings_data["spillman"]["user"]
+        self.api_password = settings_data["spillman"]["password"]
 
-    def dataexchange(self, agency, incident_id, call_id, start, end):
+    def data_exchange(self, agency, incident_id, call_id, start, end):
         if incident_id == "*":
             start_date = date(
                 int(start[0:4]), int(start[5:7]), int(start[8:10])
             ) - timedelta(days=1)
             start_date = str(start_date.strftime("%m/%d/%Y"))
-        
+
             end_date = date(int(end[0:4]), int(end[5:7]), int(end[8:10])) + timedelta(
                 days=1
             )
@@ -53,7 +53,7 @@ class fire(Resource):
                 int(start[0:4]), int(start[5:7]), int(start[8:10])
             ) - timedelta(days=1)
             start_date = str(start_date.strftime("%m/%d/%Y"))
-        
+
             end_date = date(int(end[0:4]), int(end[5:7]), int(end[8:10])) + timedelta(
                 days=1
             )
@@ -61,7 +61,7 @@ class fire(Resource):
         else:
             start_date = "01/01/1900"
             end_date = "12/31/9999"
-            
+
         if incident_id is not None and incident_id != "*":
             start_date = "01/01/1900"
             end_date = "12/31/9999"
@@ -70,7 +70,7 @@ class fire(Resource):
             end_date = "12/31/9999"
 
         session = requests.Session()
-        session.auth = (self.api_usr, self.api_pwd)
+        session.auth = (self.api_user, self.api_password)
         request = f"""
         <PublicSafetyEnvelope version="1.0">
             <From>Spillman API - XML to JSON</From>
@@ -87,7 +87,7 @@ class fire(Resource):
             </PublicSafety>
         </PublicSafetyEnvelope>
         """
-        
+
         try:
             headers = {"Content-Type": "application/xml"}
             try:
@@ -117,7 +117,7 @@ class fire(Resource):
         return data
 
     def process(self, agency, incident_id, call_id, start, end, page, limit):
-        spillman = self.dataexchange(agency, incident_id, call_id, start, end)
+        spillman = self.data_exchange(agency, incident_id, call_id, start, end)
         data = []
 
         if spillman is None:
@@ -385,7 +385,7 @@ class fire(Resource):
                         "date": dispatch_dt,
                     }
                 )
-                
+
         data = sorted(data, key=lambda x: x.get("dispatch_dt", ""), reverse=True)
 
         start_index = (page - 1) * limit
@@ -404,14 +404,16 @@ class fire(Resource):
         call_id = args.get("call_id", default="*", type=str)
         start = args.get("start", default="", type=str)
         end = args.get("end", default="", type=str)
-        page = args.get('page', default=1, type=int)
-        limit = args.get('limit', default=10, type=int)
+        page = args.get("page", default=1, type=int)
+        limit = args.get("limit", default=10, type=int)
 
         if token == "":
-            s.auth.audit("Missing", request.access_route[0], "AUTH", f"ACCESS DENIED")
+            s.AuthService.audit_request(
+                "Missing", request.access_route[0], "AUTH", f"ACCESS DENIED"
+            )
             return jsonify(error="No security token provided.")
 
-        auth = s.auth.check(token, request.access_route[0])
+        auth = s.AuthService.validate_token(token, request.access_route[0])
         if auth is True:
             pass
         else:
@@ -423,6 +425,8 @@ class fire(Resource):
         if end == "":
             end = datetime.today().strftime("%Y-%m-%d")
 
-        s.auth.audit(token, request.access_route[0], "fire", json.dumps([args]))
+        s.AuthService.audit_request(
+            token, request.access_route[0], "fire", json.dumps([args])
+        )
 
         return self.process(agency, incident_id, call_id, start, end, page, limit)
