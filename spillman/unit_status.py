@@ -281,10 +281,11 @@ class UnitStatus(Resource):
             threads = []
             for row in spillman:
                 try:
-                    thread = threading.Thread(target=self.Process_row, args=(row, data))
+                    thread = threading.Thread(target=self.process_row, args=(row, data))
                     threads.append(thread)
                     thread.start()
                 except:
+                    err.error(traceback.format_exc())
                     continue
 
             for thread in threads:
