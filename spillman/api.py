@@ -15,20 +15,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from flask import Flask, jsonify
-from flask_restful import Resource, Api
+from flask import Flask
 from apifairy import APIFairy
-import spillman as s
 from .settings import settings_data, version_data
 
 apifairy = APIFairy()
 
+
 def spillman_api():
     app = Flask(__name__)
-    app.config['APIFAIRY_TITLE'] = version_data["program"]
-    app.config['APIFAIRY_VERSION'] = version_data["version"]
+    app.config["APIFAIRY_TITLE"] = version_data["program"]
+    app.config["APIFAIRY_VERSION"] = version_data["version"]
     apifairy.init_app(app)
     return app
+
 
 # flask run --host=0.0.0.0 --port=8080
 # pip3 install -U -r requirements.txt
@@ -37,8 +37,3 @@ def spillman_api():
 # python3 -m venv venv
 # source venv/bin/activate
 # deactivate
-
-
-
-
-

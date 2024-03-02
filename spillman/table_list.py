@@ -15,12 +15,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from flask_restful import Resource, Api, request
+from flask_restful import Resource, request
 from flask import jsonify, abort
 import spillman as s
 from .log import SetupLogger
 from .settings import settings_data
-from .database import db
 
 err = SetupLogger("table_list", "table_list")
 

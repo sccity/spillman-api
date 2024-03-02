@@ -15,16 +15,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from flask_restful import Resource, Api, request
-from flask import jsonify, abort
-import sys, json, logging, xmltodict, traceback, collections
+from flask_restful import Resource
+import json, xmltodict, traceback
 import requests
-import spillman as s
-import urllib.request as urlreq
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from .log import SetupLogger
 from .settings import settings_data
-from .database import db
 from cachetools import cached, TTLCache
 
 err = SetupLogger("functions", "functions")
@@ -51,7 +47,7 @@ class SpillmanFunctions(Resource):
         except:
             data = "1900-01-01"
         return data
-      
+
     def validate_datetime(self, string):
         try:
             data = f"{string[15:19]}-{string[9:11]}-{string[12:14]} {string[0:8]}"
@@ -68,7 +64,7 @@ class SpillmanFunctions(Resource):
         except:
             data = ""
         return data
-          
+
     def validate_number(self, string):
         try:
             data = string
@@ -125,7 +121,7 @@ class SpillmanFunctions(Resource):
             return
 
         return data["OfficerName"]
-      
+
     @cached(TTLCache(maxsize=2500, ttl=3600))
     def get_unit_contact(self, unit_id):
         session = requests.Session()
