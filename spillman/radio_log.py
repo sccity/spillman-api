@@ -146,12 +146,12 @@ class RadioLog(Resource):
                 ypos = 0
 
             try:
-                gps_x = f"{row['xpos'][:4]}.{row['xpos'][4:]}"
+                gps_x = f"{spillman.get('xpos')[:4]}.{spillman.get('xpos')[4:]}"
             except:
                 gps_x = 0
 
             try:
-                gps_y = f"{row['ypos'][:2]}.{row['ypos'][2:]}"
+                gps_y = f"{spillman.get('ypos')[:2]}.{spillman.get('ypos')[2:]}"
             except:
                 gps_y = 0
 
