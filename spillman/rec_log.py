@@ -17,10 +17,9 @@
 # limitations under the License.
 from flask_restful import Resource, request
 from flask import jsonify, abort
-import sys, json, logging, xmltodict, traceback, collections
-import requests, uuid
+import json, xmltodict, traceback
+import requests
 import spillman as s
-from datetime import datetime
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from .log import SetupLogger
 from .settings import settings_data

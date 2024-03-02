@@ -17,14 +17,12 @@
 # limitations under the License.
 from flask_restful import Resource, Api, request
 from flask import jsonify, abort
-import sys, json, logging, xmltodict, traceback, collections
-import requests, uuid
+import json
+import requests
 import spillman as s
-import urllib.request as urlreq
 from datetime import datetime
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from .log import SetupLogger
-from .settings import settings_data
 from cachetools import cached, TTLCache
 
 err = SetupLogger("active_units", "active_units")
@@ -46,7 +44,7 @@ class ActiveUnits(Resource):
 
         for entry in spillman:
             unit = entry["unit"]
-        
+
             if unit not in unique_units:
                 unique_units.add(unit)
                 past_time = datetime.strptime(entry["date"], "%Y-%m-%d %H:%M:%S")
@@ -54,11 +52,24 @@ class ActiveUnits(Resource):
                 time_difference = current_time - past_time
                 minutes, seconds = divmod(time_difference.seconds, 60)
                 formatted_time = f"{minutes}m {seconds}s"
-                entry["elapsed"] = formatted_time  # Update the elapsed time for the current entry
-                result.append({"agency": entry["agency"], "unit": unit, "status": entry["status"], "elapsed": formatted_time})
-        
-        result = [entry for entry in result if entry["status"] not in ["CMPLT", "8", "ONDT", None, ""]]
-        
+                entry["elapsed"] = (
+                    formatted_time  # Update the elapsed time for the current entry
+                )
+                result.append(
+                    {
+                        "agency": entry["agency"],
+                        "unit": unit,
+                        "status": entry["status"],
+                        "elapsed": formatted_time,
+                    }
+                )
+
+        result = [
+            entry
+            for entry in result
+            if entry["status"] not in ["CMPLT", "8", "ONDT", None, ""]
+        ]
+
         return result
 
     def get(self):

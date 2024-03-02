@@ -15,14 +15,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from flask_restful import Resource, Api, request
+from flask_restful import Resource, request
 from flask import jsonify, abort
-import sys, json, logging, xmltodict, traceback, collections
-import requests, uuid
+import json, xmltodict, traceback
+import requests
 import spillman as s
-import urllib.request as urlreq
-from datetime import date, timedelta
-from datetime import datetime
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from .log import SetupLogger
 from .settings import settings_data
@@ -38,7 +35,7 @@ class Names(Resource):
         self.api_user = settings_data["spillman"]["user"]
         self.api_password = settings_data["spillman"]["password"]
         self.f = s.SpillmanFunctions()
-  
+
     @cached(TTLCache(maxsize=500, ttl=1800))
     def data_exchange(
         self, number, last, first, middle, phone, ntype, dl, dlstate, stateid, ssn
@@ -247,7 +244,7 @@ class Names(Resource):
                     primary_phone = self.f.validate_phone(row.get("phone", ""))
                     work_phone = self.f.validate_phone(row.get("wrkphn", ""))
                     alerts = self.process_alerts(name_id)
-                    
+
                 except:
                     continue
 

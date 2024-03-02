@@ -15,17 +15,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import json, logging, xmltodict, traceback, collections, requests
+import json, xmltodict, traceback, requests
 import spillman as s
-import urllib.request as urlreq
-from flask_restful import Resource, Api, request
+from flask_restful import Resource, request
 from flask import jsonify, abort
 from datetime import date, timedelta
 from datetime import datetime
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from .log import SetupLogger
 from .settings import settings_data
-from .database import db
 from cachetools import cached, TTLCache
 
 err = SetupLogger("fire", "fire")
@@ -37,7 +35,7 @@ class Fire(Resource):
         self.api_url = settings_data["spillman"]["url"]
         self.api_user = settings_data["spillman"]["user"]
         self.api_password = settings_data["spillman"]["password"]
-  
+
     @cached(TTLCache(maxsize=500, ttl=1800))
     def data_exchange(self, agency, incident_id, call_id, start, end):
         if incident_id == "*":

@@ -15,10 +15,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import json, logging, xmltodict, traceback, collections, requests
+import json, xmltodict, traceback, requests
 import spillman as s
-import urllib.request as urlreq
-from flask_restful import Resource, Api, request
+from flask_restful import Resource, request
 from flask import jsonify, abort
 from datetime import date, timedelta
 from datetime import datetime

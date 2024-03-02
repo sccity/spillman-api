@@ -17,8 +17,8 @@
 # limitations under the License.
 from flask_restful import Resource, request
 from flask import jsonify, abort
-import sys, json, logging, xmltodict, traceback, collections
-import requests, uuid
+import json, xmltodict, traceback
+import requests
 import spillman as s
 from datetime import datetime
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
@@ -116,10 +116,14 @@ class ActiveCalls(Resource):
                 call_type = "EMS"
             else:
                 call_type = "Other"
-                
-            callnum = self.f.validate_string(spillman.get("callnum")) + self.f.validate_string(spillman.get("type"))
-            
-            past_time = datetime.strptime(self.f.validate_datetime(spillman.get("stime")), "%Y-%m-%d %H:%M:%S")
+
+            callnum = self.f.validate_string(
+                spillman.get("callnum")
+            ) + self.f.validate_string(spillman.get("type"))
+
+            past_time = datetime.strptime(
+                self.f.validate_datetime(spillman.get("stime")), "%Y-%m-%d %H:%M:%S"
+            )
             current_time = datetime.now()
             time_difference = current_time - past_time
             minutes, seconds = divmod(time_difference.seconds, 60)
@@ -163,7 +167,7 @@ class ActiveCalls(Resource):
                     status = self.f.validate_string(row.get("stat", ""))
                     nature = self.f.validate_string(row.get("nature", ""))
                     city = self.f.validate_string(row.get("rtcity", ""))
-        
+
                     if row.get("type") == "l":
                         call_type = "Law"
                     elif row.get("type") == "f":
@@ -172,10 +176,14 @@ class ActiveCalls(Resource):
                         call_type = "EMS"
                     else:
                         call_type = "Other"
-                        
-                    callnum = self.f.validate_string(row.get("callnum")) + self.f.validate_string(row.get("type"))
-                    
-                    past_time = datetime.strptime(self.f.validate_datetime(row.get("reprtd")), "%Y-%m-%d %H:%M:%S")
+
+                    callnum = self.f.validate_string(
+                        row.get("callnum")
+                    ) + self.f.validate_string(row.get("type"))
+
+                    past_time = datetime.strptime(
+                        self.f.validate_datetime(row.get("reprtd")), "%Y-%m-%d %H:%M:%S"
+                    )
                     current_time = datetime.now()
                     time_difference = current_time - past_time
                     minutes, seconds = divmod(time_difference.seconds, 60)
@@ -212,7 +220,6 @@ class ActiveCalls(Resource):
 
         return paginated_data
 
-    #@s.app.route('/cad/active', methods=['POST'])
     def get(self):
         """Register a new user"""
         args = request.args
