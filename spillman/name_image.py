@@ -26,6 +26,7 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from .log import SetupLogger
 from .settings import settings_data
 from .database import db
+from cachetools import cached, TTLCache
 
 err = SetupLogger("name_image", "name_image")
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
@@ -37,6 +38,7 @@ class NameImage(Resource):
         self.api_user = settings_data["spillman"]["user"]
         self.api_password = settings_data["spillman"]["password"]
 
+    @cached(TTLCache(maxsize=500, ttl=1800))
     def data_exchange(self, name_id):
         session = requests.Session()
         session.auth = (self.api_user, self.api_password)

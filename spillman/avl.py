@@ -25,6 +25,7 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from .log import SetupLogger
 from .settings import settings_data
 from .database import db
+from cachetools import cached, TTLCache
 
 err = SetupLogger("avl", "avl")
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
@@ -37,6 +38,7 @@ class Avl(Resource):
         self.api_password = settings_data["spillman"]["password"]
         self.f = s.SpillmanFunctions()
 
+    @cached(TTLCache(maxsize=25000, ttl=300))
     def data_exchange(self, agency, unit, start, end):
         start_date = date(
             int(start[0:4]), int(start[5:7]), int(start[8:10])

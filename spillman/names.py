@@ -26,6 +26,7 @@ from datetime import datetime
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from .log import SetupLogger
 from .settings import settings_data
+from cachetools import cached, TTLCache
 
 err = SetupLogger("names", "names")
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
@@ -37,7 +38,8 @@ class Names(Resource):
         self.api_user = settings_data["spillman"]["user"]
         self.api_password = settings_data["spillman"]["password"]
         self.f = s.SpillmanFunctions()
-
+  
+    @cached(TTLCache(maxsize=500, ttl=1800))
     def data_exchange(
         self, number, last, first, middle, phone, ntype, dl, dlstate, stateid, ssn
     ):

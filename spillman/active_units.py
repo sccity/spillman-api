@@ -25,12 +25,14 @@ from datetime import datetime
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from .log import SetupLogger
 from .settings import settings_data
+from cachetools import cached, TTLCache
 
 err = SetupLogger("active_units", "active_units")
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
 class ActiveUnits(Resource):
+    @cached(TTLCache(maxsize=500, ttl=60))
     def process(self, cad_call_id):
         date = datetime.today().strftime("%Y-%m-%d")
         rlog = s.RadioLog()

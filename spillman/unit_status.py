@@ -37,6 +37,7 @@ class UnitStatus(Resource):
         self.api_password = settings_data["spillman"]["password"]
         self.f = s.SpillmanFunctions()
 
+    @cached(TTLCache(maxsize=1500, ttl=300))
     def data_exchange(self, unit, agency, zone, utype, kind, callid):
         session = requests.Session()
         session.auth = (self.api_user, self.api_password)

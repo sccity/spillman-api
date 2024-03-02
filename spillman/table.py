@@ -25,6 +25,7 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from .log import SetupLogger
 from .settings import settings_data
 from .database import db
+from cachetools import cached, TTLCache
 
 err = SetupLogger("table", "table")
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
@@ -36,6 +37,7 @@ class Table(Resource):
         self.api_user = settings_data["spillman"]["user"]
         self.api_password = settings_data["spillman"]["password"]
 
+    @cached(TTLCache(maxsize=2500, ttl=3600))
     def data_exchange(self, table, rows):
         session = requests.Session()
         session.auth = (self.api_user, self.api_password)

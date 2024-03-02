@@ -22,6 +22,7 @@ from flask import jsonify, abort
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from .log import SetupLogger
 from .settings import settings_data
+from cachetools import cached, TTLCache
 
 err = SetupLogger("comments", "comments")
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
@@ -33,6 +34,7 @@ class Comments(Resource):
         self.api_user = settings_data["spillman"]["user"]
         self.api_password = settings_data["spillman"]["password"]
 
+    @cached(TTLCache(maxsize=1000, ttl=30))
     def data_exchange(self, cad_call_id):
         session = requests.Session()
         session.auth = (self.api_user, self.api_password)
