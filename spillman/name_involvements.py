@@ -215,7 +215,7 @@ class NameInvolvements(Resource):
                 nature = "Other"
 
             try:
-                involvement_date = row["DateInvolvementOccurred"]
+                involvement_date = spillman.get("DateInvolvementOccurred")
                 involvement_date = f"{involvement_date[6:10]}-{involvement_date[0:2]}-{involvement_date[3:5]} 00:00:00"
             except:
                 involvement_date = "1900-01-01 00:00:00"

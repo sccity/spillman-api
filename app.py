@@ -15,16 +15,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#from spillman.api import create_app
-from flask import Flask, jsonify
-from flask_restful import Resource, Api
+# from spillman.api import create_app
+from flask import jsonify
+from flask_restful import Api
 import spillman as s
 from spillman.settings import settings_data, version_data
 
 app = s.spillman_api()
 api = Api(app)
 
-@app.route("/", methods=['GET'])
+
+@app.route("/", methods=["GET"])
 def HttpRoot():
     return jsonify(
         application=version_data["program"],
@@ -34,9 +35,11 @@ def HttpRoot():
         author=version_data["author"],
     )
 
+
 @app.errorhandler(404)
 def PageNotFound(e):
     return jsonify(error=str(e)), 404
+
 
 api.add_resource(s.ActiveCalls, "/cad/active")
 api.add_resource(s.ActiveUnits, "/cad/active/units")
@@ -60,4 +63,5 @@ api.add_resource(s.Units, "/spillman/unit")
 
 if __name__ == "__main__":
     from waitress import serve
+
     serve(app, host="0.0.0.0", port=settings_data["global"]["port"], threads=100)
