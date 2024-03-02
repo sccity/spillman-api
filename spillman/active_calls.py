@@ -116,6 +116,12 @@ class ActiveCalls(Resource):
                 call_type = "Other"
                 
             callnum = self.f.validate_string(spillman.get("callnum")) + self.f.validate_string(spillman.get("type"))
+            
+            past_time = datetime.strptime(self.f.validate_datetime(spillman.get("stime")), "%Y-%m-%d %H:%M:%S")
+            current_time = datetime.now()
+            time_difference = current_time - past_time
+            minutes, seconds = divmod(time_difference.seconds, 60)
+            formatted_time = f"{minutes}m {seconds}s"
 
             data.append(
                 {
@@ -131,6 +137,7 @@ class ActiveCalls(Resource):
                     "longitude": gps_x,
                     "type": call_type,
                     "status": status,
+                    "status_time": formatted_time,
                     "callnum": callnum,
                     "date": reported_dt,
                 }
@@ -165,6 +172,12 @@ class ActiveCalls(Resource):
                         call_type = "Other"
                         
                     callnum = self.f.validate_string(row.get("callnum")) + self.f.validate_string(row.get("type"))
+                    
+                    past_time = datetime.strptime(self.f.validate_datetime(row.get("reprtd")), "%Y-%m-%d %H:%M:%S")
+                    current_time = datetime.now()
+                    time_difference = current_time - past_time
+                    minutes, seconds = divmod(time_difference.seconds, 60)
+                    formatted_time = f"{minutes}m {seconds}s"
 
                 except:
                     continue
@@ -183,6 +196,7 @@ class ActiveCalls(Resource):
                         "longitude": gps_x,
                         "type": call_type,
                         "status": status,
+                        "status_time": formatted_time,
                         "callnum": callnum,
                         "date": reported_dt,
                     }
