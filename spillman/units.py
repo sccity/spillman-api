@@ -15,13 +15,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from flask_restful import Resource, Api, request
+from flask_restful import Resource, request
 from flask import jsonify, abort
-import sys, json, logging, xmltodict, traceback, collections
-import requests, uuid
+import json, xmltodict, traceback
+import requests
 import spillman as s
-import urllib.request as urlreq
-from datetime import datetime
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from .log import SetupLogger
 from .settings import settings_data
@@ -130,12 +128,12 @@ class Units(Resource):
                 station = spillman.get("station")
             except:
                 station = ""
-                
+
             try:
                 name = self.f.get_unit_name(unit)
             except:
                 name = ""
-                
+
             try:
                 contact = self.f.get_unit_contact(unit)
             except:
@@ -193,12 +191,12 @@ class Units(Resource):
                         station = row["station"]
                     except:
                         station = ""
-                        
+
                     try:
                         name = self.f.get_unit_name(unit)
                     except:
                         name = ""
-                        
+
                     try:
                         contact = self.f.get_unit_contact(unit)
                     except:

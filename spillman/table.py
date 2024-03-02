@@ -15,16 +15,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from flask_restful import Resource, Api, request
+from flask_restful import Resource, request
 from flask import jsonify, abort
-import sys, json, logging, xmltodict, traceback, collections
+import json, xmltodict, traceback
 import requests
 import spillman as s
-import urllib.request as urlreq
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from .log import SetupLogger
 from .settings import settings_data
-from .database import db
 from cachetools import cached, TTLCache
 
 err = SetupLogger("table", "table")
@@ -107,4 +105,4 @@ class Table(Resource):
             token, request.access_route[0], "table", json.dumps([args])
         )
 
-        return self.data_exchange(table,rows)
+        return self.data_exchange(table, rows)
