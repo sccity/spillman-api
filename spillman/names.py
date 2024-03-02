@@ -125,7 +125,7 @@ class Names(Resource):
         if spillman is None:
             return
 
-        elif type(spillman) == dict:
+        elif isinstance(spillman, dict):
             name_id = self.f.validate_string(spillman.get("number"))
             name_type = self.f.validate_string(spillman.get("nametyp"))
             ssn = self.f.validate_string(spillman.get("ssnum"))

@@ -91,7 +91,7 @@ class ActiveCalls(Resource):
         if spillman is None:
             return
 
-        elif type(spillman) == dict:
+        elif isinstance(spillman, dict):
             callid = self.f.validate_string(spillman.get("callid"))
             recid = self.f.validate_string(spillman.get("recid"))
             agency_id = self.f.validate_string(spillman.get("agency"))
