@@ -44,7 +44,7 @@ class ActiveUnits(Resource):
 
         for entry in spillman:
             unit = entry["unit"]
-
+        
             if unit not in unique_units:
                 unique_units.add(unit)
                 past_time = datetime.strptime(entry["date"], "%Y-%m-%d %H:%M:%S")
@@ -52,14 +52,11 @@ class ActiveUnits(Resource):
                 time_difference = current_time - past_time
                 minutes, seconds = divmod(time_difference.seconds, 60)
                 formatted_time = f"{minutes}m {seconds}s"
+                entry["elapsed"] = formatted_time  # Update the elapsed time for the current entry
                 result.append({"agency": entry["agency"], "unit": unit, "status": entry["status"], "elapsed": formatted_time})
-
-        result = [
-            {"agency": entry["agency"], "unit": entry["unit"], "status": entry["status"], "elapsed": formatted_time}
-            for entry in result
-            if entry["status"] not in ["CMPLT", "8", "ONDT", None, ""]
-        ]
-
+        
+        result = [entry for entry in result if entry["status"] not in ["CMPLT", "8", "ONDT", None, ""]]
+        
         return result
 
     def get(self):
