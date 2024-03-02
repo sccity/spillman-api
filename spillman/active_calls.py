@@ -219,7 +219,7 @@ class ActiveCalls(Resource):
         paginated_data = data[start_index:end_index]
 
         return paginated_data
-
+      
     def get(self):
         """Register a new user"""
         args = request.args
