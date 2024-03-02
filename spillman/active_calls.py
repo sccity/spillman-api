@@ -114,6 +114,8 @@ class ActiveCalls(Resource):
                 call_type = "EMS"
             else:
                 call_type = "Other"
+                
+            callnum = self.f.validate_string(spillman.get("callnum")) + self.f.validate_string(spillman.get("type"))
 
             data.append(
                 {
@@ -129,6 +131,7 @@ class ActiveCalls(Resource):
                     "longitude": gps_x,
                     "type": call_type,
                     "status": status,
+                    "callnum": callnum,
                     "date": reported_dt,
                 }
             )
@@ -160,6 +163,8 @@ class ActiveCalls(Resource):
                         call_type = "EMS"
                     else:
                         call_type = "Other"
+                        
+                    callnum = self.f.validate_string(row.get("callnum")) + self.f.validate_string(row.get("type"))
 
                 except:
                     continue
@@ -178,6 +183,7 @@ class ActiveCalls(Resource):
                         "longitude": gps_x,
                         "type": call_type,
                         "status": status,
+                        "callnum": callnum,
                         "date": reported_dt,
                     }
                 )
