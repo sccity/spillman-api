@@ -237,7 +237,7 @@ class NameInvolvements(Resource):
             for row in spillman:
                 try:
                     thread = threading.Thread(
-                        target=self.Process_row, args=(name_id, row, data)
+                        target=self.process_row, args=(name_id, row, data)
                     )
                     threads.append(thread)
                     thread.start()
