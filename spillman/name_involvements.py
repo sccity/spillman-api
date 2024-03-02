@@ -185,7 +185,7 @@ class NameInvolvements(Resource):
         if spillman is None:
             return
 
-        elif type(spillman) == dict:
+        elif isinstance(spillman, dict):
             try:
                 incident_id = spillman.get("RecIDThisRecordsIDNo")
             except:

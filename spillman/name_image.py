@@ -88,7 +88,7 @@ class NameImage(Resource):
         if spillman is None:
             return
 
-        elif type(spillman) == dict:
+        elif isinstance(spillman, dict):
             try:
                 image_file = spillman.get("Name")
             except:

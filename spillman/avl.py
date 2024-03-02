@@ -109,7 +109,7 @@ class Avl(Resource):
         if spillman is None:
             return
 
-        elif type(spillman) == dict:
+        elif isinstance(spillman, dict):
             log_date = self.f.validate_datetime(spillman.get("logdate"))
             gps_x = self.f.validate_number(spillman.get("xlng"))
             gps_y = self.f.validate_number(spillman.get("ylat"))

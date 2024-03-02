@@ -87,7 +87,7 @@ class RecLog(Resource):
         if spillman is None:
             return
 
-        elif type(spillman) == dict:
+        elif isinstance(spillman, dict):
             try:
                 callid = spillman.get("callid")
             except:
