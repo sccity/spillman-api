@@ -24,6 +24,7 @@ from datetime import datetime
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from .log import SetupLogger
 from .settings import settings_data
+from cachetools import cached, TTLCache
 
 err = SetupLogger("active_calls", "active_calls")
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
@@ -36,6 +37,7 @@ class ActiveCalls(Resource):
         self.api_password = settings_data["spillman"]["password"]
         self.f = s.SpillmanFunctions()
 
+    @cached(TTLCache(maxsize=250, ttl=30))
     def data_exchange(self, agency, status, call_type, city, cad_call_id):
         session = requests.Session()
         session.auth = (self.api_user, self.api_password)

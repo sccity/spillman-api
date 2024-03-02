@@ -24,6 +24,7 @@ from datetime import datetime
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from .log import SetupLogger
 from .settings import settings_data
+from cachetools import cached, TTLCache
 
 err = SetupLogger("rec_log", "rec_log")
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
@@ -35,6 +36,7 @@ class RecLog(Resource):
         self.api_user = settings_data["spillman"]["user"]
         self.api_password = settings_data["spillman"]["password"]
 
+    @cached(TTLCache(maxsize=500, ttl=600))
     def data_exchange(self, cad_call_id):
         session = requests.Session()
         session.auth = (self.api_user, self.api_password)

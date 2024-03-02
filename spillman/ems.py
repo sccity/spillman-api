@@ -25,6 +25,7 @@ from datetime import datetime
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from .log import SetupLogger
 from .settings import settings_data
+from cachetools import cached, TTLCache
 
 err = SetupLogger("ems", "ems")
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
@@ -36,6 +37,7 @@ class Ems(Resource):
         self.api_user = settings_data["spillman"]["user"]
         self.api_password = settings_data["spillman"]["password"]
 
+    @cached(TTLCache(maxsize=500, ttl=1800))
     def data_exchange(self, agency, incident_id, call_id, start, end):
         if incident_id == "*":
             start_date = date(
