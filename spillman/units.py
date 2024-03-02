@@ -92,7 +92,7 @@ class Units(Resource):
         if spillman is None:
             return
 
-        elif type(spillman) == dict:
+        elif isinstance(spillman, dict):
             try:
                 unit = spillman.get("unitno")
             except:
