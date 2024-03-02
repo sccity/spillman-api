@@ -36,7 +36,7 @@ class Table(Resource):
         self.api_user = settings_data["spillman"]["user"]
         self.api_password = settings_data["spillman"]["password"]
 
-    def data_exchange(self, table):
+    def data_exchange(self, table, rows):
         session = requests.Session()
         session.auth = (self.api_user, self.api_password)
         request = f"""
@@ -46,7 +46,7 @@ class Table(Resource):
                 <Query>
                     <{table}>
                     </{table}>
-                    <RowCount>100</RowCount>
+                    <RowCount>{rows}</RowCount>
                 </Query>
             </PublicSafety>
         </PublicSafetyEnvelope>
@@ -84,6 +84,7 @@ class Table(Resource):
         app = args.get("app", default="*", type=str)
         uid = args.get("uid", default="*", type=str)
         table = args.get("table", default="", type=str)
+        rows = args.get("rows", default="*", type=str)
 
         if token == "":
             s.AuthService.audit_request(
@@ -104,4 +105,4 @@ class Table(Resource):
             token, request.access_route[0], "table", json.dumps([args])
         )
 
-        return self.data_exchange(table)
+        return self.data_exchange(table,rows)
