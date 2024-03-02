@@ -32,8 +32,6 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
 class SpillmanFunctions(Resource):
-    unit_name_cache = TTLCache(maxsize=2500, ttl=3600)
-    unit_contact_cache = TTLCache(maxsize=2500, ttl=3600)
 
     def __init__(self):
         self.api_url = settings_data["spillman"]["url"]
@@ -78,7 +76,7 @@ class SpillmanFunctions(Resource):
             data = 0
         return data
 
-    @cached(unit_name_cache)
+    @cached(TTLCache(maxsize=2500, ttl=3600))
     def get_unit_name(self, unit_id):
         session = requests.Session()
         session.auth = (self.api_user, self.api_password)
@@ -128,7 +126,7 @@ class SpillmanFunctions(Resource):
 
         return data["OfficerName"]
       
-    @cached(unit_contact_cache)
+    @cached(TTLCache(maxsize=2500, ttl=3600))
     def get_unit_contact(self, unit_id):
         session = requests.Session()
         session.auth = (self.api_user, self.api_password)
@@ -177,6 +175,7 @@ class SpillmanFunctions(Resource):
 
         return data["contact"]
 
+    @cached(TTLCache(maxsize=500, ttl=3600))
     def get_alert_name(self, alert_cd):
         session = requests.Session()
         session.auth = (self.api_user, self.api_password)
@@ -225,6 +224,7 @@ class SpillmanFunctions(Resource):
 
         return data["DescriptionOfAttribute"]
 
+    @cached(TTLCache(maxsize=500, ttl=3600))
     def name_alert_codes(self, name_id):
         session = requests.Session()
         session.auth = (self.api_user, self.api_password)

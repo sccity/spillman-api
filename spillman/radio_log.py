@@ -25,6 +25,7 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from .log import SetupLogger
 from .settings import settings_data
 from .database import db
+from cachetools import cached, TTLCache
 
 err = SetupLogger("radio_log", "radio_log")
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
@@ -36,6 +37,7 @@ class RadioLog(Resource):
         self.api_user = settings_data["spillman"]["user"]
         self.api_password = settings_data["spillman"]["password"]
 
+    @cached(TTLCache(maxsize=500, ttl=120))
     def data_exchange(self, agency, unit, callid, status, start, end):
         start_date = date(
             int(start[0:4]), int(start[5:7]), int(start[8:10])
