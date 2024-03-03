@@ -1,5 +1,5 @@
 {
-  "swagger": "2.0",
+  "openapi": "3.0.3",
   "info": {
     "description": "The Spillman API is an attempt to modernize the Spillman DataExchange for further application development on top of Spillman data. It takes a typical URL based GET request, translates it into the XML POST request DataExchange expects, and then converts the DataExchange XML output into standardized JSON. This also allows for ease of upgrades in the event Spillman changes something.",
     "version": "1.0.0",
@@ -12,7 +12,17 @@
       "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
     }
   },
-  "host": "spillmanapi.scifire.us",
+    "servers": [
+    {
+      "url": "{url}",
+      "variables": {
+        "url": {
+          "description": "Base URL of the Spillman API",
+          "summary": "test"
+        }
+      }
+    }
+  ],
   "basePath": "/",
   "schemes": [
     "https"
@@ -24,10 +34,170 @@
       "in": "query"
     }
   },
+  "tags": [
+    {
+      "name": "Real-Time",
+      "description": "Live data for currently active calls"
+    },
+    {
+      "name": "Incidents",
+      "description": "Incident information"
+    },
+    {
+      "name": "CAD",
+      "description": "CAD sepcific data"
+    },
+    {
+      "name": "Unit",
+      "description": "Unit information"
+    },
+    {
+      "name": "Names",
+      "description": "Name details/involvements"
+    },
+    {
+      "name": "Other",
+      "description": "Other/Misc information"
+    }
+  ],
   "paths": {
+    "/avl": {
+      "get": {
+        "tags": [
+          "Unit"
+        ],
+        "summary": "AVL Data",
+        "description": "Automatic vehicle location data",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "app",
+            "in": "query",
+            "description": "Application name/ID accessing the API",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "uid",
+            "in": "query",
+            "description": "User name/ID accessing the API",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "agency",
+            "in": "query",
+            "description": "Filter by agency code",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "Unit",
+            "in": "query",
+            "description": "Filter by unit",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "start",
+            "in": "query",
+            "description": "Filter results starting with this date in yyyy-mm-dd format",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "description": "Filter results ending with this date in yyyy-mm-dd format",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          }
+        }
+      }
+    },
     "/cad/active": {
       "get": {
-        "summary": "Get active calls",
+        "tags": [
+          "Real-Time",
+          "CAD"
+        ],
+        "summary": "Active Calls",
+        "description": "Get currently active calls",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "app",
+            "in": "query",
+            "description": "Application name/ID accessing the API",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "uid",
+            "in": "query",
+            "description": "User name/ID accessing the API",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "agency",
+            "in": "query",
+            "description": "Filter by agency code",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "callid",
+            "in": "query",
+            "description": "Filter by specific call ID",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Filter results by call status",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "description": "Filter results by call type: l/f/e",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "city",
+            "in": "query",
+            "description": "Filter results by city code",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Current page of results when data is paginated",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "How many results to display, used with page in pagination",
+            "required": false,
+            "type": "string"
+          }
+        ],
         "security": [
           {
             "api_key": []
@@ -42,27 +212,37 @@
     },
     "/cad/active/units": {
       "get": {
-        "summary": "Get active units",
-        "responses": {
-          "200": {
-            "description": "Successful response"
+        "tags": [
+          "Real-Time",
+          "CAD",
+          "Unit"
+        ],
+        "summary": "Active Units",
+        "description": "Get active (not OFFDT) units",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "app",
+            "in": "query",
+            "description": "Application name/ID accessing the API",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "uid",
+            "in": "query",
+            "description": "User name/ID accessing the API",
+            "required": false,
+            "type": "string"
           }
-        }
-      }
-    },
-    "/avl": {
-      "get": {
-        "summary": "Get AVL information",
-        "responses": {
-          "200": {
-            "description": "Successful response"
+        ],
+        "security": [
+          {
+            "api_key": []
           }
-        }
-      }
-    },
-    "/incidents/cad": {
-      "get": {
-        "summary": "Get CAD incidents",
+        ],
         "responses": {
           "200": {
             "description": "Successful response"
@@ -72,17 +252,35 @@
     },
     "/cad/comments": {
       "get": {
-        "summary": "Get CAD comments",
-        "responses": {
-          "200": {
-            "description": "Successful response"
+        "tags": [
+          "CAD"
+        ],
+        "summary": "CAD Comments",
+        "description": "Get CAD comments for a specified call ID",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "app",
+            "in": "query",
+            "description": "Application name/ID accessing the API",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "uid",
+            "in": "query",
+            "description": "User name/ID accessing the API",
+            "required": false,
+            "type": "string"
           }
-        }
-      }
-    },
-    "/incidents/ems": {
-      "get": {
-        "summary": "Get EMS incidents",
+        ],
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful response"
@@ -92,7 +290,112 @@
     },
     "/emd": {
       "get": {
-        "summary": "Get EMD information",
+        "tags": [
+          "Other"
+        ],
+        "summary": "EMD",
+        "description": "Get EMD for a specific CAD call ID",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "app",
+            "in": "query",
+            "description": "Application name/ID accessing the API",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "uid",
+            "in": "query",
+            "description": "User name/ID accessing the API",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/incidents/cad": {
+      "get": {
+        "tags": [
+          "CAD",
+          "Incidents"
+        ],
+        "summary": "CAD Incidents",
+        "description": "Get CAD/dispatch incidents",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "app",
+            "in": "query",
+            "description": "Application name/ID accessing the API",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "uid",
+            "in": "query",
+            "description": "User name/ID accessing the API",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/incidents/ems": {
+      "get": {
+        "tags": [
+          "Incidents"
+        ],
+        "summary": "EMS Incidents",
+        "description": "Get EMS incidents",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "app",
+            "in": "query",
+            "description": "Application name/ID accessing the API",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "uid",
+            "in": "query",
+            "description": "User name/ID accessing the API",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful response"
@@ -102,7 +405,35 @@
     },
     "/incidents/fire": {
       "get": {
-        "summary": "Get fire incidents",
+        "tags": [
+          "Incidents"
+        ],
+        "summary": "Fire Incidents",
+        "description": "Get fire incidents",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "app",
+            "in": "query",
+            "description": "Application name/ID accessing the API",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "uid",
+            "in": "query",
+            "description": "User name/ID accessing the API",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful response"
@@ -112,7 +443,35 @@
     },
     "/incidents/law": {
       "get": {
-        "summary": "Get law incidents",
+        "tags": [
+          "Incidents"
+        ],
+        "summary": "Law Incidents",
+        "description": "Get law incidents",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "app",
+            "in": "query",
+            "description": "Application name/ID accessing the API",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "uid",
+            "in": "query",
+            "description": "User name/ID accessing the API",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful response"
@@ -122,47 +481,35 @@
     },
     "/incidents/law/narrative": {
       "get": {
-        "summary": "Get law incident narratives",
-        "responses": {
-          "200": {
-            "description": "Successful response"
+        "tags": [
+          "Incidents"
+        ],
+        "summary": "Law Narrative",
+        "description": "Get law narrative from a specific law incident",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "app",
+            "in": "query",
+            "description": "Application name/ID accessing the API",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "uid",
+            "in": "query",
+            "description": "User name/ID accessing the API",
+            "required": false,
+            "type": "string"
           }
-        }
-      }
-    },
-    "/name/image": {
-      "get": {
-        "summary": "Get name images",
-        "responses": {
-          "200": {
-            "description": "Successful response"
+        ],
+        "security": [
+          {
+            "api_key": []
           }
-        }
-      }
-    },
-    "/name/involvements": {
-      "get": {
-        "summary": "Get name involvements",
-        "responses": {
-          "200": {
-            "description": "Successful response"
-          }
-        }
-      }
-    },
-    "/name": {
-      "get": {
-        "summary": "Get names",
-        "responses": {
-          "200": {
-            "description": "Successful response"
-          }
-        }
-      }
-    },
-    "/radiolog": {
-      "get": {
-        "summary": "Get radio logs",
+        ],
         "responses": {
           "200": {
             "description": "Successful response"
@@ -172,7 +519,187 @@
     },
     "/incidents/reclog": {
       "get": {
-        "summary": "Get incident reclogs",
+        "tags": [
+          "Incidents"
+        ],
+        "summary": "Recommended Unit Log",
+        "description": "Get the recommended unit log for a specific call ID",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "app",
+            "in": "query",
+            "description": "Application name/ID accessing the API",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "uid",
+            "in": "query",
+            "description": "User name/ID accessing the API",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/name": {
+      "get": {
+        "tags": [
+          "Names"
+        ],
+        "summary": "Names",
+        "description": "Get name informaton",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "app",
+            "in": "query",
+            "description": "Application name/ID accessing the API",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "uid",
+            "in": "query",
+            "description": "User name/ID accessing the API",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/name/image": {
+      "get": {
+        "tags": [
+          "Names"
+        ],
+        "summary": "Name Image ID",
+        "description": "Get the primary image ID for a specified name ID",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "app",
+            "in": "query",
+            "description": "Application name/ID accessing the API",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "uid",
+            "in": "query",
+            "description": "User name/ID accessing the API",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/name/involvements": {
+      "get": {
+        "tags": [
+          "Names"
+        ],
+        "summary": "Involvements",
+        "description": "Get involvements for a specified name ID",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "app",
+            "in": "query",
+            "description": "Application name/ID accessing the API",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "uid",
+            "in": "query",
+            "description": "User name/ID accessing the API",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/radiolog": {
+      "get": {
+        "tags": [
+          "CAD"
+        ],
+        "summary": "Radio Log",
+        "description": "Get radio log data",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "app",
+            "in": "query",
+            "description": "Application name/ID accessing the API",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "uid",
+            "in": "query",
+            "description": "User name/ID accessing the API",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful response"
@@ -182,7 +709,35 @@
     },
     "/spillman/table": {
       "get": {
-        "summary": "Get Spillman tables",
+        "tags": [
+          "Other"
+        ],
+        "summary": "Table",
+        "description": "Get table data for a specified spillman table",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "app",
+            "in": "query",
+            "description": "Application name/ID accessing the API",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "uid",
+            "in": "query",
+            "description": "User name/ID accessing the API",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful response"
@@ -192,17 +747,35 @@
     },
     "/spillman/table/list": {
       "get": {
-        "summary": "Get Spillman table list",
-        "responses": {
-          "200": {
-            "description": "Successful response"
+        "tags": [
+          "Other"
+        ],
+        "summary": "Table List",
+        "description": "Get a table list of common tables",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "app",
+            "in": "query",
+            "description": "Application name/ID accessing the API",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "uid",
+            "in": "query",
+            "description": "User name/ID accessing the API",
+            "required": false,
+            "type": "string"
           }
-        }
-      }
-    },
-    "/spillman/unit/status": {
-      "get": {
-        "summary": "Get Spillman unit status",
+        ],
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful response"
@@ -212,7 +785,74 @@
     },
     "/spillman/unit": {
       "get": {
-        "summary": "Get Spillman units",
+        "tags": [
+          "Unit"
+        ],
+        "summary": "Unit",
+        "description": "Get unit information",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "app",
+            "in": "query",
+            "description": "Application name/ID accessing the API",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "uid",
+            "in": "query",
+            "description": "User name/ID accessing the API",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/spillman/unit/status": {
+      "get": {
+        "tags": [
+          "Unit",
+          "Real-Time"
+        ],
+        "summary": "Unit Status",
+        "description": "Get current unit status information",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "app",
+            "in": "query",
+            "description": "Application name/ID accessing the API",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "uid",
+            "in": "query",
+            "description": "User name/ID accessing the API",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful response"

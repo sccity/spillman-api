@@ -25,7 +25,7 @@ from flask_swagger_ui import get_swaggerui_blueprint
 app = s.spillman_api()
 api = Api(app)
 
-SWAGGER_URL="/swagger"
+SWAGGER_URL="/docs"
 API_URL="/static/swagger.json"
 
 swagger_ui_blueprint = get_swaggerui_blueprint(
