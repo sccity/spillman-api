@@ -83,13 +83,13 @@ class ActiveUnits(Resource):
             s.AuthService.audit_request(
                 "Missing", request.access_route[0], "AUTH", "ACCESS DENIED"
             )
-            return jsonify(error="No security token provided.")
+            abort(403, description="Missing or invalid security token.")
 
         auth = s.AuthService.validate_token(token, request.access_route[0])
         if auth is True:
             pass
         else:
-            return abort(403)
+            abort(401, description="Invalid or disabled security token provided.")
 
         s.AuthService.audit_request(
             token, request.access_route[0], "units", json.dumps([args])

@@ -7,3 +7,4 @@ requests==2.25.1
 waitress==2.1.2
 xmltodict==0.13.0
 Werkzeug==2.2.2
+flask_swagger_ui==4.11.1
