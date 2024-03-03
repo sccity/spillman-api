@@ -1,0 +1,682 @@
+openapi: 3.0.0
+info:
+  title: Spillman API
+  version: 1.0.0
+  description: |-
+    The Spillman API is an attempt to modernize the Spillman DataExchange for
+    further application development on top of Spillman data. It takes a typical
+    URL based GET request, translates it into the XML POST request DataExchange
+    expects, and then converts the DataExchange XML output into standardized
+    JSON. This also allows for ease of upgrades in the event Spillman changes
+    something.
+    
+    
+    [Spillman API Repository](https://github.com/sccity/spillman-api)
+    
+    
+    [Santa Clara City](https://www.santaclarautah.gov)
+  contact:
+    email: lhaynie@sccity.org
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+servers:
+  - url: /
+tags:
+  - name: Real-Time
+    description: Live data for currently active calls
+  - name: Incidents
+    description: Incident information
+  - name: CAD
+    description: CAD specific data
+  - name: Unit
+    description: Unit information
+  - name: Names
+    description: Name details/involvements
+  - name: Other
+    description: Other/Misc information
+paths:
+  /avl:
+    get:
+      tags:
+        - Unit
+      summary: AVL Data
+      description: Automatic vehicle location data
+      parameters:
+        - $ref: '#/components/parameters/app'
+        - $ref: '#/components/parameters/uid'
+        - $ref: '#/components/parameters/agency'
+        - $ref: '#/components/parameters/unit'
+        - $ref: '#/components/parameters/start'
+        - $ref: '#/components/parameters/end'
+      responses:
+        '200':
+          description: Success!
+        '401':
+          description: Invalid or disabled security token provided.
+        '403':
+          description: Missing or invalid security token
+  /cad/active:
+    get:
+      tags:
+        - Real-Time
+        - CAD
+      summary: Active Calls
+      description: Get currently active calls
+      parameters:
+        - $ref: '#/components/parameters/app'
+        - $ref: '#/components/parameters/uid'
+        - $ref: '#/components/parameters/callid'
+        - $ref: '#/components/parameters/agency'
+        - $ref: '#/components/parameters/status'
+        - $ref: '#/components/parameters/type'
+        - $ref: '#/components/parameters/city'
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/limit'
+      security:
+        - api_key: []
+      responses:
+        '200':
+          description: Success!
+        '401':
+          description: Invalid or disabled security token provided.
+        '403':
+          description: Missing or invalid security token
+  /cad/active/units:
+    get:
+      tags:
+        - Real-Time
+        - CAD
+        - Unit
+      summary: Active Units
+      description: Get active (not OFFDT) units
+      parameters:
+        - $ref: '#/components/parameters/app'
+        - $ref: '#/components/parameters/uid'
+        - $ref: '#/components/parameters/callid'
+      security:
+        - api_key: []
+      responses:
+        '200':
+          description: Success!
+        '401':
+          description: Invalid or disabled security token provided.
+        '403':
+          description: Missing or invalid security token
+  /cad/comments:
+    get:
+      tags:
+        - CAD
+      summary: CAD Comments
+      description: Get CAD comments for a specified call ID
+      parameters:
+        - $ref: '#/components/parameters/app'
+        - $ref: '#/components/parameters/uid'
+        - $ref: '#/components/parameters/callid'
+      security:
+        - api_key: []
+      responses:
+        '200':
+          description: Success!
+        '401':
+          description: Invalid or disabled security token provided.
+        '403':
+          description: Missing or invalid security token
+  /emd:
+    get:
+      tags:
+        - Other
+      summary: EMD
+      description: Get EMD for a specific CAD call ID
+      parameters:
+        - $ref: '#/components/parameters/app'
+        - $ref: '#/components/parameters/uid'
+        - $ref: '#/components/parameters/callid'
+      security:
+        - api_key: []
+      responses:
+        '200':
+          description: Success!
+        '401':
+          description: Invalid or disabled security token provided.
+        '403':
+          description: Missing or invalid security token
+  /incidents/cad:
+    get:
+      tags:
+        - CAD
+        - Incidents
+      summary: CAD Incidents
+      description: Get CAD/dispatch incidents
+      parameters:
+        - $ref: '#/components/parameters/app'
+        - $ref: '#/components/parameters/uid'
+        - $ref: '#/components/parameters/start'
+        - $ref: '#/components/parameters/end'
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/limit'
+      security:
+        - api_key: []
+      responses:
+        '200':
+          description: Success!
+        '401':
+          description: Invalid or disabled security token provided.
+        '403':
+          description: Missing or invalid security token
+  /incidents/fire:
+    get:
+      tags:
+        - Incidents
+      summary: Fire Incidents
+      description: Get fire incidents
+      parameters:
+        - $ref: '#/components/parameters/app'
+        - $ref: '#/components/parameters/uid'
+        - $ref: '#/components/parameters/agency'
+        - $ref: '#/components/parameters/incident_id'
+        - $ref: '#/components/parameters/call_id'
+        - $ref: '#/components/parameters/start'
+        - $ref: '#/components/parameters/end'
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/limit'
+      security:
+        - api_key: []
+      responses:
+        '200':
+          description: Success!
+        '401':
+          description: Invalid or disabled security token provided.
+        '403':
+          description: Missing or invalid security token
+  /incidents/ems:
+    get:
+      tags:
+        - Incidents
+      summary: EMS Incidents
+      description: Get EMS incidents
+      parameters:
+        - $ref: '#/components/parameters/app'
+        - $ref: '#/components/parameters/uid'
+        - $ref: '#/components/parameters/agency'
+        - $ref: '#/components/parameters/incident_id'
+        - $ref: '#/components/parameters/call_id'
+        - $ref: '#/components/parameters/start'
+        - $ref: '#/components/parameters/end'
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/limit'
+      security:
+        - api_key: []
+      responses:
+        '200':
+          description: Success!
+        '401':
+          description: Invalid or disabled security token provided.
+        '403':
+          description: Missing or invalid security token
+  /incidents/law:
+    get:
+      tags:
+        - Incidents
+      summary: Law Incidents
+      description: Get law incidents
+      parameters:
+        - $ref: '#/components/parameters/app'
+        - $ref: '#/components/parameters/uid'
+        - $ref: '#/components/parameters/agency'
+        - $ref: '#/components/parameters/incident_id'
+        - $ref: '#/components/parameters/call_id'
+        - $ref: '#/components/parameters/start'
+        - $ref: '#/components/parameters/end'
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/limit'
+      security:
+        - api_key: []
+      responses:
+        '200':
+          description: Success!
+        '401':
+          description: Invalid or disabled security token provided.
+        '403':
+          description: Missing or invalid security token
+  /incidents/law/narrative:
+    get:
+      tags:
+        - Incidents
+      summary: Law Narrative
+      description: Get law narrative from a specific law incident
+      parameters:
+        - $ref: '#/components/parameters/app'
+        - $ref: '#/components/parameters/uid'
+        - $ref: '#/components/parameters/incident_id'
+      security:
+        - api_key: []
+      responses:
+        '200':
+          description: Success!
+        '401':
+          description: Invalid or disabled security token provided.
+        '403':
+          description: Missing or invalid security token
+  /incidents/reclog:
+    get:
+      tags:
+        - Incidents
+      summary: Recommended Unit Log
+      description: Get the recommended unit log for a specific call ID
+      parameters:
+        - $ref: '#/components/parameters/app'
+        - $ref: '#/components/parameters/uid'
+        - $ref: '#/components/parameters/callid'
+      security:
+        - api_key: []
+      responses:
+        '200':
+          description: Success!
+        '401':
+          description: Invalid or disabled security token provided.
+        '403':
+          description: Missing or invalid security token
+  /name:
+    get:
+      tags:
+        - Names
+      summary: Names
+      description: Get name information
+      parameters:
+        - $ref: '#/components/parameters/app'
+        - $ref: '#/components/parameters/uid'
+        - $ref: '#/components/parameters/nameid'
+        - $ref: '#/components/parameters/last'
+        - $ref: '#/components/parameters/first'
+        - $ref: '#/components/parameters/middle'
+        - $ref: '#/components/parameters/phone'
+        - $ref: '#/components/parameters/nametype'
+        - $ref: '#/components/parameters/dl'
+        - $ref: '#/components/parameters/dlstate'
+        - $ref: '#/components/parameters/stateid'
+        - $ref: '#/components/parameters/ssn'
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/limit'
+      security:
+        - api_key: []
+      responses:
+        '200':
+          description: Success!
+        '401':
+          description: Invalid or disabled security token provided.
+        '403':
+          description: Missing or invalid security token
+  /name/image:
+    get:
+      tags:
+        - Names
+      summary: Name Image ID
+      description: Get the primary image ID for a specified name ID
+      parameters:
+        - $ref: '#/components/parameters/app'
+        - $ref: '#/components/parameters/uid'
+        - $ref: '#/components/parameters/name_id'
+      security:
+        - api_key: []
+      responses:
+        '200':
+          description: Success!
+        '401':
+          description: Invalid or disabled security token provided.
+        '403':
+          description: Missing or invalid security token
+  /name/involvements:
+    get:
+      tags:
+        - Names
+      summary: Involvements
+      description: Get involvements for a specified name ID
+      parameters:
+        - $ref: '#/components/parameters/app'
+        - $ref: '#/components/parameters/uid'
+        - $ref: '#/components/parameters/name_id'
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/limit'
+      security:
+        - api_key: []
+      responses:
+        '200':
+          description: Success!
+        '401':
+          description: Invalid or disabled security token provided.
+        '403':
+          description: Missing or invalid security token
+  /radiolog:
+    get:
+      tags:
+        - CAD
+      summary: Radio Log
+      description: Get radio log data
+      parameters:
+        - $ref: '#/components/parameters/app'
+        - $ref: '#/components/parameters/uid'
+        - $ref: '#/components/parameters/agency'
+        - $ref: '#/components/parameters/unit'
+        - $ref: '#/components/parameters/callid'
+        - $ref: '#/components/parameters/status'
+        - $ref: '#/components/parameters/start'
+        - $ref: '#/components/parameters/end'
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/limit'
+      security:
+        - api_key: []
+      responses:
+        '200':
+          description: Success!
+        '401':
+          description: Invalid or disabled security token provided.
+        '403':
+          description: Missing or invalid security token
+  /spillman/table:
+    get:
+      tags:
+        - Other
+      summary: Table
+      description: Get table data for a specified Spillman table
+      parameters:
+        - $ref: '#/components/parameters/app'
+        - $ref: '#/components/parameters/uid'
+        - $ref: '#/components/parameters/table'
+        - $ref: '#/components/parameters/rows'
+      security:
+        - api_key: []
+      responses:
+        '200':
+          description: Success!
+        '401':
+          description: Invalid or disabled security token provided.
+        '403':
+          description: Missing or invalid security token
+  /spillman/table/list:
+    get:
+      tags:
+        - Other
+      summary: Table List
+      description: Get a table list of common tables
+      parameters:
+        - $ref: '#/components/parameters/app'
+        - $ref: '#/components/parameters/uid'
+      security:
+        - api_key: []
+      responses:
+        '200':
+          description: Success!
+        '401':
+          description: Invalid or disabled security token provided.
+        '403':
+          description: Missing or invalid security token
+  /spillman/unit:
+    get:
+      tags:
+        - Unit
+      summary: Unit
+      description: Get unit information
+      parameters:
+        - $ref: '#/components/parameters/app'
+        - $ref: '#/components/parameters/uid'
+        - $ref: '#/components/parameters/unit'
+        - $ref: '#/components/parameters/agency'
+        - $ref: '#/components/parameters/zone'
+        - $ref: '#/components/parameters/utype'
+        - $ref: '#/components/parameters/ukind'
+      security:
+        - api_key: []
+      responses:
+        '200':
+          description: Success!
+        '401':
+          description: Invalid or disabled security token provided.
+        '403':
+          description: Missing or invalid security token
+  /spillman/unit/status:
+    get:
+      tags:
+        - Unit
+        - Real-Time
+      summary: Unit Status
+      description: Get current unit status information
+      parameters:
+        - $ref: '#/components/parameters/app'
+        - $ref: '#/components/parameters/uid'
+        - $ref: '#/components/parameters/unit'
+        - $ref: '#/components/parameters/agency'
+        - $ref: '#/components/parameters/zone'
+        - $ref: '#/components/parameters/utype'
+        - $ref: '#/components/parameters/ukind'
+        - $ref: '#/components/parameters/callid'
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/limit'
+      security:
+        - api_key: []
+      responses:
+        '200':
+          description: Success!
+        '401':
+          description: Invalid or disabled security token provided.
+        '403':
+          description: Missing or invalid token
+components:
+  securitySchemes:
+    api_key:
+      type: apiKey
+      in: query
+      name: token
+  parameters:
+    app:
+      name: app
+      in: query
+      description: App ID or Name of Application Accessing the Spillman API
+      required: false
+      schema:
+        type: string
+    uid:
+      name: uid
+      in: query
+      description: User ID of User Accessing the Spillman API
+      required: false
+      schema:
+        type: string
+    agency:
+      name: agency
+      in: query
+      description: Spillman Agency Code
+      required: false
+      schema:
+        type: string
+    unit:
+      name: unit
+      in: query
+      description: Spillman Unit ID
+      required: false
+      schema:
+        type: string
+    callid:
+      name: callid
+      in: query
+      description: Long Term Call ID
+      required: false
+      schema:
+        type: string
+    call_id:
+      name: callid
+      in: query
+      description: Long Term Call ID
+      required: false
+      schema:
+        type: string
+    incident_id:
+      name: incident_id
+      in: query
+      description: Incident ID
+      required: false
+      schema:
+        type: string
+    status:
+      name: status
+      in: query
+      description: Status Code
+      required: false
+      schema:
+        type: string
+    type:
+      name: type
+      in: query
+      description: CAD Call Type (lfe)
+      required: false
+      schema:
+        type: string
+    city:
+      name: city
+      in: query
+      description: City Code
+      required: false
+      schema:
+        type: string
+    page:
+      name: page
+      in: query
+      description: Server Side Pagination Page
+      required: false
+      schema:
+        default: 1
+        type: string
+    limit:
+      name: limit
+      in: query
+      description: Server side Pagination Row Limit
+      required: false
+      schema:
+        default: 15
+        type: string
+    start:
+      name: start
+      in: query
+      description: Start Date in yyyy-mm-dd Format
+      required: false
+      schema:
+        type: string
+    end:
+      name: end
+      in: query
+      description: Start Date in yyyy-mm-dd Format
+      required: false
+      schema:
+        type: string
+    nameid:
+      name: num
+      in: query
+      description: Spillman Name ID
+      required: false
+      schema:
+        type: string
+    name_id:
+      name: name_id
+      in: query
+      description: Spillman Name ID
+      required: false
+      schema:
+        type: string
+    nametype:
+      name: type
+      in: query
+      description: Spillman Name Type
+      required: false
+      schema:
+        type: string
+    last:
+      name: last
+      in: query
+      description: Last Name
+      required: false
+      schema:
+        type: string
+    first:
+      name: first
+      in: query
+      description: First Name
+      required: false
+      schema:
+        type: string
+    middle:
+      name: middle
+      in: query
+      description: Middle Name
+      required: false
+      schema:
+        type: string
+    phone:
+      name: phone
+      in: query
+      description: Phone Number
+      required: false
+      schema:
+        type: string
+    dl:
+      name: dl
+      in: query
+      description: Drivers License Number
+      required: false
+      schema:
+        type: string
+    dlstate:
+      name: dlstate
+      in: query
+      description: Drivers License State
+      required: false
+      schema:
+        type: string
+    stateid:
+      name: stateid
+      in: query
+      description: State ID Number
+      required: false
+      schema:
+        type: string
+    ssn:
+      name: ssn
+      in: query
+      description: Social Security Number
+      required: false
+      schema:
+        type: string
+    table:
+      name: table
+      in: query
+      description: Spillman Table Name
+      required: false
+      schema:
+        type: string
+    rows:
+      name: rows
+      in: query
+      description: Number of Rows to Return
+      required: false
+      schema:
+        type: string
+    zone:
+      name: zone
+      in: query
+      description: Spillman Zone
+      required: false
+      schema:
+        type: string
+    utype:
+      name: type
+      in: query
+      description: Unit Type
+      required: false
+      schema:
+        type: string
+    ukind:
+      name: kind
+      in: query
+      description: Unit Kind
+      required: false
+      schema:
+        type: string
