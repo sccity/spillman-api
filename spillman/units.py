@@ -231,7 +231,7 @@ class Units(Resource):
         zone = args.get("zone", default="*", type=str)
         utype = args.get("type", default="*", type=str)
         kind = args.get("kind", default="*", type=str)
-        
+
         if (app == "" or app == "*"):
             app = "default"
         

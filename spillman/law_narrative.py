@@ -131,7 +131,7 @@ class LawNarrative(Resource):
         app = args.get("app", default="*", type=str)
         uid = args.get("uid", default="*", type=str)
         incident_id = args.get("incident_id", default="", type=str)
-        
+
         if (app == "" or app == "*"):
             app = "default"
         

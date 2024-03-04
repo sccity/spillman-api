@@ -85,7 +85,7 @@ class Table(Resource):
         uid = args.get("uid", default="*", type=str)
         table = args.get("table", default="", type=str)
         rows = args.get("rows", default="*", type=str)
-        
+
         if (app == "" or app == "*"):
             app = "default"
         

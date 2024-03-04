@@ -15,8 +15,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from flask_restful import Resource, Api, request
-from flask import jsonify, abort
+from flask_restful import Resource, request
+from flask import abort
 import json
 import requests
 import spillman as s
@@ -78,7 +78,7 @@ class ActiveUnits(Resource):
         app = args.get("app", default="*", type=str)
         uid = args.get("uid", default="*", type=str)
         cad_call_id = args.get("callid", default="", type=str)
-        
+
         if (app == "" or app == "*"):
             app = "default"
         

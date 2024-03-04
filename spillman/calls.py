@@ -18,7 +18,7 @@
 import json, xmltodict, traceback, requests
 import spillman as s
 from flask_restful import Resource, request
-from flask import jsonify, abort
+from flask import abort
 from datetime import date, timedelta
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from .log import SetupLogger
@@ -265,7 +265,7 @@ class Calls(Resource):
         end = args.get("end", default="", type=str)
         page = args.get("page", default=1, type=int)
         limit = args.get("limit", default=10, type=int)
-        
+
         if (app == "" or app == "*"):
             app = "default"
         

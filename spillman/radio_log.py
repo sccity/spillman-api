@@ -296,7 +296,7 @@ class RadioLog(Resource):
         end = args.get("end", default="", type=str)
         page = args.get("page", default=1, type=int)
         limit = args.get("limit", default=10, type=int)
-        
+
         if (app == "" or app == "*"):
             app = "default"
         

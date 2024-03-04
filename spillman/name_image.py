@@ -125,7 +125,7 @@ class NameImage(Resource):
         app = args.get("app", default="*", type=str)
         uid = args.get("uid", default="*", type=str)
         name_id = args.get("name_id", default="", type=str)
-        
+
         if (app == "" or app == "*"):
             app = "default"
         

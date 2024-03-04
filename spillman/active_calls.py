@@ -16,7 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from flask_restful import Resource, request
-from flask import jsonify, abort
+from flask import abort
 import json, xmltodict, traceback
 import requests
 import spillman as s
@@ -219,7 +219,7 @@ class ActiveCalls(Resource):
         paginated_data = data[start_index:end_index]
 
         return paginated_data
-      
+
     def get(self):
         args = request.args
         token = args.get("token", default="", type=str)
