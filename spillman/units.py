@@ -16,7 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from flask_restful import Resource, request
-from flask import jsonify, abort
+from flask import abort
 import json, xmltodict, traceback
 import requests
 import spillman as s
@@ -79,7 +79,7 @@ class Units(Resource):
                     err.error(traceback.format_exc())
                     return
 
-        except:
+        except Exception:
             err.error(traceback.format_exc())
             return
 
@@ -95,19 +95,19 @@ class Units(Resource):
         elif isinstance(spillman, dict):
             try:
                 unit = spillman.get("unitno")
-            except:
+            except Exception:
                 unit = ""
 
             try:
                 desc = spillman.get("desc")
-            except:
+            except Exception:
                 desc = ""
 
             agency = spillman.get("agency")
 
             try:
                 zone = spillman.get("zone")
-            except:
+            except Exception:
                 zone = ""
 
             if spillman.get("type") == "l":
@@ -121,22 +121,22 @@ class Units(Resource):
 
             try:
                 kind = spillman.get("kind")
-            except:
+            except Exception:
                 kind = ""
 
             try:
                 station = spillman.get("station")
-            except:
+            except Exception:
                 station = ""
 
             try:
                 name = self.f.get_unit_name(unit)
-            except:
+            except Exception:
                 name = ""
 
             try:
                 contact = self.f.get_unit_contact(unit)
-            except:
+            except Exception:
                 contact = ""
 
             data.append(
@@ -158,19 +158,19 @@ class Units(Resource):
                 try:
                     try:
                         unit = row["unitno"]
-                    except:
+                    except Exception:
                         unit = ""
 
                     try:
                         desc = row["desc"]
-                    except:
+                    except Exception:
                         desc = ""
 
                     agency = row["agency"]
 
                     try:
                         zone = row["zone"]
-                    except:
+                    except Exception:
                         zone = ""
 
                     if row["type"] == "l":
@@ -184,25 +184,25 @@ class Units(Resource):
 
                     try:
                         kind = row["kind"]
-                    except:
+                    except Exception:
                         kind = ""
 
                     try:
                         station = row["station"]
-                    except:
+                    except Exception:
                         station = ""
 
                     try:
                         name = self.f.get_unit_name(unit)
-                    except:
+                    except Exception:
                         name = ""
 
                     try:
                         contact = self.f.get_unit_contact(unit)
-                    except:
+                    except Exception:
                         contact = ""
 
-                except:
+                except Exception:
                     continue
 
                 data.append(
@@ -231,6 +231,12 @@ class Units(Resource):
         zone = args.get("zone", default="*", type=str)
         utype = args.get("type", default="*", type=str)
         kind = args.get("kind", default="*", type=str)
+
+        if app == "" or app == "*":
+            app = "default"
+
+        if uid == "" or uid == "*":
+            uid = "default"
 
         if token == "":
             s.AuthService.audit_request(

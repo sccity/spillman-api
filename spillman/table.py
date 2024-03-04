@@ -16,7 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from flask_restful import Resource, request
-from flask import jsonify, abort
+from flask import abort
 import json, xmltodict, traceback
 import requests
 import spillman as s
@@ -72,7 +72,7 @@ class Table(Resource):
                     err.error(traceback.format_exc())
                     return
 
-        except Exception as e:
+        except Exception:
             err.error(traceback.format_exc())
             return
 
@@ -85,6 +85,12 @@ class Table(Resource):
         uid = args.get("uid", default="*", type=str)
         table = args.get("table", default="", type=str)
         rows = args.get("rows", default="*", type=str)
+
+        if app == "" or app == "*":
+            app = "default"
+
+        if uid == "" or uid == "*":
+            uid = "default"
 
         if token == "":
             s.AuthService.audit_request(

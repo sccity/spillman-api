@@ -19,7 +19,7 @@ import json, xmltodict, traceback, requests
 import threading
 import spillman as s
 from flask_restful import Resource, request
-from flask import jsonify, abort
+from flask import abort
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from .log import SetupLogger
 from .settings import settings_data
@@ -77,7 +77,7 @@ class NameInvolvements(Resource):
                     err.error(traceback.format_exc())
                     return
 
-        except:
+        except Exception:
             err.error(traceback.format_exc())
             return
 
@@ -126,7 +126,7 @@ class NameInvolvements(Resource):
                     err.error(traceback.format_exc())
                     return
 
-        except:
+        except Exception:
             err.error(traceback.format_exc())
             return
 
@@ -135,17 +135,17 @@ class NameInvolvements(Resource):
     def process_row(self, name_id, row, data):
         try:
             incident_id = row["RecIDThisRecordsIDNo"]
-        except:
+        except Exception:
             incident_id = ""
 
         try:
             involvement_type = row["RelationshipToOtherRecord"]
-        except:
+        except Exception:
             involvement_type = ""
 
         try:
             record_type = row["TypeOfThisRecord"]
-        except:
+        except Exception:
             record_type = ""
 
         if record_type == "1000":
@@ -164,7 +164,7 @@ class NameInvolvements(Resource):
         try:
             involvement_date = row["DateInvolvementOccurred"]
             involvement_date = f"{involvement_date[6:10]}-{involvement_date[0:2]}-{involvement_date[3:5]} 00:00:00"
-        except:
+        except Exception:
             involvement_date = "1900-01-01 00:00:00"
 
         data.append(
@@ -188,17 +188,17 @@ class NameInvolvements(Resource):
         elif isinstance(spillman, dict):
             try:
                 incident_id = spillman.get("RecIDThisRecordsIDNo")
-            except:
+            except Exception:
                 incident_id = ""
 
             try:
                 involvement_type = spillman.get("RelationshipToOtherRecord")
-            except:
+            except Exception:
                 involvement_type = ""
 
             try:
                 record_type = spillman.get("TypeOfThisRecord")
-            except:
+            except Exception:
                 record_type = ""
 
             if record_type == "1000":
@@ -217,7 +217,7 @@ class NameInvolvements(Resource):
             try:
                 involvement_date = spillman.get("DateInvolvementOccurred")
                 involvement_date = f"{involvement_date[6:10]}-{involvement_date[0:2]}-{involvement_date[3:5]} 00:00:00"
-            except:
+            except Exception:
                 involvement_date = "1900-01-01 00:00:00"
 
             data.append(
@@ -240,7 +240,7 @@ class NameInvolvements(Resource):
                     )
                     threads.append(thread)
                     thread.start()
-                except:
+                except Exception:
                     continue
 
             for thread in threads:
@@ -262,6 +262,12 @@ class NameInvolvements(Resource):
         name_id = args.get("name_id", default="", type=str)
         page = args.get("page", default=1, type=int)
         limit = args.get("limit", default=10, type=int)
+
+        if app == "" or app == "*":
+            app = "default"
+
+        if uid == "" or uid == "*":
+            uid = "default"
 
         if token == "":
             s.AuthService.audit_request(

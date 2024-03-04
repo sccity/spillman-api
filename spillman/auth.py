@@ -31,13 +31,13 @@ class AuthService:
             db_response = cursor.fetchone()
             cursor.close()
             db.close()
-        except:
+        except Exception:
             cursor.close()
             db.close()
 
         try:
             db_valid = db_response[0]
-        except:
+        except Exception:
             db_valid = 0
 
         if db_valid is None:
@@ -54,7 +54,7 @@ class AuthService:
                 db.commit()
                 cursor.close()
                 db.close()
-            except:
+            except Exception:
                 cursor.close()
                 db.close()
 
@@ -73,7 +73,7 @@ class AuthService:
                 db.commit()
                 cursor.close()
                 db.close()
-            except:
+            except Exception:
                 cursor.close()
                 db.close()
 
@@ -90,7 +90,7 @@ class AuthService:
             db.commit()
             cursor.close()
             db.close()
-        except:
+        except Exception:
             cursor.close()
             db.close()
         return

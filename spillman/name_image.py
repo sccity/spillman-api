@@ -18,7 +18,7 @@
 import json, xmltodict, traceback, requests
 import spillman as s
 from flask_restful import Resource, request
-from flask import jsonify, abort
+from flask import abort
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from .log import SetupLogger
 from .settings import settings_data
@@ -75,7 +75,7 @@ class NameImage(Resource):
                     err.error(traceback.format_exc())
                     return
 
-        except:
+        except Exception:
             err.error(traceback.format_exc())
             return
 
@@ -91,7 +91,7 @@ class NameImage(Resource):
         elif isinstance(spillman, dict):
             try:
                 image_file = spillman.get("Name")
-            except:
+            except Exception:
                 image_file = ""
 
             data.append(
@@ -106,7 +106,7 @@ class NameImage(Resource):
             for row in spillman:
                 try:
                     image_file = row["Name"]
-                except:
+                except Exception:
                     image_file = ""
 
                 data.append(
@@ -125,6 +125,12 @@ class NameImage(Resource):
         app = args.get("app", default="*", type=str)
         uid = args.get("uid", default="*", type=str)
         name_id = args.get("name_id", default="", type=str)
+
+        if app == "" or app == "*":
+            app = "default"
+
+        if uid == "" or uid == "*":
+            uid = "default"
 
         if token == "":
             s.AuthService.audit_request(

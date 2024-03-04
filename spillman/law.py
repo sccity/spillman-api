@@ -18,7 +18,7 @@
 import json, xmltodict, traceback, requests
 import spillman as s
 from flask_restful import Resource, request
-from flask import jsonify, abort
+from flask import abort
 from datetime import date, timedelta
 from datetime import datetime
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
@@ -88,8 +88,6 @@ class Law(Resource):
         </PublicSafetyEnvelope>
         """
 
-        print(request)
-
         try:
             headers = {"Content-Type": "application/xml"}
             try:
@@ -112,7 +110,7 @@ class Law(Resource):
                     err.error(traceback.format_exc())
                     return
 
-        except Exception as e:
+        except Exception:
             err.error(traceback.format_exc())
             return
 
@@ -128,17 +126,17 @@ class Law(Resource):
         elif isinstance(spillman, dict):
             try:
                 callid = spillman.get("callid")
-            except:
+            except Exception:
                 callid = ""
 
             try:
                 incident_id = spillman.get("number")
-            except:
+            except Exception:
                 incident_id = ""
 
             try:
                 nature = spillman.get("nature")
-            except:
+            except Exception:
                 nature = ""
 
             try:
@@ -146,71 +144,71 @@ class Law(Resource):
                 address = address.replace('"', "")
                 address = address.replace("'", "")
                 address = address.replace(";", "")
-            except:
+            except Exception:
                 address = ""
 
             try:
                 city = spillman.get("city")
-            except:
+            except Exception:
                 city = ""
 
             try:
                 state = spillman.get("state")
-            except:
+            except Exception:
                 state = ""
 
             try:
                 zipcode = spillman.get("zip")
-            except:
+            except Exception:
                 zipcode = ""
 
             try:
                 location = spillman.get("locatn")
-            except:
+            except Exception:
                 location = ""
 
             try:
                 agency = spillman.get("agency")
-            except:
+            except Exception:
                 agency = ""
 
             try:
                 occurred_dt1 = spillman.get("ocurdt1")
                 occurred_dt1 = f"{occurred_dt1[15:19]}-{occurred_dt1[9:11]}-{occurred_dt1[12:14]} {occurred_dt1[0:8]}"
-            except:
+            except Exception:
                 occurred_dt1 = "1900-01-01 00:00:00"
 
             try:
                 occurred_dt2 = spillman.get("ocurdt2")
                 occurred_dt2 = f"{occurred_dt2[15:19]}-{occurred_dt2[9:11]}-{occurred_dt2[12:14]} {occurred_dt2[0:8]}"
-            except:
+            except Exception:
                 occurred_dt2 = "1900-01-01 00:00:00"
 
             try:
                 reported_dt = spillman.get("dtrepor")
                 reported_dt = f"{reported_dt[15:19]}-{reported_dt[9:11]}-{reported_dt[12:14]} {reported_dt[0:8]}"
-            except:
+            except Exception:
                 reported_dt = "1900-01-01 00:00:00"
 
             try:
                 dispatch_dt = spillman.get("dispdat")
                 dispatch_dt = f"{dispatch_dt[6:10]}-{dispatch_dt[0:2]}-{dispatch_dt[3:5]} 00:00:00"
-            except:
+            except Exception:
                 dispatch_dt = "1900-01-01 00:00:00"
 
             try:
                 condition = spillman.get("condtkn")
-            except:
+            except Exception:
                 condition = ""
 
             try:
                 disposition = spillman.get("dispos")
-            except:
+            except Exception:
                 disposition = ""
 
             try:
                 howrc = spillman.get("howrc")
-            except:
+            except Exception:
                 howrc = ""
 
             if howrc == "2":
@@ -253,17 +251,17 @@ class Law(Resource):
             for row in spillman:
                 try:
                     callid = row["callid"]
-                except:
+                except Exception:
                     callid = ""
 
                 try:
                     incident_id = row["number"]
-                except:
-                    incident_id
+                except Exception:
+                    incident_id = ""
 
                 try:
                     nature = row["nature"]
-                except:
+                except Exception:
                     nature = ""
 
                 try:
@@ -271,71 +269,71 @@ class Law(Resource):
                     address = address.replace('"', "")
                     address = address.replace("'", "")
                     address = address.replace(";", "")
-                except:
+                except Exception:
                     address = ""
 
                 try:
                     city = row["city"]
-                except:
+                except Exception:
                     city = ""
 
                 try:
                     state = row["state"]
-                except:
+                except Exception:
                     state = ""
 
                 try:
                     zipcode = row["zip"]
-                except:
+                except Exception:
                     zipcode = ""
 
                 try:
                     location = row["locatn"]
-                except:
+                except Exception:
                     location = ""
 
                 try:
                     agency = row["agency"]
-                except:
+                except Exception:
                     agency = ""
 
                 try:
                     occurred_dt1 = row["ocurdt1"]
                     occurred_dt1 = f"{occurred_dt1[15:19]}-{occurred_dt1[9:11]}-{occurred_dt1[12:14]} {occurred_dt1[0:8]}"
-                except:
+                except Exception:
                     occurred_dt1 = "1900-01-01 00:00:00"
 
                 try:
                     occurred_dt2 = row["ocurdt2"]
                     occurred_dt2 = f"{occurred_dt2[15:19]}-{occurred_dt2[9:11]}-{occurred_dt2[12:14]} {occurred_dt2[0:8]}"
-                except:
+                except Exception:
                     occurred_dt2 = "1900-01-01 00:00:00"
 
                 try:
                     reported_dt = row["dtrepor"]
                     reported_dt = f"{reported_dt[15:19]}-{reported_dt[9:11]}-{reported_dt[12:14]} {reported_dt[0:8]}"
-                except:
+                except Exception:
                     reported_dt = "1900-01-01 00:00:00"
 
                 try:
                     dispatch_dt = row["dispdat"]
                     dispatch_dt = f"{dispatch_dt[6:10]}-{dispatch_dt[0:2]}-{dispatch_dt[3:5]} 00:00:00"
-                except:
+                except Exception:
                     dispatch_dt = "1900-01-01 00:00:00"
 
                 try:
                     condition = row["condtkn"]
-                except:
+                except Exception:
                     condition = ""
 
                 try:
                     disposition = row["dispos"]
-                except:
+                except Exception:
                     disposition = ""
 
                 try:
                     howrc = row["howrc"]
-                except:
+                except Exception:
                     howrc = ""
 
                 if howrc == "2":
@@ -394,6 +392,12 @@ class Law(Resource):
         end = args.get("end", default="", type=str)
         page = args.get("page", default=1, type=int)
         limit = args.get("limit", default=10, type=int)
+
+        if app == "" or app == "*":
+            app = "default"
+
+        if uid == "" or uid == "*":
+            uid = "default"
 
         if token == "":
             s.AuthService.audit_request(

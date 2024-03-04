@@ -18,7 +18,7 @@
 import json, xmltodict, traceback, requests
 import spillman as s
 from flask_restful import Resource, request
-from flask import jsonify, abort
+from flask import abort
 from datetime import date, timedelta
 from datetime import datetime
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
@@ -132,42 +132,32 @@ class RadioLog(Resource):
             try:
                 date = spillman.get("logdate")
                 logdate = f"{date[15:19]}-{date[9:11]}-{date[12:14]} {date[0:8]}"
-            except:
+            except Exception:
                 logdate = "1900-01-01 00:00:00"
 
             try:
-                xpos = spillman.get("xpos")
-            except:
-                xpos = 0
-
-            try:
-                ypos = spillman.get("ypos")
-            except:
-                ypos = 0
-
-            try:
                 gps_x = f"{spillman.get('xpos')[:4]}.{spillman.get('xpos')[4:]}"
-            except:
+            except Exception:
                 gps_x = 0
 
             try:
                 gps_y = f"{spillman.get('ypos')[:2]}.{spillman.get('ypos')[2:]}"
-            except:
+            except Exception:
                 gps_y = 0
 
             try:
                 callid = spillman.get("callid")
-            except:
+            except Exception:
                 callid = ""
 
             try:
                 agency = spillman.get("agency")
-            except:
+            except Exception:
                 agency = ""
 
             try:
                 zone = spillman.get("zone")
-            except:
+            except Exception:
                 zone = ""
 
             try:
@@ -177,20 +167,15 @@ class RadioLog(Resource):
 
             try:
                 unit = spillman.get("unit")
-            except:
+            except Exception:
                 unit = ""
 
             try:
                 description = spillman.get("desc")
                 description = description.replace('"', "")
                 description = description.replace("'", "")
-            except:
+            except Exception:
                 description = ""
-
-            try:
-                calltype = spillman.get("calltyp")
-            except:
-                calltype = ""
 
             data.append(
                 {
@@ -211,32 +196,32 @@ class RadioLog(Resource):
                 try:
                     date = row["logdate"]
                     logdate = f"{date[15:19]}-{date[9:11]}-{date[12:14]} {date[0:8]}"
-                except:
+                except Exception:
                     logdate = "1900-01-01 00:00:00"
 
                 try:
                     gps_x = f"{row['xpos'][:4]}.{row['xpos'][4:]}"
-                except:
+                except Exception:
                     gps_x = 0
 
                 try:
                     gps_y = f"{row['ypos'][:2]}.{row['ypos'][2:]}"
-                except:
+                except Exception:
                     gps_y = 0
 
                 try:
                     callid = row["callid"]
-                except:
+                except Exception:
                     callid = ""
 
                 try:
                     agency = row["agency"]
-                except:
+                except Exception:
                     agency = ""
 
                 try:
                     zone = row["zone"]
-                except:
+                except Exception:
                     zone = ""
 
                 try:
@@ -246,20 +231,15 @@ class RadioLog(Resource):
 
                 try:
                     unit = row["unit"]
-                except:
+                except Exception:
                     unit = ""
 
                 try:
                     description = row["desc"]
                     description = description.replace('"', "")
                     description = description.replace("'", "")
-                except:
+                except Exception:
                     description = ""
-
-                try:
-                    calltype = row["calltyp"]
-                except:
-                    calltype = ""
 
                 data.append(
                     {
@@ -296,6 +276,12 @@ class RadioLog(Resource):
         end = args.get("end", default="", type=str)
         page = args.get("page", default=1, type=int)
         limit = args.get("limit", default=10, type=int)
+
+        if app == "" or app == "*":
+            app = "default"
+
+        if uid == "" or uid == "*":
+            uid = "default"
 
         if token == "":
             s.AuthService.audit_request(

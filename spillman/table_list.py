@@ -16,7 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from flask_restful import Resource, request
-from flask import jsonify, abort
+from flask import abort
 import spillman as s
 from .log import SetupLogger
 from .settings import settings_data
@@ -35,7 +35,12 @@ class TableList(Resource):
         token = args.get("token", default="", type=str)
         app = args.get("app", default="*", type=str)
         uid = args.get("uid", default="*", type=str)
-        tablelist = args.get("tablelist", default="*", type=str)
+
+        if app == "" or app == "*":
+            app = "default"
+
+        if uid == "" or uid == "*":
+            uid = "default"
 
         if token == "":
             s.AuthService.audit_request(
