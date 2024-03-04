@@ -132,10 +132,10 @@ class LawNarrative(Resource):
         uid = args.get("uid", default="*", type=str)
         incident_id = args.get("incident_id", default="", type=str)
 
-        if (app == "" or app == "*"):
+        if app == "" or app == "*":
             app = "default"
 
-        if (uid == "" or uid == "*"):
+        if uid == "" or uid == "*":
             uid = "default"
 
         if token == "":

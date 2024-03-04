@@ -150,10 +150,10 @@ class Emd(Resource):
         uid = args.get("uid", default="*", type=str)
         cad_call_id = args.get("callid", default="", type=str)
 
-        if (app == "" or app == "*"):
+        if app == "" or app == "*":
             app = "default"
 
-        if (uid == "" or uid == "*"):
+        if uid == "" or uid == "*":
             uid = "default"
 
         if token == "":

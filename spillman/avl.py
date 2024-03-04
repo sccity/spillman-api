@@ -171,10 +171,10 @@ class Avl(Resource):
         start = args.get("start", default="", type=str)
         end = args.get("end", default="", type=str)
 
-        if (app == "" or app == "*"):
+        if app == "" or app == "*":
             app = "default"
 
-        if (uid == "" or uid == "*"):
+        if uid == "" or uid == "*":
             uid = "default"
 
         if token == "":

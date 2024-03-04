@@ -86,10 +86,10 @@ class Table(Resource):
         table = args.get("table", default="", type=str)
         rows = args.get("rows", default="*", type=str)
 
-        if (app == "" or app == "*"):
+        if app == "" or app == "*":
             app = "default"
 
-        if (uid == "" or uid == "*"):
+        if uid == "" or uid == "*":
             uid = "default"
 
         if token == "":

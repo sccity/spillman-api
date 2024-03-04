@@ -233,10 +233,10 @@ class ActiveCalls(Resource):
         page = args.get("page", default=1, type=int)
         limit = args.get("limit", default=100, type=int)
 
-        if (app == "" or app == "*"):
+        if app == "" or app == "*":
             app = "default"
 
-        if (uid == "" or uid == "*"):
+        if uid == "" or uid == "*":
             uid = "default"
 
         if token == "":

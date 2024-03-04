@@ -232,10 +232,10 @@ class Units(Resource):
         utype = args.get("type", default="*", type=str)
         kind = args.get("kind", default="*", type=str)
 
-        if (app == "" or app == "*"):
+        if app == "" or app == "*":
             app = "default"
 
-        if (uid == "" or uid == "*"):
+        if uid == "" or uid == "*":
             uid = "default"
 
         if token == "":

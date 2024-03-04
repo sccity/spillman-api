@@ -36,10 +36,10 @@ class TableList(Resource):
         app = args.get("app", default="*", type=str)
         uid = args.get("uid", default="*", type=str)
 
-        if (app == "" or app == "*"):
+        if app == "" or app == "*":
             app = "default"
 
-        if (uid == "" or uid == "*"):
+        if uid == "" or uid == "*":
             uid = "default"
 
         if token == "":
