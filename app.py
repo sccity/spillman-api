@@ -25,28 +25,27 @@ from flask_swagger_ui import get_swaggerui_blueprint
 app = s.spillman_api()
 api = Api(app)
 
-SWAGGER_URL="/docs"
-API_URL="/static/swagger.yaml"
+SWAGGER_URL = "/docs"
+API_URL = "/static/swagger.yaml"
 
 swagger_ui_blueprint = get_swaggerui_blueprint(
-    SWAGGER_URL,
-    API_URL,
-    config={
-        'app_name': version_data["program"]
-    }
+    SWAGGER_URL, API_URL, config={"app_name": version_data["program"]}
 )
 app.register_blueprint(swagger_ui_blueprint, url_prefix=SWAGGER_URL)
 
+
 @app.after_request
 def add_cors_headers(response):
-    response.headers['Access-Control-Allow-Origin'] = '*'
-    response.headers['Access-Control-Allow-Headers'] = 'Content-Type,Authorization'
-    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type,Authorization"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
     return response
-  
+
+
 @app.errorhandler(404)
 def PageNotFound(e):
     return jsonify(error=str(e)), 404
+
 
 @app.route("/", methods=["GET"])
 def HttpRoot():
@@ -57,6 +56,7 @@ def HttpRoot():
         copyright=version_data["copyright"],
         author=version_data["author"],
     )
+
 
 api.add_resource(s.ActiveCalls, "/cad/active")
 api.add_resource(s.ActiveUnits, "/cad/active/units")

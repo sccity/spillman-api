@@ -1,10 +1,10 @@
 [Unit]
-Description=Spillman API Production
+Description=Spillman API
 After=syslog.target network.target
 
 [Service]
 WorkingDirectory=/opt/spillman-api/prod
-ExecStart=/usr/bin/python3 /opt/spillman-api/dev/app.py
+ExecStart=/opt/spillman-api/prod/venv/bin/python3 /opt/spillman-api/prod/app.py
 
 Restart=always
 RestartSec=120

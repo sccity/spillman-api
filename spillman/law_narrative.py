@@ -18,7 +18,7 @@
 import json, xmltodict, traceback, requests
 import spillman as s
 from flask_restful import Resource, request
-from flask import jsonify, abort
+from flask import abort
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from .log import SetupLogger
 from .settings import settings_data
@@ -73,7 +73,7 @@ class LawNarrative(Resource):
                     err.error(traceback.format_exc())
                     return
 
-        except:
+        except Exception:
             err.error(traceback.format_exc())
             return
 
@@ -89,12 +89,12 @@ class LawNarrative(Resource):
         elif isinstance(spillman, dict):
             try:
                 incident_id = spillman.get("IncidentNumber")
-            except:
+            except Exception:
                 incident_id = ""
 
             try:
                 narrative = spillman.get("Narrative")
-            except:
+            except Exception:
                 narrative = ""
 
             data.append(
@@ -108,12 +108,12 @@ class LawNarrative(Resource):
             for row in spillman:
                 try:
                     incident_id = row["IncidentNumber"]
-                except:
+                except Exception:
                     incident_id = ""
 
                 try:
                     narrative = row["Narrative"]
-                except:
+                except Exception:
                     narrative = ""
 
                 data.append(
@@ -131,6 +131,12 @@ class LawNarrative(Resource):
         app = args.get("app", default="*", type=str)
         uid = args.get("uid", default="*", type=str)
         incident_id = args.get("incident_id", default="", type=str)
+
+        if app == "" or app == "*":
+            app = "default"
+
+        if uid == "" or uid == "*":
+            uid = "default"
 
         if token == "":
             s.AuthService.audit_request(

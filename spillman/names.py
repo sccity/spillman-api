@@ -16,7 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from flask_restful import Resource, request
-from flask import jsonify, abort
+from flask import abort
 import json, xmltodict, traceback
 import requests
 import spillman as s
@@ -86,7 +86,7 @@ class Names(Resource):
                     err.error(traceback.format_exc())
                     return
 
-        except Exception as e:
+        except Exception:
             err.error(traceback.format_exc())
             return
 
@@ -99,7 +99,7 @@ class Names(Resource):
             alert_names = [f.get_alert_name(alert) for alert in alert_list]
             result = ", ".join(alert_names)
             return result
-        except:
+        except Exception:
             return "NONE"
 
     def process(
@@ -245,7 +245,7 @@ class Names(Resource):
                     work_phone = self.f.validate_phone(row.get("wrkphn", ""))
                     alerts = self.process_alerts(name_id)
 
-                except:
+                except Exception:
                     continue
 
                 data.append(
@@ -309,6 +309,12 @@ class Names(Resource):
         ssn = args.get("ssn", default="*", type=str)
         page = args.get("page", default=1, type=int)
         limit = args.get("limit", default=10, type=int)
+
+        if app == "" or app == "*":
+            app = "default"
+
+        if uid == "" or uid == "*":
+            uid = "default"
 
         if token == "":
             s.AuthService.audit_request(

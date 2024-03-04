@@ -16,7 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from flask_restful import Resource, request
-from flask import jsonify, abort
+from flask import abort
 import json, xmltodict, traceback
 import requests
 import spillman as s
@@ -78,7 +78,7 @@ class ActiveCalls(Resource):
                     err.error(traceback.format_exc())
                     return
 
-        except:
+        except Exception:
             err.error(traceback.format_exc())
             return
 
@@ -189,7 +189,7 @@ class ActiveCalls(Resource):
                     minutes, seconds = divmod(time_difference.seconds, 60)
                     formatted_time = f"{minutes}m {seconds}s"
 
-                except:
+                except Exception:
                     continue
 
                 data.append(
@@ -219,9 +219,8 @@ class ActiveCalls(Resource):
         paginated_data = data[start_index:end_index]
 
         return paginated_data
-      
+
     def get(self):
-        """Register a new user"""
         args = request.args
         token = args.get("token", default="", type=str)
         app = args.get("app", default="*", type=str)
@@ -233,6 +232,12 @@ class ActiveCalls(Resource):
         city = args.get("city", default="*", type=str)
         page = args.get("page", default=1, type=int)
         limit = args.get("limit", default=100, type=int)
+
+        if app == "" or app == "*":
+            app = "default"
+
+        if uid == "" or uid == "*":
+            uid = "default"
 
         if token == "":
             s.AuthService.audit_request(
