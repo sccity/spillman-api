@@ -3,9 +3,8 @@ Description=Spillman API
 After=syslog.target network.target
 
 [Service]
-Environment="PATH=opt/spillman-api/prod/venv/bin"
 WorkingDirectory=/opt/spillman-api/prod
-ExecStart=/usr/bin/python3 /opt/spillman-api/prod/app.py
+ExecStart=/opt/spillman-api/prod/venv/bin/python3 /opt/spillman-api/prod/app.py
 
 Restart=always
 RestartSec=120
