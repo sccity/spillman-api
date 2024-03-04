@@ -99,7 +99,7 @@ class Names(Resource):
             alert_names = [f.get_alert_name(alert) for alert in alert_list]
             result = ", ".join(alert_names)
             return result
-        except:
+        except Exception:
             return "NONE"
 
     def process(
@@ -245,7 +245,7 @@ class Names(Resource):
                     work_phone = self.f.validate_phone(row.get("wrkphn", ""))
                     alerts = self.process_alerts(name_id)
 
-                except:
+                except Exception:
                     continue
 
                 data.append(

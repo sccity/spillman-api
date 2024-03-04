@@ -37,21 +37,21 @@ class SpillmanFunctions(Resource):
     def validate_string(self, string):
         try:
             data = string
-        except:
+        except Exception:
             data = ""
         return data
 
     def validate_date(self, string):
         try:
             data = f"{string[6:10]}-{string[0:2]}-{string[3:5]}"
-        except:
+        except Exception:
             data = "1900-01-01"
         return data
 
     def validate_datetime(self, string):
         try:
             data = f"{string[15:19]}-{string[9:11]}-{string[12:14]} {string[0:8]}"
-        except:
+        except Exception:
             data = "1900-01-01 00:00:00"
         return data
 
@@ -61,14 +61,14 @@ class SpillmanFunctions(Resource):
             string = string.replace(")", "")
             string = string.replace("-", "")
             data = string
-        except:
+        except Exception:
             data = ""
         return data
 
     def validate_number(self, string):
         try:
             data = string
-        except:
+        except Exception:
             data = 0
         return data
 
@@ -116,7 +116,7 @@ class SpillmanFunctions(Resource):
                     err.error(traceback.format_exc())
                     return
 
-        except:
+        except Exception:
             err.error(traceback.format_exc())
             return
 
@@ -165,7 +165,7 @@ class SpillmanFunctions(Resource):
                     err.error(traceback.format_exc())
                     return
 
-        except:
+        except Exception:
             err.error(traceback.format_exc())
             return
 
@@ -214,7 +214,7 @@ class SpillmanFunctions(Resource):
                     err.error(traceback.format_exc())
                     return
 
-        except:
+        except Exception:
             err.error(traceback.format_exc())
             return
 
@@ -262,7 +262,7 @@ class SpillmanFunctions(Resource):
                     err.error(traceback.format_exc())
                     return
 
-        except:
+        except Exception:
             err.error(traceback.format_exc())
             return
 

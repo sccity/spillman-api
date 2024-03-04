@@ -75,7 +75,7 @@ class NameImage(Resource):
                     err.error(traceback.format_exc())
                     return
 
-        except:
+        except Exception:
             err.error(traceback.format_exc())
             return
 
@@ -91,7 +91,7 @@ class NameImage(Resource):
         elif isinstance(spillman, dict):
             try:
                 image_file = spillman.get("Name")
-            except:
+            except Exception:
                 image_file = ""
 
             data.append(
@@ -106,7 +106,7 @@ class NameImage(Resource):
             for row in spillman:
                 try:
                     image_file = row["Name"]
-                except:
+                except Exception:
                     image_file = ""
 
                 data.append(

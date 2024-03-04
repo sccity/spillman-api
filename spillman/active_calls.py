@@ -78,7 +78,7 @@ class ActiveCalls(Resource):
                     err.error(traceback.format_exc())
                     return
 
-        except:
+        except Exception:
             err.error(traceback.format_exc())
             return
 
@@ -189,7 +189,7 @@ class ActiveCalls(Resource):
                     minutes, seconds = divmod(time_difference.seconds, 60)
                     formatted_time = f"{minutes}m {seconds}s"
 
-                except:
+                except Exception:
                     continue
 
                 data.append(

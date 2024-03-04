@@ -73,7 +73,7 @@ class Emd(Resource):
                     err.error(traceback.format_exc())
                     return
 
-        except:
+        except Exception:
             err.error(traceback.format_exc())
             return
 
@@ -88,12 +88,12 @@ class Emd(Resource):
 
         try:
             callid = spillman.get("LongTermCallID")
-        except:
+        except Exception:
             callid = ""
 
         try:
             comment = spillman.get("CallTakerComments")
-        except:
+        except Exception:
             comment = ""
 
         comment = comment.replace('"', "")

@@ -73,7 +73,7 @@ class Comments(Resource):
                     err.error(traceback.format_exc())
                     return
 
-        except:
+        except Exception:
             err.error(traceback.format_exc())
             return
 
@@ -88,12 +88,12 @@ class Comments(Resource):
 
         try:
             callid = spillman.get("LongTermCallID")
-        except:
+        except Exception:
             callid = ""
 
         try:
             comment = spillman.get("CallTakerComments")
-        except:
+        except Exception:
             comment = ""
 
         data.append({"call_id": callid, "comments": comment})

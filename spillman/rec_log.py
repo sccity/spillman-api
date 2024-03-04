@@ -74,7 +74,7 @@ class RecLog(Resource):
                     err.error(traceback.format_exc())
                     return
 
-        except:
+        except Exception:
             err.error(traceback.format_exc())
             return
 
@@ -90,42 +90,42 @@ class RecLog(Resource):
         elif isinstance(spillman, dict):
             try:
                 callid = spillman.get("callid")
-            except:
+            except Exception:
                 callid = ""
 
             try:
                 recnum = spillman.get("recnum")
-            except:
+            except Exception:
                 recnum = ""
 
             try:
                 unit = spillman.get("unit")
-            except:
+            except Exception:
                 unit = ""
 
             try:
                 desc = spillman.get("desc")
-            except:
+            except Exception:
                 desc = ""
 
             try:
                 funtcn = spillman.get("funtcn")
-            except:
+            except Exception:
                 funtcn = ""
 
             try:
                 recom = spillman.get("recom")
-            except:
+            except Exception:
                 recom = ""
 
             try:
                 select = spillman.get("select")
-            except:
+            except Exception:
                 select = ""
 
             try:
                 disptch = spillman.get("disptch")
-            except:
+            except Exception:
                 disptch = ""
 
             if recom == "Y":
@@ -169,37 +169,37 @@ class RecLog(Resource):
 
                     try:
                         recnum = row["recnum"]
-                    except:
+                    except Exception:
                         recnum = ""
 
                     try:
                         unit = row["unit"]
-                    except:
+                    except Exception:
                         unit = ""
 
                     try:
                         funtcn = row["funtcn"]
-                    except:
+                    except Exception:
                         funtcn = ""
 
                     try:
                         recom = row["recom"]
-                    except:
+                    except Exception:
                         recom = ""
 
                     try:
                         select = row["select"]
-                    except:
+                    except Exception:
                         select = ""
 
                     try:
                         disptch = row["disptch"]
-                    except:
+                    except Exception:
                         disptch = ""
 
                     try:
                         desc = row["desc"]
-                    except:
+                    except Exception:
                         desc = ""
 
                     if recom == "Y":
@@ -223,7 +223,7 @@ class RecLog(Resource):
                     else:
                         disptch = "ERR"
 
-                except:
+                except Exception:
                     continue
 
                 data.append(

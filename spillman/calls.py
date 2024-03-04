@@ -84,7 +84,7 @@ class Calls(Resource):
                     err.error(traceback.format_exc())
                     return
 
-        except:
+        except Exception:
             err.error(traceback.format_exc())
             return
 
@@ -100,12 +100,12 @@ class Calls(Resource):
         elif isinstance(spillman, dict):
             try:
                 callid = spillman.get("RecordNumber")
-            except:
+            except Exception:
                 callid = ""
 
             try:
                 nature = spillman.get("CallNature")
-            except:
+            except Exception:
                 nature = ""
 
             try:
@@ -113,35 +113,35 @@ class Calls(Resource):
                 address = address.replace('"', "")
                 address = address.replace("'", "")
                 address = address.replace(";", "")
-            except:
+            except Exception:
                 address = ""
 
             try:
                 city = spillman.get("CityCode")
-            except:
+            except Exception:
                 city = ""
 
             try:
                 occurred_dt1 = spillman.get("TimeDateOccurredEarliest")
                 occurred_dt1 = f"{occurred_dt1[15:19]}-{occurred_dt1[9:11]}-{occurred_dt1[12:14]} {occurred_dt1[0:8]}"
-            except:
+            except Exception:
                 occurred_dt1 = "1900-01-01 00:00:00"
 
             try:
                 occurred_dt2 = spillman.get("TimeDateOccuredLatest")
                 occurred_dt2 = f"{occurred_dt2[15:19]}-{occurred_dt2[9:11]}-{occurred_dt2[12:14]} {occurred_dt2[0:8]}"
-            except:
+            except Exception:
                 occurred_dt2 = "1900-01-01 00:00:00"
 
             try:
                 reported_dt = spillman.get("TimeDateReported")
                 reported_dt = f"{reported_dt[15:19]}-{reported_dt[9:11]}-{reported_dt[12:14]} {reported_dt[0:8]}"
-            except:
+            except Exception:
                 reported_dt = "1900-01-01 00:00:00"
 
             try:
                 howrc = spillman.get("HowReceived")
-            except:
+            except Exception:
                 howrc = ""
 
             if howrc == "2":
@@ -176,12 +176,12 @@ class Calls(Resource):
             for row in spillman:
                 try:
                     callid = row["RecordNumber"]
-                except:
+                except Exception:
                     callid = ""
 
                 try:
                     nature = row["CallNature"]
-                except:
+                except Exception:
                     nature = ""
 
                 try:
@@ -189,35 +189,35 @@ class Calls(Resource):
                     address = address.replace('"', "")
                     address = address.replace("'", "")
                     address = address.replace(";", "")
-                except:
+                except Exception:
                     address = ""
 
                 try:
                     city = row["CityCode"]
-                except:
+                except Exception:
                     city = ""
 
                 try:
                     occurred_dt1 = row["TimeDateOccurredEarliest"]
                     occurred_dt1 = f"{occurred_dt1[15:19]}-{occurred_dt1[9:11]}-{occurred_dt1[12:14]} {occurred_dt1[0:8]}"
-                except:
+                except Exception:
                     occurred_dt1 = "1900-01-01 00:00:00"
 
                 try:
                     occurred_dt2 = row["TimeDateOccuredLatest"]
                     occurred_dt2 = f"{occurred_dt2[15:19]}-{occurred_dt2[9:11]}-{occurred_dt2[12:14]} {occurred_dt2[0:8]}"
-                except:
+                except Exception:
                     occurred_dt2 = "1900-01-01 00:00:00"
 
                 try:
                     reported_dt = row["TimeDateReported"]
                     reported_dt = f"{reported_dt[15:19]}-{reported_dt[9:11]}-{reported_dt[12:14]} {reported_dt[0:8]}"
-                except:
+                except Exception:
                     reported_dt = "1900-01-01 00:00:00"
 
                 try:
                     howrc = row["HowReceived"]
-                except:
+                except Exception:
                     howrc = ""
 
                 if howrc == "2":

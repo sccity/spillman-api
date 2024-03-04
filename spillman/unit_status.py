@@ -80,7 +80,7 @@ class UnitStatus(Resource):
                     err.error(traceback.format_exc())
                     return
 
-        except:
+        except Exception:
             err.error(traceback.format_exc())
             return
 
@@ -89,28 +89,28 @@ class UnitStatus(Resource):
     def process_row(self, row, data):
         try:
             unit = row["unit"]
-        except:
+        except Exception:
             unit = ""
 
         try:
             status = row["stcode"]
-        except:
+        except Exception:
             status = ""
 
         try:
             status_time = row["stime"]
             sql_date = f"{status_time[15:19]}-{status_time[9:11]}-{status_time[12:14]} {status_time[0:8]}"
-        except:
+        except Exception:
             sql_date = "1900-01-01 00:00:00"
 
         try:
             agency = row["agency"]
-        except:
+        except Exception:
             agency = ""
 
         try:
             zone = row["zone"]
-        except:
+        except Exception:
             zone = ""
 
         try:
@@ -122,37 +122,37 @@ class UnitStatus(Resource):
                 utype = "EMS"
             else:
                 utype = "Other"
-        except:
+        except Exception:
             utype = "Other"
 
         try:
             kind = row["kind"]
-        except:
+        except Exception:
             kind = ""
 
         try:
             station = row["statn"]
-        except:
+        except Exception:
             station = ""
 
         try:
             gps_x = f"{xpos[:4]}.{xpos[4:]}"
-        except:
+        except Exception:
             gps_x = 0
 
         try:
             gps_y = f"{ypos[:2]}.{ypos[2:]}"
-        except:
+        except Exception:
             gps_y = 0
 
         try:
             callid = row["callid"]
-        except:
+        except Exception:
             callid = ""
 
         try:
             desc = row["desc"]
-        except:
+        except Exception:
             desc = ""
 
         try:
@@ -160,7 +160,7 @@ class UnitStatus(Resource):
                 name = self.f.get_unit_name(unit)
             else:
                 name = ""
-        except:
+        except Exception:
             name = ""
 
         data.append(
@@ -191,28 +191,28 @@ class UnitStatus(Resource):
         elif isinstance(spillman, dict):
             try:
                 unit = spillman.get("unit")
-            except:
+            except Exception:
                 unit = ""
 
             try:
                 status = spillman.get("stcode")
-            except:
+            except Exception:
                 status = ""
 
             try:
                 status_time = spillman.get("stime")
                 sql_date = f"{status_time[15:19]}-{status_time[9:11]}-{status_time[12:14]} {status_time[0:8]}"
-            except:
+            except Exception:
                 sql_date = "1900-01-01 00:00:00"
 
             try:
                 agency = spillman.get("agency")
-            except:
+            except Exception:
                 agency = ""
 
             try:
                 zone = spillman.get("zone")
-            except:
+            except Exception:
                 zone = ""
 
             if spillman.get("utype") == "l":
@@ -226,37 +226,37 @@ class UnitStatus(Resource):
 
             try:
                 kind = spillman.get("kind")
-            except:
+            except Exception:
                 kind = ""
 
             try:
                 station = spillman.get("statn")
-            except:
+            except Exception:
                 station = ""
 
             try:
                 gps_x = f"{xpos[:4]}.{xpos[4:]}"
-            except:
+            except Exception:
                 gps_x = 0
 
             try:
                 gps_y = f"{ypos[:2]}.{ypos[2:]}"
-            except:
+            except Exception:
                 gps_y = 0
 
             try:
                 callid = spillman.get("callid")
-            except:
+            except Exception:
                 callid = ""
 
             try:
                 desc = spillman.get("desc")
-            except:
+            except Exception:
                 desc = ""
 
             try:
                 name = self.f.get_unit_name(unit)
-            except:
+            except Exception:
                 name = ""
 
             data.append(
@@ -284,7 +284,7 @@ class UnitStatus(Resource):
                     thread = threading.Thread(target=self.process_row, args=(row, data))
                     threads.append(thread)
                     thread.start()
-                except:
+                except Exception:
                     err.error(traceback.format_exc())
                     continue
 

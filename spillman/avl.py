@@ -143,7 +143,7 @@ class Avl(Resource):
                     unit = self.f.validate_string(row.get("assgnmt", ""))
                     heading = self.f.validate_number(row.get("heading", ""))
                     speed = self.f.validate_number(row.get("speed", ""))
-                except:
+                except Exception:
                     continue
 
                 data.append(
