@@ -18,7 +18,7 @@
 import json, xmltodict, traceback, requests
 import spillman as s
 from flask_restful import Resource, request
-from flask import jsonify, abort
+from flask import abort
 from datetime import date, timedelta
 from datetime import datetime
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
@@ -136,16 +136,6 @@ class RadioLog(Resource):
                 logdate = "1900-01-01 00:00:00"
 
             try:
-                xpos = spillman.get("xpos")
-            except Exception:
-                xpos = 0
-
-            try:
-                ypos = spillman.get("ypos")
-            except Exception:
-                ypos = 0
-
-            try:
                 gps_x = f"{spillman.get('xpos')[:4]}.{spillman.get('xpos')[4:]}"
             except Exception:
                 gps_x = 0
@@ -186,11 +176,6 @@ class RadioLog(Resource):
                 description = description.replace("'", "")
             except Exception:
                 description = ""
-
-            try:
-                calltype = spillman.get("calltyp")
-            except Exception:
-                calltype = ""
 
             data.append(
                 {
@@ -256,11 +241,6 @@ class RadioLog(Resource):
                 except Exception:
                     description = ""
 
-                try:
-                    calltype = row["calltyp"]
-                except Exception:
-                    calltype = ""
-
                 data.append(
                     {
                         "call_id": callid,
@@ -299,7 +279,7 @@ class RadioLog(Resource):
 
         if (app == "" or app == "*"):
             app = "default"
-        
+
         if (uid == "" or uid == "*"):
             uid = "default"
 

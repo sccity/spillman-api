@@ -16,7 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from flask_restful import Resource, request
-from flask import jsonify, abort
+from flask import abort
 import json, xmltodict, traceback
 import requests
 import spillman as s
@@ -86,7 +86,7 @@ class Names(Resource):
                     err.error(traceback.format_exc())
                     return
 
-        except Exception as e:
+        except Exception:
             err.error(traceback.format_exc())
             return
 
@@ -312,7 +312,7 @@ class Names(Resource):
 
         if (app == "" or app == "*"):
             app = "default"
-        
+
         if (uid == "" or uid == "*"):
             uid = "default"
 

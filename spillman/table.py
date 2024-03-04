@@ -72,7 +72,7 @@ class Table(Resource):
                     err.error(traceback.format_exc())
                     return
 
-        except Exception as e:
+        except Exception:
             err.error(traceback.format_exc())
             return
 
@@ -88,7 +88,7 @@ class Table(Resource):
 
         if (app == "" or app == "*"):
             app = "default"
-        
+
         if (uid == "" or uid == "*"):
             uid = "default"
 

@@ -109,7 +109,7 @@ class Comments(Resource):
 
         if (app == "" or app == "*"):
             app = "default"
-        
+
         if (uid == "" or uid == "*"):
             uid = "default"
 

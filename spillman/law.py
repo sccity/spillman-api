@@ -18,7 +18,7 @@
 import json, xmltodict, traceback, requests
 import spillman as s
 from flask_restful import Resource, request
-from flask import jsonify, abort
+from flask import abort
 from datetime import date, timedelta
 from datetime import datetime
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
@@ -110,7 +110,7 @@ class Law(Resource):
                     err.error(traceback.format_exc())
                     return
 
-        except Exception as e:
+        except Exception:
             err.error(traceback.format_exc())
             return
 
@@ -257,7 +257,7 @@ class Law(Resource):
                 try:
                     incident_id = row["number"]
                 except Exception:
-                    incident_id
+                    incident_id = ""
 
                 try:
                     nature = row["nature"]
@@ -395,7 +395,7 @@ class Law(Resource):
 
         if (app == "" or app == "*"):
             app = "default"
-        
+
         if (uid == "" or uid == "*"):
             uid = "default"
 

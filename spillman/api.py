@@ -16,7 +16,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from flask import Flask
-from .settings import version_data
 
 
 def spillman_api():

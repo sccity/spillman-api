@@ -18,7 +18,7 @@
 import json, xmltodict, traceback, requests
 import spillman as s
 from flask_restful import Resource, request
-from flask import jsonify, abort
+from flask import abort
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from .log import SetupLogger
 from .settings import settings_data
@@ -134,7 +134,7 @@ class LawNarrative(Resource):
 
         if (app == "" or app == "*"):
             app = "default"
-        
+
         if (uid == "" or uid == "*"):
             uid = "default"
 

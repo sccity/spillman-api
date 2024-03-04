@@ -232,7 +232,7 @@ class ActiveCalls(Resource):
         city = args.get("city", default="*", type=str)
         page = args.get("page", default=1, type=int)
         limit = args.get("limit", default=100, type=int)
-        
+
         if (app == "" or app == "*"):
             app = "default"
         
