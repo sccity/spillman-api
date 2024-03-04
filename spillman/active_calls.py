@@ -221,7 +221,6 @@ class ActiveCalls(Resource):
         return paginated_data
       
     def get(self):
-        """Register a new user"""
         args = request.args
         token = args.get("token", default="", type=str)
         app = args.get("app", default="*", type=str)
@@ -233,6 +232,12 @@ class ActiveCalls(Resource):
         city = args.get("city", default="*", type=str)
         page = args.get("page", default=1, type=int)
         limit = args.get("limit", default=100, type=int)
+        
+        if (app == "" or app == "*"):
+            app = "default"
+        
+        if (uid == "" or uid == "*"):
+            uid = "default"
 
         if token == "":
             s.AuthService.audit_request(

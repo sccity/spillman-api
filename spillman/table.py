@@ -85,6 +85,12 @@ class Table(Resource):
         uid = args.get("uid", default="*", type=str)
         table = args.get("table", default="", type=str)
         rows = args.get("rows", default="*", type=str)
+        
+        if (app == "" or app == "*"):
+            app = "default"
+        
+        if (uid == "" or uid == "*"):
+            uid = "default"
 
         if token == "":
             s.AuthService.audit_request(

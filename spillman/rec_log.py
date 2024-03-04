@@ -247,6 +247,12 @@ class RecLog(Resource):
         app = args.get("app", default="*", type=str)
         uid = args.get("uid", default="*", type=str)
         cad_call_id = args.get("callid", default="*", type=str)
+        
+        if (app == "" or app == "*"):
+            app = "default"
+        
+        if (uid == "" or uid == "*"):
+            uid = "default"
 
         if token == "":
             s.AuthService.audit_request(

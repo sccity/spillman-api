@@ -170,6 +170,12 @@ class Avl(Resource):
         unit = args.get("unit", default="*", type=str)
         start = args.get("start", default="", type=str)
         end = args.get("end", default="", type=str)
+        
+        if (app == "" or app == "*"):
+            app = "default"
+        
+        if (uid == "" or uid == "*"):
+            uid = "default"
 
         if token == "":
             s.AuthService.audit_request(
