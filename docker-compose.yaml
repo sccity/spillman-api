@@ -1,14 +1,39 @@
 version: '3'
 services:
-  spillman-api:
+  spillman-api-prod:
     build:
       context: .
-      dockerfile: Dockerfile
-    image: sccity/spillman-api:static
-    container_name: spillman-api
+      dockerfile: Dockerfile-api
+    image: sccity/spillman-api:prod
+    container_name: spillman-api-prod
     ports:
-      - "8080:5000"
+      - "8888:5000"
     volumes:
-      - "$PWD/config:/app/config"
+      - "$PWD/config/prod:/app/config"
     restart: unless-stopped
     user: "1435:1435" 
+  spillman-api-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile-api
+    image: sccity/spillman-api:dev
+    container_name: spillman-api-dev
+    ports:
+      - "8889:5000"
+    volumes:
+      - "$PWD/config/dev:/app/config"
+    restart: unless-stopped
+    user: "1435:1435" 
+  spillman-api-proxy:
+    build:
+      context: .
+      dockerfile: Dockerfile-proxy
+    image: sccity/spillman-api:proxy
+    container_name: spillman-api-proxy
+    ports:
+      - "80:80"
+    volumes:
+      - "$PWD/config/nginx:/etc/nginx/conf.d"
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
