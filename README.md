@@ -11,10 +11,19 @@ The Spillman API is an attempt to modernize the Spillman DataExchange for furthe
 We highly recommend people use docker for running the Spillman API, whether you are on Windows, macOS or Linux. This assumes you have Docker and Docker Compose already installed. You may have to make some changes to work on macOS or Windows; it's been untested on these environments. This will create three microservices utilizing docker. It will create a spillman-api prod/dev instance, and a proxy server.
 ```
 cd /opt
-git clone https://github.com/sccity/spillman-api.git
-cd spillman-api
-./server.sh start
 ```
+```
+sudo git clone https://github.com/sccity/spillman-api.git
+```
+```
+cd spillman-api
+```
+**Edit your settings as described below.**
+```
+sudo ./server.sh start
+```
+
+If you are running Ubuntu, you can also use the spillman-api.service as a systemd service so you do not have to manually start/stop.
 
 ## SETTINGS
 ### Spillman DataExchange
@@ -24,24 +33,35 @@ In the config directory you will find a dev and prod folder that needs a setting
 In the config/nginx folder you will see example configuration files. They need to be renamed to just default.conf, spillman-api-dev.conf, and spillman-api-prod.conf. You only need to edit the server_name to be your hostname. If you don't want to do host based routing for the proxy server, you can only enable default.com and it can be reached via http://yourip. It is strongly recommended however to use host based routing for externally published endpoints so that you can enable SSL encryption. While this document does not cover enabling SSL, CloudFlare makes the process easy and seemless.
 
 ## BASIC COMMANDS
+
+Start the Spillman API
 ```
-# Start the Spillman API
-$ ./server.sh start
+sudo ./server.sh start
+```
 
-# Restart Spillman API (useful if things get stuck)
-$ ./server.sh restart
+Restart Spillman API (useful if things get stuck)
+```
+sudo ./server.sh restart
+```
 
-# Stop the Spillman API server (temporarily)
-$ ./server.sh stop
+Stop the Spillman API server (temporarily)
+```
+sudo ./server.sh stop
+```
 
-# Halt the Spillman API server
-$ ./server.sh down
+Halt the Spillman API server
+```
+sudo ./server.sh down
+```
 
-# Update everything to the latest version
-$ ./server.sh update
+Update everything to the latest version
+```
+sudo ./server.sh update
+```
 
-# Rebuild everything from scratch
-$ ./server.sh rebuild
+Rebuild everything from scratch
+```
+sudo ./server.sh rebuild
 ```
 
 ## PORTS USED
