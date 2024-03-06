@@ -18,7 +18,7 @@ sudo git clone https://github.com/sccity/spillman-api.git
 ```
 cd spillman-api
 ```
-Edit your settings as described below.
+**Edit your settings as described below.**
 ```
 sudo ./server.sh start
 ```
