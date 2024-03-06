@@ -1,6 +1,4 @@
-#docker build -t spillman-api .
 FROM python:3.10-alpine
-MAINTAINER Lance Haynie <lhaynie@sccity.org>
 
 ENV USER=sccity
 ENV GROUPNAME=$USER
