@@ -28,7 +28,6 @@ elif [[ $1 = "update" ]]; then
 elif [[ $1 = "shell" ]]; then
 	echo "Entering Spillman API Shell..."
 	docker exec -it spillman-api sh
-	git pull origin prod
 else
 	echo "Unkown or missing command..."
 fi
