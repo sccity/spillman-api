@@ -4,7 +4,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: sccity/spillman-api:latest
+    image: sccity/spillman-api:static
     container_name: spillman-api
     ports:
       - "8080:5000"
