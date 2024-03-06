@@ -1,0 +1,20 @@
+global:
+    loglevel: "WARNING"
+    env: "PROD"
+    port: 5000
+    smtp:
+        host: ""
+        port: 
+        user: ""
+        pass: ""
+        from: ""
+        to: ""
+spillman:
+    url: ""
+    user: ""
+    password: ""
+database:
+    schema: ""
+    user: ""
+    password: ""
+    host: ""

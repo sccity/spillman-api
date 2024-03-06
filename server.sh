@@ -2,7 +2,10 @@
 
 docker_compose="docker-compose -f docker-compose.yaml"
 
-[ -f config/settings.yaml ] || { echo "Missing settings.yaml file. Exiting."; exit 1; }
+[ -f config/dev/settings.yaml ] || { echo "Missing dev settings.yaml file. Exiting."; exit 1; }
+[ -f config/prod/settings.yaml ] || { echo "Missing prod settings.yaml file. Exiting."; exit 1; }
+[ -f config/nginx/spillman-api-dev.conf ] || { echo "Missing spillman-api-dev.conf file. Exiting."; exit 1; }
+[ -f config/nginx/spillman-api-prod.conf ] || { echo "Missing spillman-api-prod.conf file. Exiting."; exit 1; }
 
 if [[ $1 = "start" ]]; then
   echo "Starting Spillman API..."

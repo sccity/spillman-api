@@ -8,13 +8,20 @@ The Spillman API is an attempt to modernize the Spillman DataExchange for furthe
 *  Docker & Docker Compose
 
 ## INSTALL
-We highly recommend people use docker for running the Spillman API, whether you are on Windows, macOS or Linux. This assumes you have Docker and Docker Compose already installed.
+We highly recommend people use docker for running the Spillman API, whether you are on Windows, macOS or Linux. This assumes you have Docker and Docker Compose already installed. You may have to make some changes to work on macOS or Windows; it's been untested on these environments.
 ```
 cd /opt
 git clone https://github.com/sccity/spillman-api.git
 cd spillman-api
 ./server.sh start
 ```
+
+## SETTINGS
+### Spillman DataExchange
+In the config directory you will find a dev and prod folder that needs a settings.yaml. There is an example in each called settings.yaml.example. You will notice there are smtp, spillman, and database settings. The smtp settings are for error reporting outside of file logging. The spillman settings are for your specific install of the DataExchange. It should look like https://yourserver/DataExchange/REST. The prod folder should point to your production Spillman DataExchange, and the dev folder should point to your dev/practice DataExchange. Finally, the database settings are for tokens and audit trail data.
+
+### Proxy Server
+In the config/nginx folder you will see example configuration files. They need to be renamed to just default.conf, spillman-api-dev.conf, and spillman-api-prod.conf. You only need to edit the server_name to be your hostname. If you don't want to do host based routing for the proxy server, you can only enable default.com and it can be reached via http://yourip. It is strongly recommended however to use host based routing for externally published endpoints so that you can enable SSL encryption. While this document does not cover enabling SSL, CloudFlare makes the process easy and seemless.
 
 ## BASIC COMMANDS
 ```
@@ -37,8 +44,10 @@ $ ./server.sh update
 $ ./server.sh rebuild
 ```
 
-## SETTINGS
-In the settings.yaml file you will notice there are smtp, spillman, and database settings. The smtp settings are for error reporting outside of file logging. The spillman settings are for your specific install of the DataExchange. It should look like https://yourserver/DataExchange/REST. Finally, the database settings are for tokens and audit trail data.
+## PORTS USED
+80: Proxy Server
+8888: Spillman API Production
+8889: Spillman API Development
 
 ## LICENSE
 Copyright (c) Santa Clara City UT\
