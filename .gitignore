@@ -2,6 +2,8 @@
 nohup.out
 settings.yaml
 venv/
+.dockerignore
+Dockerfile.*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

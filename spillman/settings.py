@@ -17,7 +17,7 @@
 # limitations under the License.
 import os, sys, yaml
 
-settings_file = "./spillman/settings.yaml"
+settings_file = "./config/settings.yaml"
 if not os.path.exists(settings_file):
     print("settings.yaml not found!")
     sys.exit()

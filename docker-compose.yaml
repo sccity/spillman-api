@@ -1,0 +1,14 @@
+version: '3'
+services:
+  spillman-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: spillman-api/webapp:spillman-api
+    container_name: spillman-api
+    ports:
+      - "8080:5000"
+    volumes:
+      - "$PWD/config:/app/config"
+    restart: unless-stopped
+    user: "1435:1435" 

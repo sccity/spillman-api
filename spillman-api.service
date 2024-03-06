@@ -3,8 +3,9 @@ Description=Spillman API
 After=syslog.target network.target
 
 [Service]
-WorkingDirectory=/opt/spillman-api/prod
-ExecStart=/opt/spillman-api/prod/venv/bin/python3 /opt/spillman-api/prod/app.py
+WorkingDirectory=/opt/spillman-api
+ExecStart=/bin/bash -c "docker-compose -f /opt/spillman-api/docker-compose.yaml up"
+ExecStop=/bin/bash -c "docker-compose -f /opt/spillman-api/docker-compose.yaml stop"
 
 Restart=always
 RestartSec=120

@@ -1,5 +1,7 @@
 global:
     loglevel: "DEBUG"
+    env: "DEV"
+    port: 5000
     smtp:
         host: ""
         port: 

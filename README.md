@@ -5,28 +5,40 @@ The Spillman API is an attempt to modernize the Spillman DataExchange for furthe
 ## REQUIREMENTS
 *  Spillman server with proper access rights & DataExchange enabled.
 *  A MySQL/MariaDB database with proper access rights. Currently, we are using Amazon AWS RDS.
-*  Python 3.7+.
-*  AWS Elastic Beanstalk.
-
-This project is still in the early development phase and we will update this document accordingly as required.
+*  Docker & Docker Compose
 
 ## INSTALL
-run: python3 -m venv venv && source venv/bin/activate\
-run: pip install -r requirements.txt
+We highly recommend people use docker for running the Spillman API, whether you are on Windows, macOS or Linux. This assumes you have Docker and Docker Compose already installed.
+```
+cd /opt
+git clone https://github.com/sccity/spillman-api.git
+cd spillman-api
+./server.sh start
+```
 
-Rename example.settings.yaml to settings.yaml and update with your credentials and information
-Test that everything is working with python3 app.py
-The following commands are specific to Elastic Beanstalk, eb init will ask a few questions that will be specific to your environment
+## BASIC COMMANDS
+```
+# Start the Spillman API
+$ ./server.sh start
 
-run: eb init\
-run: eb create\
-run: eb deploy
+# Restart Spillman API (useful if things get stuck)
+$ ./server.sh restart
+
+# Stop the Spillman API server (temporarily)
+$ ./server.sh stop
+
+# Halt the Spillman API server
+$ ./server.sh down
+
+# Update everything to the latest version
+$ ./server.sh update
+
+# Rebuild everything from scratch
+$ ./server.sh rebuild
+```
 
 ## SETTINGS
 In the settings.yaml file you will notice there are smtp, spillman, and database settings. The smtp settings are for error reporting outside of file logging. The spillman settings are for your specific install of the DataExchange. It should look like https://yourserver/DataExchange/REST. Finally, the database settings are for tokens and audit trail data.
-
-## USAGE
-Will update this section soon!
 
 ## LICENSE
 Copyright (c) Santa Clara City UT\
