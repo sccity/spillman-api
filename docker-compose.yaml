@@ -6,6 +6,8 @@ services:
       dockerfile: Dockerfile-api
     image: sccity/spillman-api:prod
     container_name: spillman-api-prod
+    environment:
+      - TZ=America/Denver
     ports:
       - "8888:5000"
     volumes:
@@ -18,6 +20,8 @@ services:
       dockerfile: Dockerfile-api
     image: sccity/spillman-api:dev
     container_name: spillman-api-dev
+    environment:
+      - TZ=America/Denver
     ports:
       - "8889:5000"
     volumes:
@@ -30,8 +34,10 @@ services:
       dockerfile: Dockerfile-proxy
     image: sccity/spillman-api:proxy
     container_name: spillman-api-proxy
+    environment:
+      - TZ=America/Denver
     ports:
-      - "80:80"
+      - "8080:80"
     volumes:
       - "$PWD/config/nginx:/etc/nginx/conf.d"
     restart: unless-stopped
