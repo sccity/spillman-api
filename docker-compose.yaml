@@ -37,7 +37,7 @@ services:
     environment:
       - TZ=America/Denver
     ports:
-      - "8080:80"
+      - "80:80"
     volumes:
       - "$PWD/config/nginx:/etc/nginx/conf.d"
     restart: unless-stopped
