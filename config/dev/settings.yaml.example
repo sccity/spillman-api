@@ -1,6 +1,7 @@
 global:
     loglevel: "DEBUG"
     env: "DEV"
+    jira-log-api: ""
     port: 5000
     smtp:
         host: ""
