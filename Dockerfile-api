@@ -21,5 +21,5 @@ COPY . /app
 RUN chown -R sccity:sccity /app && chmod -R 775 /app
 USER sccity
 EXPOSE 5000
-HEALTHCHECK --interval=30s --timeout=5s CMD curl -f http://localhost:5000/ || exit 1
+HEALTHCHECK --interval=30s --timeout=5s CMD timeout 10s bash -c ':> /dev/tcp/127.0.0.1/5000' || exit 1
 CMD ["python", "app.py"]
