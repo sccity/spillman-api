@@ -1,4 +1,4 @@
-FROM python:3.10-alpine
+FROM python:3.11-slim-bookworm
 ENV USER=sccity
 ENV GROUPNAME=$USER
 ENV UID=1435
