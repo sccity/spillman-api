@@ -39,8 +39,8 @@ services:
     ports:
       - "80:80"
     volumes:
-      - "/etc/sccity/spillman-api-proxy-prod.conf:/app/config/nginx/default.conf:ro"
-      - "/etc/sccity/spillman-api-proxy-dev.conf:/app/config/nginx/spillman-api-proxy-dev.conf:ro"
+      - "/etc/sccity/spillman-api-proxy-prod.conf:/etc/nginx/conf.d/default.conf:ro"
+      - "/etc/sccity/spillman-api-proxy-dev.conf:/etc/nginx/conf.d/spillman-api-proxy-dev.conf:ro"
     restart: unless-stopped
     extra_hosts:
       - "host.docker.internal:host-gateway"
