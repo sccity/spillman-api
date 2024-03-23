@@ -16,11 +16,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # from spillman.api import create_app
-import os, sys
-from dotenv import load_dotenv
-
-load_dotenv()
-
 from flask import jsonify
 from flask_restful import Api
 import spillman as s
