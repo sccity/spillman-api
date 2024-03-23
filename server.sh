@@ -1,6 +1,6 @@
 #!/bin/bash
 
-docker_compose="docker-compose -f docker-compose.yaml"
+docker_compose="docker-compose -f docker-compose.yml"
 
 [ -f config/dev/settings.yaml ] || { echo "Missing dev settings.yaml file. Exiting."; exit 1; }
 [ -f config/prod/settings.yaml ] || { echo "Missing prod settings.yaml file. Exiting."; exit 1; }

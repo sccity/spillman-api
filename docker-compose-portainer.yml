@@ -1,0 +1,46 @@
+version: '3'
+services:
+  spillman-api-prod:
+    build:
+      context: .
+      dockerfile: Dockerfile-api
+    image: sccity/spillman-api:prod
+    container_name: spillman-api-prod
+    environment:
+      - TZ=America/Denver
+    ports:
+      - "8888:5000"
+    volumes:
+      - "/etc/sccity/spillman-api-prod.yaml:/app/config/prod/settings.yaml"
+    restart: unless-stopped
+    user: "1435:1435" 
+  spillman-api-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile-api
+    image: sccity/spillman-api:dev
+    container_name: spillman-api-dev
+    environment:
+      - TZ=America/Denver
+    ports:
+      - "8889:5000"
+    volumes:
+      - "/etc/sccity/spillman-api-dev.yaml:/app/config/dev/settings.yaml"
+    restart: unless-stopped
+    user: "1435:1435" 
+  spillman-api-proxy:
+    build:
+      context: .
+      dockerfile: Dockerfile-proxy
+    image: sccity/spillman-api:proxy
+    container_name: spillman-api-proxy
+    environment:
+      - TZ=America/Denver
+    ports:
+      - "80:80"
+    volumes:
+      - "/etc/sccity/spillman-api-proxy-prod.conf:/app/config/nginx/default.conf"
+      - "/etc/sccity/spillman-api-proxy-dev.conf:/app/config/nginx/spillman-api-proxy-dev.conf"
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
