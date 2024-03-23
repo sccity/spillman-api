@@ -11,7 +11,7 @@ services:
     ports:
       - "8888:5000"
     volumes:
-      - "/etc/sccity/spillman-api-prod.yaml:/app/config/prod/settings.yaml"
+      - "/etc/sccity/spillman-api-prod.yaml:/app/config/prod/settings.yaml:ro"
     restart: unless-stopped
     user: "1435:1435" 
   spillman-api-dev:
@@ -25,7 +25,7 @@ services:
     ports:
       - "8889:5000"
     volumes:
-      - "/etc/sccity/spillman-api-dev.yaml:/app/config/dev/settings.yaml"
+      - "/etc/sccity/spillman-api-dev.yaml:/app/config/dev/settings.yaml:ro"
     restart: unless-stopped
     user: "1435:1435" 
   spillman-api-proxy:
@@ -39,8 +39,8 @@ services:
     ports:
       - "80:80"
     volumes:
-      - "/etc/sccity/spillman-api-proxy-prod.conf:/app/config/nginx/default.conf"
-      - "/etc/sccity/spillman-api-proxy-dev.conf:/app/config/nginx/spillman-api-proxy-dev.conf"
+      - "/etc/sccity/spillman-api-proxy-prod.conf:/app/config/nginx/default.conf:ro"
+      - "/etc/sccity/spillman-api-proxy-dev.conf:/app/config/nginx/spillman-api-proxy-dev.conf:ro"
     restart: unless-stopped
     extra_hosts:
       - "host.docker.internal:host-gateway"
