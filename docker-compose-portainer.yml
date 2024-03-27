@@ -14,6 +14,11 @@ services:
       - "/etc/sccity/spillman-api-prod.yaml:/app/config/settings.yaml:ro"
     restart: unless-stopped
     user: "1435:1435" 
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
   spillman-api-dev:
     build:
       context: .
@@ -28,6 +33,11 @@ services:
       - "/etc/sccity/spillman-api-dev.yaml:/app/config/settings.yaml:ro"
     restart: unless-stopped
     user: "1435:1435" 
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
   spillman-api-proxy:
     build:
       context: .
@@ -44,3 +54,8 @@ services:
     restart: unless-stopped
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
