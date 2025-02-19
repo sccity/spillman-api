@@ -10,7 +10,8 @@ withCredentials([usernamePassword(credentialsId: 'git', usernameVariable: 'GIT_U
 
     commit_hash=$(git rev-parse --short HEAD)
 
-    yq -iY '.version = "$commit_hash-$branch"' spillman/version.yaml
+    version_str=$commit_hash-$branch
+    yq -iY '.version = "'"$version_str"'"' spillman/version.yaml
 
     echo "Branch: ${branch} - Commit Hash: $commit_hash"
 
