@@ -10,7 +10,7 @@ withCredentials([usernamePassword(credentialsId: 'docker-hub', usernameVariable:
         exit 1
     fi
 
-    sed -i 's/"version": "[^"]*"/"version": "'"$commit_hash"'"/' spillman/version.yaml
+    yq -iY '.version = "$commit_hash"' spillman/version.yaml
 
     echo "Using Commit Hash: $commit_hash for Docker build"
     echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
