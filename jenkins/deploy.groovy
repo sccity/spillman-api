@@ -21,8 +21,8 @@ withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
 
     ./kubectl get deployments -n $namespace
 
-    ./kubectl set image deployment/$DEPLOYMENT \
-        $container=$image:$commit_hash-$branch \
+    ./kubectl set image "deployment/$DEPLOYMENT" \
+        "$container=$image:$commit_hash-$branch" \
         --kubeconfig=$KUBECONFIG -n $namespace
 
     if [ $? -ne 0 ]; then
