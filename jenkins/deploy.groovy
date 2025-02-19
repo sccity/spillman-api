@@ -3,9 +3,9 @@ withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
     commit_hash=$(cat commit_hash.txt)
     branch=$(cat branch.txt)
 
-    namespace=spillman
-    container=spillman-api
-    image=sccity/spillman-api
+    namespace="spillman"
+    container="spillman-api"
+    image="sccity/spillman-api"
 
     if [ "$branch" = "dev" ]; then
         DEPLOYMENT="spillman-api-dev"
