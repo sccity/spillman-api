@@ -21,9 +21,10 @@ withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
 
     ./kubectl get deployments -n $namespace
 
-    ./kubectl -n $namespace --kubeconfig $KUBECONFIG \
+    ./kubectl --kubeconfig $KUBECONFIG \
         set image deployment/$DEPLOYMENT \
-        $container=$image:$commit_hash-$branch
+        $container=$image:$commit_hash-$branch \
+        -n $namespace
 
     if [ $? -ne 0 ]; then
         echo "Error: Kubernetes Update Failed!"
@@ -31,7 +32,8 @@ withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
     fi
 
     ./kubectl -n $namespace --kubeconfig $KUBECONFIG \
-        rollout status deployment/$DEPLOYMENT
+        rollout status deployment/$DEPLOYMENT \
+        -n $namespace
 
     if [ $? -ne 0 ]; then
         echo "Error: Kubernetes Rollout Failed!"
