@@ -30,6 +30,10 @@ elif len(sys.argv) == 2:
     args = sys.argv
     arg1 = sys.argv[1]
 
+else:
+    args = ""
+    arg1 = ""
+
 app = s.spillman_api()
 api = Api(app)
 
