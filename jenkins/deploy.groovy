@@ -21,10 +21,9 @@ withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
 
     ./kubectl get deployments -n $namespace
 
-    ./kubectl --kubeconfig $KUBECONFIG \
-        set image deployment/$DEPLOYMENT \
+    ./kubectl set image deployment/$DEPLOYMENT \
         $container=$image:$commit_hash-$branch \
-        -n $namespace
+        --kubeconfig=$KUBECONFIG -n $namespace
 
     if [ $? -ne 0 ]; then
         echo "Error: Kubernetes Update Failed!"
