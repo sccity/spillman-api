@@ -8,7 +8,7 @@ kind: Pod
 spec:
   containers:
     - name: jnlp
-      image: sccity/jenkins-agent-python:0.0.6
+      image: sccity/jenkins-agent-python:0.0.5
       volumeMounts:
         - name: workspace-volume
           mountPath: /home/jenkins/agent
