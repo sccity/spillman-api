@@ -19,11 +19,9 @@ withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
     curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
     chmod +x kubectl
 
-    echo "KUBECONFIG: $(env KUBECONFIG)"
-
     ./kubectl get deployments -n $namespace
 
-    ./kubectl --kubeconfig=$KUBECONFIG -n $namespace \
+    ./kubectl -n $namespace \
         set image "deployment/$DEPLOYMENT" \
         "$container=$image:$commit_hash-$branch"
 
@@ -32,7 +30,7 @@ withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
         exit 1
     fi
 
-    ./kubectl -n $namespace --kubeconfig $KUBECONFIG \
+    ./kubectl -n $namespace \
         rollout status deployment/$DEPLOYMENT \
         -n $namespace
 
