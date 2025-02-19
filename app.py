@@ -16,11 +16,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # from spillman.api import create_app
+import os, sys
 from flask import jsonify
 from flask_restful import Api
 import spillman as s
 from spillman.settings import settings_data, version_data
 from flask_swagger_ui import get_swaggerui_blueprint
+
+if len(sys.argv) == 1:
+    args = sys.argv
+
+elif len(sys.argv) == 2:
+    args = sys.argv
+    arg1 = sys.argv[1]
 
 app = s.spillman_api()
 api = Api(app)
@@ -77,6 +85,10 @@ api.add_resource(s.Table, "/spillman/table")
 api.add_resource(s.TableList, "/spillman/table/list")
 api.add_resource(s.UnitStatus, "/spillman/unit/status")
 api.add_resource(s.Units, "/spillman/unit")
+
+if arg1.lower() == "--check-config":
+    print("Just making sure everything works!")
+    exit(0)
 
 if __name__ == "__main__":
     from waitress import serve
