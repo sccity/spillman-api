@@ -10,6 +10,8 @@ withCredentials([usernamePassword(credentialsId: 'git', usernameVariable: 'GIT_U
 
     commit_hash=$(git rev-parse --short HEAD)
 
+    yq -iY '.version = "$commit_hash-$branch"' spillman/version.yaml
+
     echo "Branch: ${branch} - Commit Hash: $commit_hash"
 
     git config --global user.email "jenkins@email.santaclarautah.gov"
