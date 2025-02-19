@@ -25,6 +25,7 @@ from flask_swagger_ui import get_swaggerui_blueprint
 
 if len(sys.argv) == 1:
     args = sys.argv
+    arg1 = ""
 
 elif len(sys.argv) == 2:
     args = sys.argv
