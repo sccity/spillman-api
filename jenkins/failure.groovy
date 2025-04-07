@@ -1,7 +1,7 @@
 script {
     def logLines = currentBuild.rawBuild.getLog(100).join('\n')
     emailext(
-        to: 'lhaynie@santaclarautah.gov, rlevsey@santaclarautah.gov',
+        to: 'devops@santaclaracity.atlassian.net',
         subject: "Build Failed: ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}",
         body: """
             <strong>Project:</strong> ${env.JOB_NAME}<br>
